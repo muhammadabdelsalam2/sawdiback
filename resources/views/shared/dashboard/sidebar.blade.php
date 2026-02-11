@@ -1,7 +1,13 @@
 <!-- Sidebar -->
 <aside id="sidebar">
+    @php
+        $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
+        $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
+        $activeLocale = $currentLocale ?? app()->getLocale();
+    @endphp
     <nav class="sidebar-nav mt-4">
-        <a href="#" class="nav-item active">
+        <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}"
+            class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
             <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
             <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
         </a>
@@ -85,10 +91,18 @@
     </nav>
 
     <div class="sidebar-bottom">
-        <a href="#" class="nav-item">
-            <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
-            <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
-        </a>
+        @can('roles.manage')
+            <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
+                class="nav-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
+                <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
+            </a>
+            <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}"
+                class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
+                <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
+                <span class="nav-label">User Management</span>
+            </a>
+        @endcan
         <!-- Link-style logout -->
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
             class="nav-item d-flex align-items-center">

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -37,7 +36,12 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', ['locale' => $locale]));
+        $user = $request->user();
+        $defaultRoute = $user->hasRole('SuperAdmin')
+            ? route('superadmin.dashboard', ['locale' => $locale])
+            : route('dashboard', ['locale' => $locale]);
+
+        return redirect()->intended($defaultRoute);
     }
 
     public function logout(Request $request, $locale)
@@ -46,7 +50,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login.submit', ['locale' => $locale]); // redirect to login page after logout
+        return redirect()->route('login.form', ['locale' => $locale]);
     }
 
 }
