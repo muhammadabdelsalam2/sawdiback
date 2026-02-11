@@ -1,0 +1,55 @@
+ @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+ :root {
+     --primary-green: #234C14;
+     --light-green: #E9EDE7;
+     --bg-light: #FCFCFD;
+     --border-gray: #E6E6E6;
+     --text-dark: #1A1A1A;
+     --text-gray: #666666;
+     --text-muted: #161616;
+     --search-bg: #E9EDE7;
+     --search-border: rgba(22, 22, 22, 0.1);
+     --search-icon-bg: rgba(22, 22, 22, 0.1);
+
+     /* Shadows as requested */
+     --card-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05),
+         0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+
+     --font-main: 'Inter', sans-serif;
+ }
+
+ @font-face {
+     font-family: 'Cairo';
+     src: url('{{ asset("assets/fonts/cairo/Cairo-Regular.woff2") }}') format('woff2'),
+     url('{{ asset("assets/fonts/cairo/Cairo-Regular.ttf") }}') format('truetype');
+     font-weight: 400;
+     font-style: normal;
+ }
+
+ @font-face {
+     font-family: 'Cairo';
+     src: url('{{ asset("assets/fonts/cairo/Cairo-Bold.woff2") }}') format('woff2'),
+     url('{{ asset("assets/fonts/cairo/Cairo-Bold.ttf") }}') format('truetype');
+     font-weight: 700;
+     font-style: normal;
+ }
+
+ html[lang="ar"] {
+     font-family: 'Cairo', sans-serif;
+ }
+
+ html[lang="en"] {
+     font-family: 'Inter', sans-serif;
+ }
+
+ :root {
+     --brand-green: #2D5A27;
+     --soft-bg: #F8FAF8;
+ }
+
+ body {
+     font-family: 'Inter', sans-serif;
+     color: #2d3436;
+     background-color: #fff;
+ }

@@ -1,0 +1,72 @@
+<?php
+return [
+    'sidebar' => [
+        'dashboard' => 'لوحة التحكم',
+        'livestock' => 'إدارة الماشية',
+        'animal_registry' => 'سجل الحيوانات',
+        'health_vax' => 'الصحة والتطعيمات',
+        'breeding_cycles' => 'دورات التربية',
+        'production' => 'الإنتاج',
+        'crops_feed' => 'المحاصيل والأعلاف',
+        'inventory' => 'المخزون',
+        'sales_distribution' => 'المبيعات والتوزيع',
+        'procurement' => 'المشتريات',
+        'finance' => 'المالية',
+        'hr_management' => 'إدارة الموارد البشرية',
+        'maintenance' => 'الصيانة',
+        'system_settings' => 'إعدادات النظام',
+        'logout' => 'تسجيل الخروج',
+    ],
+
+    'overview_title' => 'نظرة عامة على لوحة التحكم',
+    'overview_desc' => 'نظام إدارة مزرعة السوايدي',
+    'last_30_days' => 'آخر 30 يومًا',
+
+    'stats' => [
+        'total_livestock' => 'إجمالي الثروة الحيوانية',
+        'heads' => 'رؤوس',
+        'new_born' => 'مولود جديد',
+        'daily_milk_yield' => 'إنتاج الحليب اليومي',
+        'liters' => 'لتر',
+        'vs_last_month' => 'مقابل الشهر الماضي',
+        'feed_inventory' => 'جرد الأعلاف',
+        'tons' => 'طن',
+        'low_stock_alert' => 'تنبيه انخفاض المخزون',
+        'average_profit_daily' => 'متوسط الربح (يومي)',
+        'aed' => 'درهم',
+    ],
+
+    'charts' => [
+        'daily_production_performance' => 'أداء الإنتاج اليومي',
+        'actual_vs_target' => 'الإنتاج الفعلي مقابل الهدف اليومي (لتر)',
+        'herd_composition_status' => 'حالة تكوين القطيع',
+        'distribution_by_stage' => 'التوزيع حسب مرحلة دورة الحياة',
+        'profitability_cost_center' => 'الربحية حسب مركز التكلفة',
+        'net_profit_margin' => 'تحليل صافي الربح والهامش حسب الأقسام',
+    ],
+
+    'alerts' => [
+        'critical_alerts' => 'تنبيهات حرجة',
+        'urgent_health_stock' => 'مشاكل عاجلة في الصحة والمخزون',
+        'low_feed_stock' => 'انخفاض مخزون الأعلاف (خليط الذرة)',
+        'warehouse_c_only_2_tons' => 'المستودع C • تبقى فقط 2 طن',
+        'vaccination_overdue' => 'تأخير التطعيم (FMD)',
+        'group_b_3_days_late' => 'المجموعة B (الأبقار الصغيرة) • متأخر 3 أيام',
+        'machinery_maintenance' => 'صيانة المعدات...',
+        'tractor_oil_filter_change' => 'الجرار T-5 • تغيير الزيت والفلاتر',
+        'high_scc_detected' => 'ارتفاع مؤشر SCC',
+        'tank2_quality_risk' => 'الخزان 2 • خطر الجودة (>400k)',
+        'urgent' => 'عاجل',
+        'warning' => 'تنبيه',
+        'active_sales_orders' => 'طلبات المبيعات النشطة',
+        'pending_approvals_processing' => 'في انتظار الموافقات والمعالجة',
+        'todays_operations' => 'عمليات اليوم',
+        'visits_maintenance_logistics' => 'الزيارات والصيانة واللوجستيات',
+    ],
+
+    'buttons' => [
+        'view_all' => 'عرض الكل',
+    ],
+
+    'last_updated' => 'آخر تحديث',
+];
