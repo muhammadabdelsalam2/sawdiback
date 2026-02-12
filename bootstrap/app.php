@@ -31,7 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Append MiidleWare
         $middleware->alias([
             'set.locale' => SetLocale::class,
-            'auth' => Authenticate::class
+            'auth' => Authenticate::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
