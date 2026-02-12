@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -14,15 +12,23 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-
-        User::updateOrCreate(
-            ['email' => 'admin@elsawady.com'], // البريد الثابت لتسجيل الدخول
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'admin@elsawady.com'],
             [
-                'name' => 'Admin',
-                'email' => 'admin@elsawady.com',
-                'password' => Hash::make('password123'), // كلمة المرور
+                'name' => 'Super Admin',
+                'password' => 'password123',
             ]
         );
+
+        $customer = User::updateOrCreate(
+            ['email' => 'customer@elsawady.com'],
+            [
+                'name' => 'Default Customer',
+                'password' => 'password123',
+            ]
+        );
+
+        $superAdmin->syncRoles(['SuperAdmin']);
+        $customer->syncRoles(['Customer']);
     }
 }
