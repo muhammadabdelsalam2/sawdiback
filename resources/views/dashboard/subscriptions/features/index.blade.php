@@ -55,7 +55,7 @@
                     @endforelse
                 </tbody>
             </table>
-            {{ $features->links() }}
+            {{ $features->links('pagination::bootstrap-5') }}
         </div>
     </div>
 @endsection

@@ -51,7 +51,7 @@
                     @endforelse
                 </tbody>
             </table>
-            {{ $subscriptions->links() }}
+           {{ $subscriptions->links('pagination::bootstrap-5') }}
         </div>
     </div>
 @endsection
