@@ -82,6 +82,18 @@
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
         </div>
+        <div class="nav-dropdown">
+              <a href="{{ route('superadmin.plans.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}" class="nav-item">
+            <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
+            <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
+        </a>
+        </div>
+        <div class="nav-dropdown">
+              <a href="{{ route('superadmin.subscriptions.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}" class="nav-item">
+            <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon">
+            <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
+        </a>
+        </div>
     </nav>
 
     <div class="sidebar-bottom">
