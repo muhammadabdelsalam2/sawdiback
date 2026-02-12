@@ -15,6 +15,9 @@ return [
         'hr_management' => 'إدارة الموارد البشرية',
         'maintenance' => 'الصيانة',
         'system_settings' => 'إعدادات النظام',
+        'subscriptions' => 'الاشتراكات ',
+        'plans' => 'الباقات',
+        'features' => 'الميزات',
         'logout' => 'تسجيل الخروج',
     ],
 

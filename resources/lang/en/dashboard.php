@@ -15,6 +15,9 @@ return [
         'hr_management' => 'HR Management',
         'maintenance' => 'Maintenance',
         'system_settings' => 'System Settings',
+        'subscriptions' => 'Subscriptions ',
+        'plans' => 'Plans',
+        'features' => 'Features',
         'logout' => 'Logout',
     ],
 

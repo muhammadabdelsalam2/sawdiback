@@ -88,7 +88,26 @@
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
         </div>
-    </nav>
+     @role('SuperAdmin')
+
+<div class="nav-dropdown">
+    <a href="{{ route('superadmin.plans.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
+        class="nav-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
+        <i class="bi bi-gem nav-icon"></i>
+        <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
+    </a>
+</div>
+
+<div class="nav-dropdown">
+    <a href="{{ route('superadmin.subscriptions.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
+        class="nav-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
+        <i class="bi bi-arrow-repeat nav-icon"></i>
+        <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
+    </a>
+</div>
+
+@endrole
+
 
     <div class="sidebar-bottom">
         @can('roles.manage')
