@@ -1,4 +1,5 @@
 <?php
+
 return [
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
@@ -15,6 +16,11 @@ return [
         'hr_management' => 'إدارة الموارد البشرية',
         'maintenance' => 'الصيانة',
         'system_settings' => 'إعدادات النظام',
+
+        'countries' => 'الدول',
+        'cities' => 'المدن',
+        'theme' => 'الثيم',
+
         'logout' => 'تسجيل الخروج',
     ],
 
