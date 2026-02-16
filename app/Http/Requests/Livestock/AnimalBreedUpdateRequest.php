@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Http\Requests\Livestock;
+
+use App\Models\AnimalBreed;
+use Illuminate\Validation\Rule;
+
+class AnimalBreedUpdateRequest extends BaseLivestockRequest
+{
+    public function rules(): array
+    {
+        $tenantId = $this->tenantId();
+        /** @var AnimalBreed|null $breed */
+        $breed = $this->route('breed');
+
+        return [
+            'species_id' => ['required', 'integer', Rule::exists('animal_species', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('animal_breeds', 'name')
+                    ->where(fn ($q) => $q->where('tenant_id', $tenantId)->where('species_id', $this->input('species_id')))
+                    ->ignore($breed?->id),
+            ],
+        ];
+    }
+}

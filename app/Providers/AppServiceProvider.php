@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Tenant;
+use App\Models\LivestockAnimal;
+use App\Observers\LivestockAnimalObserver;
 use App\Observers\TenantObserver;
 use App\Repositories\Contracts\PlanRepositoryInterface;
 use App\Repositories\PlanRepository;
@@ -38,5 +40,6 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
         Tenant::observe(TenantObserver::class);
+        LivestockAnimal::observe(LivestockAnimalObserver::class);
     }
 }
