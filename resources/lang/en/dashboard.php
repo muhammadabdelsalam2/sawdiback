@@ -1,4 +1,5 @@
 <?php
+
 return [
     'sidebar' => [
         'dashboard' => 'Dashboard',
@@ -18,12 +19,19 @@ return [
         'subscriptions' => 'Subscriptions ',
         'plans' => 'Plans',
         'features' => 'Features',
+
+        // ✅ Added for Settings submenu (MVP)
+        'countries' => 'Countries',
+        'cities' => 'Cities',
+        'theme' => 'Theme',
+
         'logout' => 'Logout',
     ],
 
     'overview_title' => 'Dashboard Overview',
     'overview_desc' => 'Al-Sawadi Farm Management System',
     'last_30_days' => 'Last 30 Days',
+
     'stats' => [
         'total_livestock' => 'Total Livestock',
         'heads' => 'Heads',
@@ -37,6 +45,7 @@ return [
         'average_profit_daily' => 'Average Profit (Daily)',
         'aed' => 'AED',
     ],
+
     'charts' => [
         'daily_production_performance' => 'Daily Production Performance',
         'actual_vs_target' => 'Actual Yield vs. Daily Target (Liters)',
@@ -45,6 +54,7 @@ return [
         'profitability_cost_center' => 'Profitability by Cost Center',
         'net_profit_margin' => 'Net profit & margin analysis across departments',
     ],
+
     'alerts' => [
         'critical_alerts' => 'Critical Alerts',
         'urgent_health_stock' => 'Urgent health & stock issues',
@@ -63,9 +73,11 @@ return [
         'todays_operations' => "Today's Operations",
         'visits_maintenance_logistics' => 'Visits, Maintenance & Logistics',
     ],
+
     'buttons' => [
         'view_all' => 'View All',
     ],
+
     'last_updated' => 'Last Updated',
     // Empty State / No Plan
     'no_plan_title' => 'You don’t have an active plan',

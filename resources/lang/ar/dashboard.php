@@ -1,4 +1,5 @@
 <?php
+
 return [
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
@@ -18,6 +19,11 @@ return [
         'subscriptions' => 'الاشتراكات ',
         'plans' => 'الباقات',
         'features' => 'الميزات',
+
+        'countries' => 'الدول',
+        'cities' => 'المدن',
+        'theme' => 'الثيم',
+
         'logout' => 'تسجيل الخروج',
     ],
 

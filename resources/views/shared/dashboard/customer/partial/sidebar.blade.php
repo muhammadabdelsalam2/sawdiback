@@ -6,6 +6,7 @@
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
     @endphp
+
     {{-- You Can Start Get Features About Current Subscription Plan auth()->user()->planFeatures() --}}
     <nav class="sidebar-nav mt-4">
 
@@ -143,16 +144,20 @@
                 <span class="nav-label">User Management</span>
             </a>
 
+
         @endcan
 
         {{-- Logout --}}
-        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+        <a href="#"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
             class="nav-item d-flex align-items-center">
             <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
             <span class="nav-label">{{ __('dashboard.sidebar.logout') }}</span>
         </a>
 
-        <form id="logout-form" action="{{ route('logout', $currentLocale) }}" method="POST" class="d-none">
+        <!-- Hidden logout form -->
+        <form id="logout-form" action="{{ route('logout', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
+            method="POST" class="d-none">
             @csrf
         </form>
 
