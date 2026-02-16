@@ -16,6 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__ . '/../routes/web.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware('web')->group(function () {
+                foreach (glob(base_path('routes/web/*.php')) as $file) {
+                    require $file; // ✅ actually load the route files
+                }
+            });
+        }
+
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(function (Request $request): string {

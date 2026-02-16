@@ -16,7 +16,6 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-
         $lang_country = $request->route('locale'); // e.g., "en-SA"
 
         // Validate locale pattern
@@ -30,31 +29,43 @@ class SetLocale
         app()->setLocale($lang);
         session(['locale' => $lang, 'locale_full' => $lang_country]);
 
-        // Map country to currency
+        // Map country to currency code
         $currencyMap = [
             'SA' => 'SAR',
             'EG' => 'EGP',
         ];
 
         $currencyCode = $currencyMap[$country] ?? 'SAR';
-        $request->localeData = [
-            'currentLocale' => session('locale_full', 'en-SA'),
-            'currentLang' => $lang,
-            'currentCurrency' => session('currency', 'USD'),
-            'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
-        ];
-        // Fetch currency from DB
-        $currency = Currency::where('code', $currencyCode)->first();
+
+        // Fetch currency from DB dynamically
+        $currency = Currency::where('symbol', $currencyCode)
+            ->orderBy('is_default', 'desc') // optional, default currency first
+            ->first();
+
         if ($currency) {
-            session(['currency' => $currency]);
+            session([
+                'currency' => $currency->toArray(), // full currency info
+                'currency_id' => $currency->id,     // store currency_id for models
+            ]);
         } else {
+            // fallback if not found
             session([
                 'currency' => [
                     'code' => $currencyCode,
                     'symbol' => $currencyCode,
-                ]
+                ],
+                'currency_id' => null,
             ]);
         }
+
+        // Extra locale data for views
+        $request->localeData = [
+            'currentLocale' => session('locale_full', 'en-SA'),
+            'currentLang' => $lang,
+            'currentCurrency' => session('currency', ['code' => 'USD', 'symbol' => '$']),
+            'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
+        ];
+
         return $next($request);
     }
 }

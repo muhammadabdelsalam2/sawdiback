@@ -22,13 +22,18 @@
     @stack('styles')
 </head>
 
-<body  dir="{{ $direction }}">
+<body dir="{{ $direction }}">
 
     @include('shared.dashboard.navbar')
 
     <main>
         <div class="wrapper grow w-100">
-            @include('shared.dashboard.sidebar')
+            @if (auth()?->user()->hasRole('SuperAdmin'))
+                @include('shared.dashboard.superadmin.partial.sidebar')
+            @else
+                @include('shared.dashboard.customer.partial.sidebar')
+            @endif
+
             <main id="content">
                 @yield('content')
             </main>

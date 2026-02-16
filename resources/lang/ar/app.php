@@ -79,5 +79,8 @@ return [
     'footer_newsletter' => 'النشرة الإخبارية',
     'footer_email_placeholder' => 'البريد الإلكتروني',
     'footer_join_button' => 'اشترك',
+    "per_month" => 'شهري',
+    "per_year" => 'سنوي',
+    "weekly" => 'الأكثر شهرة',
 
 ];

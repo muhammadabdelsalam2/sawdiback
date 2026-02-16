@@ -67,3 +67,67 @@ h3 {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
 }
+
+.pricing-card {
+    border-radius: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #fff;
+    position: relative;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.featured-plan {
+    border: 2px solid var(--secondary-purple);
+}
+
+.featured-badge {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #fff;
+}
+
+.price-display {
+    font-family: var(--font-main);
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Toggle wrapper */
+.toggle-billing .btn {
+    border-radius: 50px !important;
+    /* Full pill shape */
+    padding: 0.5rem 1.5rem;
+    /* Adjust size */
+    font-weight: 500;
+    border: 1px solid #28a745;
+    /* Green border */
+    color: #28a745;
+    transition: all 0.3s ease;
+    margin-right: 0.5rem;
+    /* Spacing */
+}
+
+/* Active button style */
+.toggle-billing .btn.active,
+.toggle-billing .btn:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Remove extra right margin on last button */
+.toggle-billing .btn:last-child {
+    margin-right: 0;
+}
+
+/* Responsive smaller pills for mobile */
+@media (max-width: 575.98px) {
+    .toggle-billing .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}

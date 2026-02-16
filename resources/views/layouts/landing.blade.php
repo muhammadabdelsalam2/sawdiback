@@ -29,7 +29,7 @@
     </main>
 
     @include('shared.footer')
-
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 

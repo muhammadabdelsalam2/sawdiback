@@ -83,4 +83,9 @@ return [
     'footer_email_placeholder' => 'Email',
     'footer_join_button' => 'Join',
 
+    // Plans periods
+    "monthly" => 'Monthly',
+    "yearly" => 'Yearly',
+    "weekly" => 'Weekly',
+  
 ];

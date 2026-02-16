@@ -18,6 +18,26 @@ class PlanFactory extends Factory
     {
         $name = fake()->unique()->words(2, true);
 
+        // Define possible feature keys and types
+        $featureKeys = [
+            ['key' => 'max_users', 'type' => 'numeric'],
+            ['key' => 'advanced_reports', 'type' => 'boolean'],
+            ['key' => 'priority_support', 'type' => 'boolean'],
+            ['key' => 'storage_limit', 'type' => 'numeric'],
+            ['key' => 'custom_domain', 'type' => 'boolean'],
+        ];
+
+        // Pick 2–4 random features for this plan
+        $randomFeatures = collect($featureKeys)->random(rand(2, 4));
+
+        $featuresJson = [];
+        foreach ($randomFeatures as $feature) {
+            $featuresJson[$feature['key']] = [
+                'value' => $feature['type'] === 'boolean' ? true : fake()->numberBetween(1, 100),
+                'enabled' => true
+            ];
+        }
+
         return [
             'name' => ucwords($name),
             'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(100, 999),
@@ -27,6 +47,7 @@ class PlanFactory extends Factory
             'is_active' => true,
             'description' => fake()->sentence(),
             'sort_order' => fake()->numberBetween(0, 10),
+            'features' => $featuresJson, // assign features JSON
         ];
     }
 }

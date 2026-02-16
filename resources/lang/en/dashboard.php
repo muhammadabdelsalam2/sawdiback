@@ -67,4 +67,16 @@ return [
         'view_all' => 'View All',
     ],
     'last_updated' => 'Last Updated',
+    // Empty State / No Plan
+    'no_plan_title' => 'You don’t have an active plan',
+    'no_plan_desc' => 'Please subscribe to one of our plans to access your dashboard and manage your livestock efficiently.',
+    'go_to_subscription' => 'Go to Subscription',
+    'no_plan_features_title' => 'With a subscription you can:',
+    'no_plan_feature_1' => 'Track your livestock daily',
+    'no_plan_feature_2' => 'Monitor milk production and feed',
+    'no_plan_feature_3' => 'Get critical alerts and notifications',
+    'no_plan_feature_4' => 'Generate reports and insights',
+
+    // Dashboard stats (example reuse)
+
 ];

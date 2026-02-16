@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Tenant;
+use App\Observers\TenantObserver;
+use App\Repositories\Contracts\PlanRepositoryInterface;
+use App\Repositories\PlanRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 
@@ -13,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        $this->app->bind(
+            PlanRepositoryInterface::class,
+            PlanRepository::class
+        );
     }
 
     /**
@@ -29,5 +37,6 @@ class AppServiceProvider extends ServiceProvider
                 'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
             ]);
         });
+        Tenant::observe(TenantObserver::class);
     }
 }

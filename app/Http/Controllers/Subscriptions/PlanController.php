@@ -9,18 +9,24 @@ use App\Http\Requests\Subscriptions\PlanUpdateRequest;
 use App\Models\Currency;
 use App\Models\Feature;
 use App\Models\Plan;
+use App\Repositories\PlanRepository;
+use App\Services\PlanService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PlanController extends Controller
 {
+    protected PlanRepository $planRepository;
+    protected PlanService $planService;
+
+    public function __construct(PlanRepository $planRepository, PlanService $planService)
+    {
+        $this->planRepository = $planRepository;
+        $this->planService = $planService;
+    }
     public function index(string $locale): View
     {
-        $plans = Plan::query()
-            ->with(['currency', 'features'])
-            ->orderBy('sort_order')
-            ->orderBy('id', 'desc')
-            ->paginate(15);
+        $plans = $this->planRepository->paginate(15);
 
         return view('dashboard.subscriptions.plans.index', compact('plans'));
     }
@@ -34,11 +40,11 @@ class PlanController extends Controller
 
     public function store(PlanStoreRequest $request, string $locale): RedirectResponse
     {
-        Plan::query()->create([
-            ...$request->validated(),
-            'is_active' => $request->boolean('is_active', true),
-            'sort_order' => $request->integer('sort_order', 0),
-        ]);
+        $data = $request->validated();
+        $data['is_active'] = $request->boolean('is_active', true);
+        $data['sort_order'] = $request->integer('sort_order', 0);
+
+        $plan = $this->planService->createPlan($data);
 
         return redirect()
             ->route('superadmin.plans.index', ['locale' => session('locale_full', 'en-SA')])
@@ -76,28 +82,33 @@ class PlanController extends Controller
 
     public function editFeatures(string $locale, Plan $plan): View
     {
-        $plan->load(['features', 'currency']);
-        $features = Feature::query()->where('is_active', true)->orderBy('name')->get();
+        // جلب الـ plan مع العلاقات المطلوبة
+        $plan = $this->planRepository->findWithRelations($plan->id, ['currency']);
 
+        // استخدام الـ Service لحل features ودمج القيم مع التعريفات
+        $features = $this->planService->resolvedFeatures($plan->features ?? []);
+
+        // تمرير البيانات للـ view
         return view('dashboard.subscriptions.plans.features', compact('plan', 'features'));
     }
 
     public function updateFeatures(PlanFeatureSyncRequest $request, string $locale, Plan $plan): RedirectResponse
     {
-        $inputFeatures = $request->validated('features', []);
+        try {
+            $featuresInput = $request->validated('features', []);
+            $this->planService->updateFeatures($plan, $featuresInput);
 
-        $syncData = [];
-        foreach ($inputFeatures as $featureId => $payload) {
-            $syncData[(int) $featureId] = [
-                'enabled' => (bool) ($payload['enabled'] ?? false),
-                'value' => $payload['value'] ?? null,
-            ];
+            return redirect()
+                ->route('superadmin.plans.features.edit', ['locale' => session('locale_full', 'en-SA'), 'plan' => $plan->id])
+                ->with('success', __('subscriptions.messages.plan_features_updated'));
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()
+                ->back()
+                ->withErrors($e->errors())
+                ->withInput();
         }
-
-        $plan->features()->sync($syncData);
-
-        return redirect()
-            ->route('superadmin.plans.features.edit', ['locale' => session('locale_full', 'en-SA'), 'plan' => $plan->id])
-            ->with('success', __('subscriptions.messages.plan_features_updated'));
     }
+
+
 }

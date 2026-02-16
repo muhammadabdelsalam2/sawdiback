@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,11 +45,31 @@ class Subscription extends Model
 
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
 
     public function histories(): HasMany
     {
         return $this->hasMany(SubscriptionHistory::class);
     }
+
+    // Active subscriptions (not expired and not canceled)
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('end_at')
+                    ->orWhere('end_at', '>', now());
+            })
+            ->whereNull('canceled_at');
+    }
+
+    public function getIsValidAttribute(): bool
+    {
+        return $this->status === 'active'
+            && (is_null($this->end_at) || $this->end_at > now())
+            && is_null($this->canceled_at);
+    }
+
+
 }
