@@ -19,9 +19,20 @@
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
             <div class="dropdown-container">
-                <a href="animal-registry.html" class="dropdown-item">{{ __('dashboard.sidebar.animal_registry') }}</a>
-                <a href="#" class="dropdown-item">{{ __('dashboard.sidebar.health_vax') }}</a>
-                <a href="#" class="dropdown-item">{{ __('dashboard.sidebar.breeding_cycles') }}</a>
+                <a href="{{ route('superadmin.livestock.animals.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.animals.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.animal_registry') }}</a>
+                <a href="{{ route('superadmin.livestock.alerts.under-treatment', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.alerts.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.health_vax') }}</a>
+                <a href="{{ route('superadmin.livestock.reproduction-cycles.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.reproduction-cycles.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.breeding_cycles') }}</a>
+                <a href="{{ route('superadmin.livestock.species.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.species.*') ? 'active' : '' }}">{{ __('livestock.titles.species') }}</a>
+                <a href="{{ route('superadmin.livestock.breeds.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.breeds.*') ? 'active' : '' }}">{{ __('livestock.titles.breeds') }}</a>
+                <a href="{{ route('superadmin.livestock.feed-types.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
+                <a href="{{ route('superadmin.livestock.vaccines.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.livestock.vaccines.*') ? 'active' : '' }}">{{ __('livestock.titles.vaccines') }}</a>
             </div>
         </div>
 

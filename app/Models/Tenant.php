@@ -45,4 +45,19 @@ class Tenant extends Model
     {
         return $this->hasMany(Subscription::class);
     }
+
+    public function livestockAnimals()
+    {
+        return $this->hasMany(LivestockAnimal::class);
+    }
+
+    public function animalSpecies()
+    {
+        return $this->hasMany(AnimalSpecies::class);
+    }
+
+    public function animalBreeds()
+    {
+        return $this->hasMany(AnimalBreed::class);
+    }
 }

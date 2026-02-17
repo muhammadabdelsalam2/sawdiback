@@ -22,9 +22,11 @@ class TenantScope implements Scope
 
             $tenantId = session('tenant_id') ?? auth()->user()?->tenant_id;
 
-            // Apply filter only if tenantId exists
+            // Apply filter and fail closed when tenant context is missing.
             if ($tenantId) {
                 $builder->where($model->getTable() . '.tenant_id', $tenantId);
+            } else {
+                $builder->whereRaw('1 = 0');
             }
         }
     }
