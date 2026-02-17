@@ -10,7 +10,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\SuperAdmin\AccessManagementController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 
-// Subscriptions 
+// Subscriptions
 use App\Http\Controllers\Subscriptions\FeatureController;
 use App\Http\Controllers\Subscriptions\PlanController;
 use App\Http\Controllers\Subscriptions\SubscriptionController;
@@ -42,3 +42,9 @@ Route::prefix('{locale}')
 Route::get('/switch-language/{locale}', [LanguageController::class, 'switch'])
     ->name('language.switch');
 
+// =====================
+// Load Modular Route Files
+// =====================
+
+require __DIR__.'/web/superadmin.php';
+require __DIR__.'/web/customer.php';

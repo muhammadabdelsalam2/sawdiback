@@ -17,6 +17,17 @@
             <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
         </a>
 
+        {{-- Subscription --}}
+<li class="nav-item">
+    <a class="nav-link" href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}">
+        <span class="nav-icon">
+            <i class="fa-solid fa-credit-card"></i>
+        </span>
+        <span class="nav-label">My Subscription</span>
+    </a>
+</li>
+
+
         {{-- Livestock --}}
         <div class="nav-dropdown">
             <a href="javascript:void(0)" class="nav-item has-dropdown">

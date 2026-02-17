@@ -3,7 +3,7 @@
 @section('title', 'Dashboard' . 'EL-Sawady')
 
 @section('content')
-    @if (auth()->user()->subscription->is_valid)
+@if (optional(auth()->user()->subscription)->is_valid)
         <div class="dashboard-body">
             <!-- Header Row -->
             <div class="row align-items-center mb-4 g-3">
@@ -371,10 +371,11 @@
             <h1 class="h2 mb-2">{{ __('dashboard.no_plan_title') }}</h1>
             <p class="text-muted mb-4">{{ __('dashboard.no_plan_desc') }}</p>
 
-            <a href="" class="btn btn-primary btn-lg d-flex align-items-center gap-2">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                {{ __('dashboard.go_to_subscription') }}
-            </a>
+<a href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}"
+   class="btn btn-primary btn-lg d-flex align-items-center gap-2">
+    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+    {{ __('dashboard.go_to_subscription') }}
+</a>
 
             <div class="mt-5 w-75 text-start">
                 <h4 class="mb-3">{{ __('dashboard.no_plan_features_title') }}</h4>

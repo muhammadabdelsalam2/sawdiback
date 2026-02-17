@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,13 +12,14 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_ACTIVE = 'active';
-    public const STATUS_CANCELED = 'canceled';
-    public const STATUS_EXPIRED = 'expired';
+    public const STATUS_PENDING   = 'pending';
+    public const STATUS_ACTIVE    = 'active';
+    public const STATUS_CANCELED  = 'canceled';
+    public const STATUS_EXPIRED   = 'expired';
     public const STATUS_SUSPENDED = 'suspended';
 
     protected $fillable = [
+        'tenant_id',
         'customer_id',
         'plan_id',
         'status',
@@ -38,6 +38,11 @@ class Subscription extends Model
         'metadata' => 'array',
     ];
 
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id');
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'customer_id');
@@ -53,23 +58,20 @@ class Subscription extends Model
         return $this->hasMany(SubscriptionHistory::class);
     }
 
-    // Active subscriptions (not expired and not canceled)
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('status', 'active')
+        return $query->where('status', self::STATUS_ACTIVE)
             ->where(function ($q) {
                 $q->whereNull('end_at')
-                    ->orWhere('end_at', '>', now());
+                  ->orWhere('end_at', '>', now());
             })
             ->whereNull('canceled_at');
     }
 
     public function getIsValidAttribute(): bool
     {
-        return $this->status === 'active'
+        return $this->status === self::STATUS_ACTIVE
             && (is_null($this->end_at) || $this->end_at > now())
             && is_null($this->canceled_at);
     }
-
-
 }
