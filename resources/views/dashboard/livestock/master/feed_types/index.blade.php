@@ -18,7 +18,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
         <div class="table-container">
-            <table class="table registry-table mb-0">
+            <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
                     <tr><th>{{ __('livestock.fields.id') }}</th><th>{{ __('livestock.fields.name') }}</th><th>{{ __('livestock.fields.category') }}</th><th>{{ __('livestock.fields.unit') }}</th><th>{{ __('livestock.fields.cost_per_unit') }}</th><th>{{ __('livestock.fields.actions') }}</th></tr>
                 </thead>

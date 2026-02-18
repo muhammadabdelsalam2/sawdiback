@@ -10,7 +10,7 @@
         <h2 class="page-title mb-3">{{ __('livestock.titles.vaccinations_overdue') }}</h2>
 
         <div class="table-container">
-            <table class="table registry-table mb-0">
+            <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
                     <tr>
                         <th>{{ __('livestock.fields.tag') }}</th>

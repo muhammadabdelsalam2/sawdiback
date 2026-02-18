@@ -20,7 +20,7 @@
         @endif
 
         <div class="table-container">
-            <table class="table registry-table mb-0">
+            <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
                     <tr>
                         <th>{{ __('livestock.fields.id') }}</th>

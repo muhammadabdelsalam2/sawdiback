@@ -10,7 +10,7 @@
         <h2 class="page-title mb-3">{{ __('livestock.titles.under_treatment') }}</h2>
 
         <div class="table-container mb-3">
-            <table class="table registry-table mb-0">
+            <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
                     <tr>
                         <th>{{ __('livestock.fields.tag') }}</th>
@@ -40,7 +40,7 @@
 
         <h4 class="mb-2">{{ __('livestock.sections.upcoming_vaccinations') }}</h4>
         <div class="table-container">
-            <table class="table registry-table mb-0">
+            <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
                     <tr>
                         <th>{{ __('livestock.fields.tag') }}</th>

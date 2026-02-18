@@ -248,7 +248,7 @@
         <div class="card-block mt-3">
             <h5>{{ __('livestock.sections.status_history') }}</h5>
             <div class="table-responsive">
-                <table class="table">
+                <table class="table js-livestock-table">
                     <thead>
                         <tr>
                             <th>{{ __('livestock.fields.old') }}</th>
