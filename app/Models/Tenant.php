@@ -46,6 +46,12 @@ class Tenant extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function plan()
+{
+    return $this->belongsTo(Plan::class, 'plan_id');
+}
+
+
     public function livestockAnimals()
     {
         return $this->hasMany(LivestockAnimal::class);

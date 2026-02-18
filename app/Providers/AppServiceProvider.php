@@ -22,7 +22,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             PlanRepositoryInterface::class,
             PlanRepository::class
+
+
         );
+        $this->app->bind(
+    \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class,
+    \App\Repositories\CustomerSubscriptionRepository::class
+);
+
     }
 
     /**
