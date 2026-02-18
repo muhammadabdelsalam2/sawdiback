@@ -21,7 +21,7 @@
 
         <div class="card-block">
             <form method="POST"
-                action="{{ route('superadmin.livestock.animals.update', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
+                action="{{ route('customer.livestock.animals.update', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
                 @csrf
                 @method('PUT')
                 @include('dashboard.livestock.animals._form', ['animal' => $animal])
@@ -29,7 +29,7 @@
                 <div class="mt-3 d-flex gap-2">
                     <button class="btn btn-primary-green" type="submit">{{ __('livestock.actions.update') }}</button>
                     <a class="btn btn-outline-white"
-                        href="{{ route('superadmin.livestock.animals.show', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">{{ __('livestock.actions.back') }}</a>
+                        href="{{ route('customer.livestock.animals.show', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">{{ __('livestock.actions.back') }}</a>
                 </div>
             </form>
         </div>

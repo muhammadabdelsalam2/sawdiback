@@ -10,7 +10,7 @@
         <h2 class="page-title mb-3">{{ __('livestock.titles.expected_deliveries') }}</h2>
 
         <form class="row g-2 mb-3" method="GET"
-            action="{{ route('superadmin.livestock.alerts.expected-deliveries', ['locale' => $currentLocale]) }}">
+            action="{{ route('customer.livestock.alerts.expected-deliveries', ['locale' => $currentLocale]) }}">
             <div class="col-md-3">
                 <input type="month" name="month" class="form-control" value="{{ $month }}">
             </div>

@@ -48,7 +48,7 @@ class LivestockAnimalController extends Controller
         $animal = $this->registerAnimalService->execute($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
+            ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
             ->with('success', 'Animal registered successfully.');
     }
 
@@ -88,7 +88,7 @@ class LivestockAnimalController extends Controller
         $this->animals->update($animal, $request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
+            ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
             ->with('success', 'Animal updated successfully.');
     }
 

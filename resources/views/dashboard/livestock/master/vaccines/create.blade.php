@@ -12,11 +12,11 @@
             <div class="alert alert-danger"><ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
         @endif
         <div class="card-block">
-            <form method="POST" action="{{ route('superadmin.livestock.vaccines.store', ['locale' => $currentLocale]) }}">
+            <form method="POST" action="{{ route('customer.livestock.vaccines.store', ['locale' => $currentLocale]) }}">
                 @include('dashboard.livestock.master.vaccines._form')
                 <div class="mt-3 d-flex gap-2">
                     <button class="btn btn-primary-green" type="submit">{{ __('livestock.actions.save') }}</button>
-                    <a class="btn btn-outline-white" href="{{ route('superadmin.livestock.vaccines.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.cancel') }}</a>
+                    <a class="btn btn-outline-white" href="{{ route('customer.livestock.vaccines.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.cancel') }}</a>
                 </div>
             </form>
         </div>

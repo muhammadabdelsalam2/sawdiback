@@ -30,7 +30,7 @@ class AnimalBreedController extends Controller
         AnimalBreed::query()->create($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.breeds.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.breeds.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Breed created successfully.');
     }
 
@@ -45,7 +45,7 @@ class AnimalBreedController extends Controller
         $breed->update($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.breeds.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.breeds.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Breed updated successfully.');
     }
 
