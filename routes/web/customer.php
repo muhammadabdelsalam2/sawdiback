@@ -1,5 +1,5 @@
 <?php
-use App\Http\Controllers\DashboardController;
+
 use App\Http\Controllers\Livestock\AnimalBreedController;
 use App\Http\Controllers\Livestock\AnimalSpeciesController;
 use App\Http\Controllers\Livestock\FeedTypeController;
@@ -7,29 +7,12 @@ use App\Http\Controllers\Livestock\LivestockAnimalController;
 use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
 use Illuminate\Support\Facades\Route;
-
-/**
- * --------------------------------------------------------------------------
- * Customer Routes
- * --------------------------------------------------------------------------
- *
- * This file contains all routes related to the "Customer" section of the system.
- * 
- * - All routes are prefixed with the locale and '/customer', e.g., /en-SA/customer/ziad
- * - Middleware applied:
- *      - 'web'        => Laravel web middleware group (sessions, CSRF, etc.)
- *      - 'set.locale' => Sets the application locale from the route parameter
- *
- * Naming convention:
- *      - Route names start with 'customer.' (e.g., customer.dashboard)
- *
- * Add all new customer-related routes here to keep them organized and maintainable.
- */
-
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Customer\Subscriptions\CustomerSubscriptionController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
-    ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
+    ->middleware(['set.locale', 'auth', 'role:Customer', 'auth', 'role:Customer|SuperAdmin'])
     ->name('customer.')
     ->group(function () {
 
@@ -68,4 +51,16 @@ Route::prefix('{locale}')
             Route::get('alerts/under-treatment', [LivestockOperationsController::class, 'underTreatmentAnimals'])->name('alerts.under-treatment');
         });
 
+        // Customer Subscription
+        Route::get('/subscription', [CustomerSubscriptionController::class, 'index'])
+            ->name('subscription.index');
+
+        Route::post('/subscription/subscribe', [CustomerSubscriptionController::class, 'subscribe'])
+            ->name('subscription.subscribe');
+
+        Route::post('/subscription/change-plan', [CustomerSubscriptionController::class, 'changePlan'])
+            ->name('subscription.change-plan');
+
+        Route::post('/subscription/cancel', [CustomerSubscriptionController::class, 'cancel'])
+            ->name('subscription.cancel');
     });
