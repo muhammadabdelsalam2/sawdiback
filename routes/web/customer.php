@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Livestock\AnimalBreedController;
+use App\Http\Controllers\Livestock\AnimalSpeciesController;
+use App\Http\Controllers\Livestock\FeedTypeController;
+use App\Http\Controllers\Livestock\LivestockAnimalController;
+use App\Http\Controllers\Livestock\LivestockOperationsController;
+use App\Http\Controllers\Livestock\VaccineController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Customer\Subscriptions\CustomerSubscriptionController;
@@ -47,14 +53,14 @@ Route::prefix('{locale}')
 
         // Customer Subscription
         Route::get('/subscription', [CustomerSubscriptionController::class, 'index'])
-            ->name('customer.subscription.index');
+            ->name('subscription.index');
 
         Route::post('/subscription/subscribe', [CustomerSubscriptionController::class, 'subscribe'])
-            ->name('customer.subscription.subscribe');
+            ->name('subscription.subscribe');
 
         Route::post('/subscription/change-plan', [CustomerSubscriptionController::class, 'changePlan'])
-            ->name('customer.subscription.change-plan');
+            ->name('subscription.change-plan');
 
         Route::post('/subscription/cancel', [CustomerSubscriptionController::class, 'cancel'])
-            ->name('customer.subscription.cancel');
+            ->name('subscription.cancel');
     });

@@ -42,9 +42,6 @@ Route::prefix('{locale}')
 Route::get('/switch-language/{locale}', [LanguageController::class, 'switch'])
     ->name('language.switch');
 
-// =====================
-// Load Modular Route Files
-// =====================
-
-require __DIR__.'/web/superadmin.php';
-require __DIR__.'/web/customer.php';
+// ==============================================================================================
+//  ‼️ Important Note The Cutomization Routes File In Web folder Required In web.php File Automatic 
+// ==============================================================================================
