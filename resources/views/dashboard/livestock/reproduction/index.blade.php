@@ -24,7 +24,7 @@
 
         <div class="card-block mb-3">
             <h5 class="section-title">{{ __('livestock.sections.open_new_cycle') }}</h5>
-            <form method="POST" action="{{ route('superadmin.livestock.reproduction-cycles.store', ['locale' => $currentLocale]) }}"
+            <form method="POST" action="{{ route('customer.livestock.reproduction-cycles.store', ['locale' => $currentLocale]) }}"
                 class="row g-2">
                 @csrf
                 <div class="col-md-4">
@@ -79,7 +79,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <form method="POST"
-                                            action="{{ route('superadmin.livestock.reproduction-cycles.insemination', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
+                                            action="{{ route('customer.livestock.reproduction-cycles.insemination', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
                                             class="border rounded p-2">
                                             @csrf
                                             <h6 class="mb-2">{{ __('livestock.sections.insemination') }}</h6>
@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <form method="POST"
-                                            action="{{ route('superadmin.livestock.reproduction-cycles.pregnancy-check', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
+                                            action="{{ route('customer.livestock.reproduction-cycles.pregnancy-check', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
                                             class="border rounded p-2">
                                             @csrf
                                             <h6 class="mb-2">{{ __('livestock.sections.pregnancy_check') }}</h6>
@@ -116,7 +116,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <form method="POST"
-                                            action="{{ route('superadmin.livestock.reproduction-cycles.birth', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
+                                            action="{{ route('customer.livestock.reproduction-cycles.birth', ['locale' => $currentLocale, 'cycle' => $cycle->id]) }}"
                                             class="border rounded p-2">
                                             @csrf
                                             <h6 class="mb-2">{{ __('livestock.sections.birth') }}</h6>

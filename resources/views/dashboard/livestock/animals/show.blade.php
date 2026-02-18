@@ -11,9 +11,9 @@
             <h2 class="page-title">{{ __('livestock.titles.animal_profile') }} {{ $animal->tag_number }}</h2>
             <div class="quick-actions">
                 <a class="btn btn-outline-white"
-                    href="{{ route('superadmin.livestock.animals.edit', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">{{ __('livestock.actions.edit') }}</a>
+                    href="{{ route('customer.livestock.animals.edit', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">{{ __('livestock.actions.edit') }}</a>
                 <a class="btn btn-outline-white"
-                    href="{{ route('superadmin.livestock.animals.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.back_to_list') }}</a>
+                    href="{{ route('customer.livestock.animals.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.back_to_list') }}</a>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
         <div class="card-block mb-3">
             <h5>{{ __('livestock.sections.change_status') }}</h5>
             <form method="POST"
-                action="{{ route('superadmin.livestock.animals.status.change', ['locale' => $currentLocale, 'animal' => $animal->id]) }}"
+                action="{{ route('customer.livestock.animals.status.change', ['locale' => $currentLocale, 'animal' => $animal->id]) }}"
                 class="row g-2">
                 @csrf
                 <div class="col-md-3">
@@ -71,7 +71,7 @@
             <div class="col-md-6">
                 <div class="card-block h-100">
                     <h5>{{ __('livestock.sections.record_feeding') }}</h5>
-                    <form method="POST" action="{{ route('superadmin.livestock.feeding-logs.store', ['locale' => $currentLocale]) }}"
+                    <form method="POST" action="{{ route('customer.livestock.feeding-logs.store', ['locale' => $currentLocale]) }}"
                         class="row g-2">
                         @csrf
                         <input type="hidden" name="animal_id" value="{{ $animal->id }}">
@@ -107,7 +107,7 @@
                 <div class="card-block h-100">
                     <h5>{{ __('livestock.sections.record_milk') }}</h5>
                     <form method="POST"
-                        action="{{ route('superadmin.livestock.milk-production-logs.store', ['locale' => $currentLocale]) }}"
+                        action="{{ route('customer.livestock.milk-production-logs.store', ['locale' => $currentLocale]) }}"
                         class="row g-2">
                         @csrf
                         <input type="hidden" name="animal_id" value="{{ $animal->id }}">
@@ -141,7 +141,7 @@
                 <div class="card-block h-100">
                     <h5>{{ __('livestock.sections.record_health') }}</h5>
                     <form method="POST"
-                        action="{{ route('superadmin.livestock.health-records.store', ['locale' => $currentLocale]) }}"
+                        action="{{ route('customer.livestock.health-records.store', ['locale' => $currentLocale]) }}"
                         class="row g-2">
                         @csrf
                         <input type="hidden" name="animal_id" value="{{ $animal->id }}">
@@ -189,7 +189,7 @@
                 <div class="card-block h-100">
                     <h5>{{ __('livestock.sections.record_vaccination') }}</h5>
                     <form method="POST"
-                        action="{{ route('superadmin.livestock.vaccinations.store', ['locale' => $currentLocale]) }}"
+                        action="{{ route('customer.livestock.vaccinations.store', ['locale' => $currentLocale]) }}"
                         class="row g-2">
                         @csrf
                         <input type="hidden" name="animal_id" value="{{ $animal->id }}">
@@ -224,7 +224,7 @@
             <div class="col-md-6">
                 <div class="card-block">
                     <h5>{{ __('livestock.sections.record_weight') }}</h5>
-                    <form method="POST" action="{{ route('superadmin.livestock.weight-logs.store', ['locale' => $currentLocale]) }}"
+                    <form method="POST" action="{{ route('customer.livestock.weight-logs.store', ['locale' => $currentLocale]) }}"
                         class="row g-2">
                         @csrf
                         <input type="hidden" name="animal_id" value="{{ $animal->id }}">

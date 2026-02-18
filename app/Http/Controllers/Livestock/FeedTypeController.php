@@ -28,7 +28,7 @@ class FeedTypeController extends Controller
         FeedType::query()->create($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.feed-types.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.feed-types.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Feed type created successfully.');
     }
 
@@ -42,7 +42,7 @@ class FeedTypeController extends Controller
         $feedType->update($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.feed-types.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.feed-types.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Feed type updated successfully.');
     }
 

@@ -28,7 +28,7 @@ class AnimalSpeciesController extends Controller
         AnimalSpecies::query()->create($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Species created successfully.');
     }
 
@@ -42,7 +42,7 @@ class AnimalSpeciesController extends Controller
         $species->update($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Species updated successfully.');
     }
 

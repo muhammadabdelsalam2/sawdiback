@@ -9,7 +9,7 @@
     <div class="container py-4 livestock-page">
         <div class="page-head">
             <h2 class="page-title">{{ __('livestock.titles.species') }}</h2>
-            <a class="btn btn-primary-green" href="{{ route('superadmin.livestock.species.create', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.add_species') }}</a>
+            <a class="btn btn-primary-green" href="{{ route('customer.livestock.species.create', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.add_species') }}</a>
         </div>
 
         @if (session('success'))
@@ -36,8 +36,8 @@
                             <td>{{ $row->code }}</td>
                             <td>{{ $row->name }}</td>
                             <td class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-white" href="{{ route('superadmin.livestock.species.edit', ['locale' => $currentLocale, 'species' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
-                                <form method="POST" action="{{ route('superadmin.livestock.species.destroy', ['locale' => $currentLocale, 'species' => $row->id]) }}">
+                                <a class="btn btn-sm btn-outline-white" href="{{ route('customer.livestock.species.edit', ['locale' => $currentLocale, 'species' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
+                                <form method="POST" action="{{ route('customer.livestock.species.destroy', ['locale' => $currentLocale, 'species' => $row->id]) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger" type="submit">{{ __('livestock.actions.delete') }}</button>

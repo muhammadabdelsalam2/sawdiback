@@ -9,7 +9,7 @@
     <div class="container py-4 livestock-page">
         <div class="page-head">
             <h2 class="page-title">{{ __('livestock.titles.vaccines') }}</h2>
-            <a class="btn btn-primary-green" href="{{ route('superadmin.livestock.vaccines.create', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.add_vaccine') }}</a>
+            <a class="btn btn-primary-green" href="{{ route('customer.livestock.vaccines.create', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.add_vaccine') }}</a>
         </div>
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -29,8 +29,8 @@
                             <td>{{ $row->name }}</td>
                             <td>{{ $row->default_interval_days ?? '-' }}</td>
                             <td class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-white" href="{{ route('superadmin.livestock.vaccines.edit', ['locale' => $currentLocale, 'vaccine' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
-                                <form method="POST" action="{{ route('superadmin.livestock.vaccines.destroy', ['locale' => $currentLocale, 'vaccine' => $row->id]) }}">
+                                <a class="btn btn-sm btn-outline-white" href="{{ route('customer.livestock.vaccines.edit', ['locale' => $currentLocale, 'vaccine' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
+                                <form method="POST" action="{{ route('customer.livestock.vaccines.destroy', ['locale' => $currentLocale, 'vaccine' => $row->id]) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger" type="submit">{{ __('livestock.actions.delete') }}</button>

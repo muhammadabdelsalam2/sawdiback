@@ -25,9 +25,20 @@
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
             <div class="dropdown-container">
-                <a href="#" class="dropdown-item">{{ __('dashboard.sidebar.animal_registry') }}</a>
-                <a href="#" class="dropdown-item">{{ __('dashboard.sidebar.health_vax') }}</a>
-                <a href="#" class="dropdown-item">{{ __('dashboard.sidebar.breeding_cycles') }}</a>
+                <a href="{{ route('customer.livestock.animals.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.animals.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.animal_registry') }}</a>
+                <a href="{{ route('customer.livestock.alerts.under-treatment', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.alerts.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.health_vax') }}</a>
+                <a href="{{ route('customer.livestock.reproduction-cycles.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.reproduction-cycles.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.breeding_cycles') }}</a>
+                <a href="{{ route('customer.livestock.species.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.species.*') ? 'active' : '' }}">{{ __('livestock.titles.species') }}</a>
+                <a href="{{ route('customer.livestock.breeds.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.breeds.*') ? 'active' : '' }}">{{ __('livestock.titles.breeds') }}</a>
+                <a href="{{ route('customer.livestock.feed-types.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
+                <a href="{{ route('customer.livestock.vaccines.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.vaccines.*') ? 'active' : '' }}">{{ __('livestock.titles.vaccines') }}</a>
             </div>
         </div>
 

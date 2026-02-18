@@ -20,14 +20,14 @@
         @endif
 
         <div class="card-block">
-            <form method="POST" action="{{ route('superadmin.livestock.animals.store', ['locale' => $currentLocale]) }}">
+            <form method="POST" action="{{ route('customer.livestock.animals.store', ['locale' => $currentLocale]) }}">
                 @csrf
                 @include('dashboard.livestock.animals._form')
 
                 <div class="mt-3 d-flex gap-2">
                     <button class="btn btn-primary-green" type="submit">{{ __('livestock.actions.save') }}</button>
                     <a class="btn btn-outline-white"
-                        href="{{ route('superadmin.livestock.animals.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.cancel') }}</a>
+                        href="{{ route('customer.livestock.animals.index', ['locale' => $currentLocale]) }}">{{ __('livestock.actions.cancel') }}</a>
                 </div>
             </form>
         </div>

@@ -28,7 +28,7 @@ class VaccineController extends Controller
         Vaccine::query()->create($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Vaccine created successfully.');
     }
 
@@ -42,7 +42,7 @@ class VaccineController extends Controller
         $vaccine->update($request->validated());
 
         return redirect()
-            ->route('superadmin.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
+            ->route('customer.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
             ->with('success', 'Vaccine updated successfully.');
     }
 

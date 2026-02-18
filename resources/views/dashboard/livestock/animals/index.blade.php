@@ -11,15 +11,15 @@
             <h2 class="page-title">{{ __('livestock.titles.animals') }}</h2>
             <div class="quick-actions">
                 <a class="btn btn-outline-white"
-                    href="{{ route('superadmin.livestock.reproduction-cycles.index', ['locale' => $currentLocale]) }}">
+                    href="{{ route('customer.livestock.reproduction-cycles.index', ['locale' => $currentLocale]) }}">
                     {{ __('livestock.actions.reproduction') }}
                 </a>
                 <a class="btn btn-outline-white"
-                    href="{{ route('superadmin.livestock.alerts.under-treatment', ['locale' => $currentLocale]) }}">
+                    href="{{ route('customer.livestock.alerts.under-treatment', ['locale' => $currentLocale]) }}">
                     {{ __('livestock.actions.alerts') }}
                 </a>
                 <a class="btn btn-primary-green"
-                    href="{{ route('superadmin.livestock.animals.create', ['locale' => $currentLocale]) }}">
+                    href="{{ route('customer.livestock.animals.create', ['locale' => $currentLocale]) }}">
                     {{ __('livestock.actions.register_animal') }}
                 </a>
             </div>
@@ -65,11 +65,11 @@
                             <td>{{ __('livestock.options.' . $animal->health_status) }}</td>
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-primary"
-                                    href="{{ route('superadmin.livestock.animals.show', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
+                                    href="{{ route('customer.livestock.animals.show', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
                                     {{ __('livestock.actions.view') }}
                                 </a>
                                 <a class="btn btn-sm btn-outline-secondary"
-                                    href="{{ route('superadmin.livestock.animals.edit', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
+                                    href="{{ route('customer.livestock.animals.edit', ['locale' => $currentLocale, 'animal' => $animal->id]) }}">
                                     {{ __('livestock.actions.edit') }}
                                 </a>
                             </td>
