@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
  * --------------------------------------------------------------------------
  *
  * This file contains all routes related to the "SuperAdmin" section of the system.
- * 
+ *
  * - All routes are prefixed with the locale and '/superadmin', e.g., /en-SA/superadmin/dashboard
  * - Middleware applied:
  *      - 'web'        => Laravel web middleware group (sessions, CSRF, etc.)
@@ -91,6 +91,13 @@ Route::prefix('{locale}')
             Route::post('subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
             Route::post('subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
             Route::post('subscriptions/{subscription}/expire', [SubscriptionController::class, 'expire'])->name('subscriptions.expire');
+
+            Route::post('subscriptions/{subscription}/approve', [SubscriptionController::class, 'approve'])
+    ->name('subscriptions.approve');
+
+Route::post('subscriptions/{subscription}/reject', [SubscriptionController::class, 'reject'])
+    ->name('subscriptions.reject');
+
 
         });
 

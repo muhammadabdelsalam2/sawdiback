@@ -8,7 +8,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface CustomerSubscriptionRepositoryInterface
 {
-    public function getCurrentForTenant(string $tenantId): ?Subscription;
+    public function getLatestForTenant(string $tenantId): ?Subscription;
+
+    public function getActiveForTenant(string $tenantId): ?Subscription;
+
+    public function getPendingForTenant(string $tenantId): ?Subscription;
 
     public function listActivePlans(int $perPage = 15): LengthAwarePaginator;
 

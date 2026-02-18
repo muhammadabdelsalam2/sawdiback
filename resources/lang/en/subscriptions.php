@@ -7,6 +7,7 @@ return [
         'subscriptions' => 'Subscriptions',
         'history' => 'Subscription History',
     ],
+
     'actions' => [
         'save' => 'Save',
         'edit' => 'Edit',
@@ -25,6 +26,7 @@ return [
         'cancel' => 'Cancel',
         'expire' => 'Expire',
     ],
+
     'fields' => [
         'name' => 'Name',
         'slug' => 'Slug',
@@ -53,11 +55,13 @@ return [
         'changed_by' => 'Changed By',
         'created_at' => 'Created At',
     ],
+
     'billing_cycles' => [
         'weekly' => 'Weekly',
         'monthly' => 'Monthly',
         'yearly' => 'Yearly',
     ],
+
     'statuses' => [
         'pending' => 'Pending',
         'active' => 'Active',
@@ -65,6 +69,7 @@ return [
         'expired' => 'Expired',
         'suspended' => 'Suspended',
     ],
+
     'messages' => [
         'plan_created' => 'Plan created successfully.',
         'plan_updated' => 'Plan updated successfully.',
@@ -78,11 +83,15 @@ return [
         'subscription_renewed' => 'Subscription renewed successfully.',
         'subscription_canceled' => 'Subscription canceled successfully.',
         'subscription_expired' => 'Subscription expired successfully.',
+        'subscription_approved' => 'Subscription approved successfully.',
+        'subscription_rejected' => 'Subscription rejected successfully.',
     ],
+
     'general' => [
         'yes' => 'Yes',
         'no' => 'No',
     ],
+
     'empty' => [
         'no_data' => 'No data found.',
     ],

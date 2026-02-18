@@ -9,10 +9,28 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CustomerSubscriptionRepository implements CustomerSubscriptionRepositoryInterface
 {
-    public function getCurrentForTenant(string $tenantId): ?Subscription
+    public function getLatestForTenant(string $tenantId): ?Subscription
     {
         return Subscription::query()
             ->where('tenant_id', $tenantId)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    public function getActiveForTenant(string $tenantId): ?Subscription
+    {
+        return Subscription::query()
+            ->where('tenant_id', $tenantId)
+            ->where('status', Subscription::STATUS_ACTIVE)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    public function getPendingForTenant(string $tenantId): ?Subscription
+    {
+        return Subscription::query()
+            ->where('tenant_id', $tenantId)
+            ->where('status', Subscription::STATUS_PENDING)
             ->orderByDesc('id')
             ->first();
     }
