@@ -48,6 +48,7 @@ return [
     'nav_docs' => 'المستندات',
     'nav_login' => 'تسجيل الدخول',
     'nav_language' => 'اللغة', // optional
+    'nav_register' => 'أنشاء حساب',
 
     // Features Section
     'features_title' => 'كل ما تحتاجه لـ <span class="text-green">التوسع.</span>',

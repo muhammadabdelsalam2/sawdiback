@@ -38,7 +38,7 @@ return [
     'get_started' => 'Get Started',
     'start_free_trial' => 'Start Free Trial',
     'contact_sales' => 'Contact Sales',
-
+    'nav_register' => 'Register',
     // Badge
     'most_popular' => 'Most Popular',
     // Navbar
@@ -87,5 +87,5 @@ return [
     "monthly" => 'Monthly',
     "yearly" => 'Yearly',
     "weekly" => 'Weekly',
-  
+
 ];

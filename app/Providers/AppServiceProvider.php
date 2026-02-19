@@ -6,7 +6,9 @@ use App\Models\Tenant;
 use App\Models\LivestockAnimal;
 use App\Observers\LivestockAnimalObserver;
 use App\Observers\TenantObserver;
+use App\Repositories\Contracts\CustomerRepositoryInterface;
 use App\Repositories\Contracts\PlanRepositoryInterface;
+use App\Repositories\CustomerRepository;
 use App\Repositories\PlanRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
@@ -26,9 +28,14 @@ class AppServiceProvider extends ServiceProvider
 
         );
         $this->app->bind(
-    \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class,
-    \App\Repositories\CustomerSubscriptionRepository::class
-);
+            \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class,
+            \App\Repositories\CustomerSubscriptionRepository::class
+        );
+
+        $this->app->bind(
+            CustomerRepositoryInterface::class,
+            CustomerRepository::class
+        );
 
     }
 
