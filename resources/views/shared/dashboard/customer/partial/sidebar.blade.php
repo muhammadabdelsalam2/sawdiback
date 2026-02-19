@@ -5,6 +5,11 @@
         $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
+
+        $features = auth()->check() ? auth()->user()->planFeatures() : [];
+
+        // Feature flag (new structure: ['hr_management' => ['enabled' => bool, ...]])
+        $hrEnabled = (bool) ($features['hr_management']['enabled'] ?? false);
     @endphp
 
     {{-- You Can Start Get Features About Current Subscription Plan auth()->user()->planFeatures() --}}
@@ -18,15 +23,13 @@
         </a>
 
         {{-- Subscription --}}
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}">
-        <span class="nav-icon">
-            <i class="fa-solid fa-credit-card"></i>
-        </span>
-        <span class="nav-label">My Subscription</span>
-    </a>
-</li>
-
+        <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}"
+            class="nav-item {{ request()->routeIs('customer.subscription.*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <i class="fa-solid fa-credit-card"></i>
+            </span>
+            <span class="nav-label">My Subscription</span>
+        </a>
 
         {{-- Livestock --}}
         <div class="nav-dropdown">
@@ -107,14 +110,49 @@
             </a>
         </div>
 
-        {{-- HR Management --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
-                <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
-            </a>
-        </div>
+        {{-- HR Management (Only if enabled in plan features) --}}
+        @if ($hrEnabled)
+            <div class="nav-dropdown">
+                <a href="javascript:void(0)"
+                    class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
+                    <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                </a>
+
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">
+                        HR Dashboard
+                    </a>
+
+                    <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">
+                        Departments
+                    </a>
+
+                    <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">
+                        Job Titles
+                    </a>
+
+                    <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">
+                        Employees
+                    </a>
+
+                    <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">
+                        Attendance
+                    </a>
+
+                    <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">
+                        Leave Requests
+                    </a>
+                </div>
+            </div>
+        @endif
 
         {{-- Maintenance --}}
         <div class="nav-dropdown">
@@ -165,7 +203,6 @@
                 <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">User Management</span>
             </a>
-
 
         @endcan
 

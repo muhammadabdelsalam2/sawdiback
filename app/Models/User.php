@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PlanService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,21 +50,65 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class, 'customer_id');
     }
 
-    public function plan(): ?BelongsTo
-    {
-        return $this->subscription?->plan();
-    }
-
+    /**
+     * Resolve current plan features for this user.
+     * Priority:
+     * 1) subscription.plan (if exists)
+     * 2) tenant.plan (if tenant has plan_id)
+     */
     public function planFeatures(): array
     {
-        $user = self::with('subscription.plan')->find(auth()->id());
-        $plan = $user?->subscription?->plan;
+        $this->loadMissing([
+            'subscription.plan',
+            'tenant.plan',
+        ]);
+
+        $plan = $this->subscription?->plan ?? $this->tenant?->plan;
 
         if (!$plan) {
             return [];
         }
 
-        return app(\App\Services\PlanService::class)
-            ->resolvedFeatures($plan->features ?? []);
+        // $plan->features ممكن تكون array (cast) أو string JSON (legacy)
+        $features = $plan->features ?? [];
+
+        if (!is_array($features)) {
+            $features = json_decode((string) $features, true) ?: [];
+        }
+
+        return $features;
+    }
+
+    /**
+     * Quick check: is feature enabled?
+     */
+    public function hasPlanFeature(string $key): bool
+    {
+        $features = $this->planFeatures();
+
+        $feature = $features[$key] ?? null;
+
+        if (is_array($feature)) {
+            return (bool) ($feature['enabled'] ?? false);
+        }
+
+        // support boolean-style flags: "feature_key" => true
+        return (bool) $feature;
+    }
+
+    /**
+     * Quick read: feature value
+     */
+    public function planFeatureValue(string $key, $default = null)
+    {
+        $features = $this->planFeatures();
+
+        $feature = $features[$key] ?? null;
+
+        if (is_array($feature)) {
+            return $feature['value'] ?? $default;
+        }
+
+        return $default;
     }
 }
