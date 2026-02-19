@@ -64,11 +64,21 @@
 
         {{-- Crops & Feed --}}
         <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+            <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-4.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.crops_feed') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.crops-feed.crops.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.crops.*') ? 'active' : '' }}">{{ __('crops_feed.titles.crops') }}</a>
+                <a href="{{ route('customer.crops-feed.feed.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.feed.*') ? 'active' : '' }}">{{ __('crops_feed.titles.feed_management') }}</a>
+                <a href="{{ route('customer.crops-feed.reports.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.reports.*') ? 'active' : '' }}">{{ __('crops_feed.titles.reports') }}</a>
+                <a href="{{ route('customer.livestock.feed-types.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
+            </div>
         </div>
 
         {{-- Inventory --}}

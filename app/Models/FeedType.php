@@ -19,11 +19,13 @@ class FeedType extends Model
         'category',
         'unit',
         'cost_per_unit',
+        'low_stock_threshold',
         'notes',
     ];
 
     protected $casts = [
         'cost_per_unit' => 'decimal:2',
+        'low_stock_threshold' => 'decimal:2',
     ];
 
     public function tenant(): BelongsTo
@@ -34,5 +36,20 @@ class FeedType extends Model
     public function feedingLogs(): HasMany
     {
         return $this->hasMany(AnimalFeedingLog::class, 'feed_type_id');
+    }
+
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(FeedStockMovement::class);
+    }
+
+    public function feedConsumptions(): HasMany
+    {
+        return $this->hasMany(FeedConsumption::class);
+    }
+
+    public function cropFeedAllocations(): HasMany
+    {
+        return $this->hasMany(CropFeedAllocation::class);
     }
 }

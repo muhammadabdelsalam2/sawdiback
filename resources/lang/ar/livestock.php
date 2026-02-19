@@ -124,6 +124,7 @@ return [
         'category' => 'الفئة',
         'unit' => 'الوحدة',
         'cost_per_unit' => 'تكلفة الوحدة',
+        'low_stock_threshold' => 'حد المخزون المنخفض',
         'default_interval' => 'المدة الافتراضية',
     ],
 

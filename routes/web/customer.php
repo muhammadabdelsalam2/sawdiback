@@ -6,6 +6,8 @@ use App\Http\Controllers\Livestock\FeedTypeController;
 use App\Http\Controllers\Livestock\LivestockAnimalController;
 use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
+use App\Http\Controllers\CropsFeed\CropController;
+use App\Http\Controllers\CropsFeed\FeedManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Customer\Subscriptions\CustomerSubscriptionController;
@@ -49,6 +51,19 @@ Route::prefix('{locale}')
             Route::get('alerts/vaccinations-overdue', [LivestockOperationsController::class, 'vaccinationOverdueAlerts'])->name('alerts.vaccinations-overdue');
             Route::get('alerts/expected-deliveries', [LivestockOperationsController::class, 'expectedDeliveries'])->name('alerts.expected-deliveries');
             Route::get('alerts/under-treatment', [LivestockOperationsController::class, 'underTreatmentAnimals'])->name('alerts.under-treatment');
+        });
+
+        Route::prefix('crops-feed')->name('crops-feed.')->group(function () {
+            Route::resource('crops', CropController::class);
+            Route::post('crops/growth-stages', [CropController::class, 'storeGrowthStage'])->name('crops.growth-stages.store');
+            Route::post('crops/cost-items', [CropController::class, 'storeCostItem'])->name('crops.cost-items.store');
+
+            Route::get('feed', [FeedManagementController::class, 'index'])->name('feed.index');
+            Route::post('feed/stock-movements', [FeedManagementController::class, 'storeStockMovement'])->name('feed.stock-movements.store');
+            Route::post('feed/consumptions', [FeedManagementController::class, 'storeConsumption'])->name('feed.consumptions.store');
+            Route::post('feed/crop-allocations', [FeedManagementController::class, 'storeCropAllocation'])->name('feed.crop-allocations.store');
+
+            Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
         });
 
         // Customer Subscription

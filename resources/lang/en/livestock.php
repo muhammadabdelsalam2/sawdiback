@@ -124,6 +124,7 @@ return [
         'category' => 'Category',
         'unit' => 'Unit',
         'cost_per_unit' => 'Cost Per Unit',
+        'low_stock_threshold' => 'Low Stock Threshold',
         'default_interval' => 'Default Interval',
     ],
 
