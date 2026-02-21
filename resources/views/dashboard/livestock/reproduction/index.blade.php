@@ -53,7 +53,7 @@
         </div>
 
         <div class="table-container">
-            <table class="table align-middle registry-table mb-0 js-livestock-table">
+            <table class="table align-middle registry-table mb-0 js-livestock-table no-datatable">
                 <thead>
                     <tr>
                         <th>{{ __('livestock.fields.id') }}</th>
@@ -69,7 +69,8 @@
                         <tr>
                             <td>{{ $cycle->id }}</td>
                             <td>{{ $cycle->femaleAnimal->tag_number ?? '-' }}</td>
-                            <td>{{ __('livestock.options.' . $cycle->status) }}</td>
+                            @php($statusKey = 'livestock.options.' . $cycle->status)
+                            <td>{{ \Illuminate\Support\Facades\Lang::has($statusKey) ? __($statusKey) : \Illuminate\Support\Str::headline((string) $cycle->status) }}</td>
                             <td>{{ optional($cycle->heat_date)->toDateString() ?? __('livestock.options.no_data') }}</td>
                             <td>{{ optional($cycle->insemination_date)->toDateString() ?? __('livestock.options.no_data') }}</td>
                             <td>{{ optional($cycle->expected_delivery_date)->toDateString() ?? __('livestock.options.no_data') }}</td>
