@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Middleware\SetLocale;
-use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\EnsureFeatureEnabled;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,11 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             Route::middleware('web')->group(function () {
                 foreach (glob(base_path('routes/web/*.php')) as $file) {
-                    require $file; // ✅ actually load the route files
+                    require $file;
                 }
             });
         }
-
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(function (Request $request): string {
@@ -36,15 +36,18 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('login.form', ['locale' => $locale]);
         });
 
-        // Append MiidleWare
         $middleware->alias([
             'set.locale' => SetLocale::class,
             'auth' => Authenticate::class,
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+
+            // ✅ REQUIRED FOR FEATURE GATING
+            'feature' => EnsureFeatureEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();

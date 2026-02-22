@@ -5,6 +5,7 @@
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
     @endphp
+
     <nav class="sidebar-nav mt-4">
         <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}"
             class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
@@ -45,25 +46,22 @@
         </div>
 
         @role('SuperAdmin')
+            <div class="nav-dropdown">
+                <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}"
+                    class="nav-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
+                    <i class="bi bi-gem nav-icon"></i>
+                    <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
+                </a>
+            </div>
 
-        <div class="nav-dropdown">
-            <a href="{{ route('superadmin.plans.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
-                class="nav-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
-                <i class="bi bi-gem nav-icon"></i>
-                <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
-            </a>
-        </div>
-
-        <div class="nav-dropdown">
-            <a href="{{ route('superadmin.subscriptions.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
-                class="nav-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
-                <i class="bi bi-arrow-repeat nav-icon"></i>
-                <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
-            </a>
-        </div>
-
+            <div class="nav-dropdown">
+                <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}"
+                    class="nav-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
+                    <i class="bi bi-arrow-repeat nav-icon"></i>
+                    <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
+                </a>
+            </div>
         @endrole
-
 
         <div class="sidebar-bottom">
             @can('roles.manage')
@@ -72,25 +70,26 @@
                     <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
                     <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
                 </a>
+
                 <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}"
                     class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{__('superadmin.dashboard.user_management')}}</span>
+                    <span class="nav-label">{{ __('superadmin.dashboard.user_management') }}</span>
                 </a>
             @endcan
-            <!-- Link-style logout -->
-            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                class="nav-item d-flex align-items-center">
 
+            <!-- Link-style logout -->
+            <a href="#"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="nav-item d-flex align-items-center">
                 <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
                 <span class="nav-label">{{ __('dashboard.sidebar.logout') }}</span>
             </a>
 
             <!-- Hidden logout form -->
-            <form id="logout-form" action="{{ route('logout', $currentLocale) }}" method="POST" class="d-none">
+            <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
                 @csrf
             </form>
-
-
         </div>
+    </nav>
 </aside>

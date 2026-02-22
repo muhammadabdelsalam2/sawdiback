@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Customer\Subscriptions\CustomerSubscriptionController;
 use App\Http\Controllers\Livestock\AnimalBreedController;
 use App\Http\Controllers\Livestock\AnimalSpeciesController;
 use App\Http\Controllers\Livestock\FeedTypeController;
@@ -8,19 +11,37 @@ use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
 use App\Http\Controllers\CropsFeed\CropController;
 use App\Http\Controllers\CropsFeed\FeedManagementController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Customer\Subscriptions\CustomerSubscriptionController;
+
+use App\Http\Controllers\Customer\HR\DepartmentController;
+use App\Http\Controllers\Customer\HR\JobTitleController;
+use App\Http\Controllers\Customer\HR\EmployeeController;
+use App\Http\Controllers\Customer\HR\AttendanceController;
+use App\Http\Controllers\Customer\HR\LeaveRequestController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
-    ->middleware(['set.locale', 'auth', 'role:Customer', 'auth', 'role:Customer|SuperAdmin'])
+    ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
     ->name('customer.')
     ->group(function () {
 
-        Route::get('dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard');
+        // =========================
+        // Subscription (Always Allowed)
+        // =========================
+        Route::get('subscription', [CustomerSubscriptionController::class, 'index'])
+            ->name('subscription.index');
 
+        Route::post('subscription/subscribe', [CustomerSubscriptionController::class, 'subscribe'])
+            ->name('subscription.subscribe');
+
+        Route::post('subscription/change-plan', [CustomerSubscriptionController::class, 'changePlan'])
+            ->name('subscription.change-plan');
+
+        Route::post('subscription/cancel', [CustomerSubscriptionController::class, 'cancel'])
+            ->name('subscription.cancel');
+
+        // =========================
+        // Livestock (No Feature Gate)
+        // =========================
         Route::prefix('livestock')->name('livestock.')->group(function () {
             Route::resource('species', AnimalSpeciesController::class)->except(['show']);
             Route::resource('breeds', AnimalBreedController::class)->except(['show']);
@@ -66,16 +87,44 @@ Route::prefix('{locale}')
             Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
         });
 
-        // Customer Subscription
-        Route::get('/subscription', [CustomerSubscriptionController::class, 'index'])
-            ->name('subscription.index');
+        Route::prefix('crops-feed')->name('crops-feed.')->group(function () {
+            Route::resource('crops', CropController::class);
+            Route::post('crops/growth-stages', [CropController::class, 'storeGrowthStage'])->name('crops.growth-stages.store');
+            Route::post('crops/cost-items', [CropController::class, 'storeCostItem'])->name('crops.cost-items.store');
 
-        Route::post('/subscription/subscribe', [CustomerSubscriptionController::class, 'subscribe'])
-            ->name('subscription.subscribe');
+            Route::get('feed', [FeedManagementController::class, 'index'])->name('feed.index');
+            Route::post('feed/stock-movements', [FeedManagementController::class, 'storeStockMovement'])->name('feed.stock-movements.store');
+            Route::post('feed/consumptions', [FeedManagementController::class, 'storeConsumption'])->name('feed.consumptions.store');
+            Route::post('feed/crop-allocations', [FeedManagementController::class, 'storeCropAllocation'])->name('feed.crop-allocations.store');
 
-        Route::post('/subscription/change-plan', [CustomerSubscriptionController::class, 'changePlan'])
-            ->name('subscription.change-plan');
+            Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
+        });
 
-        Route::post('/subscription/cancel', [CustomerSubscriptionController::class, 'cancel'])
-            ->name('subscription.cancel');
+        // =========================
+        // HR Management (Feature Gated)
+        // =========================
+        Route::prefix('hr')
+            ->name('hr.')
+            ->middleware(['feature:hr_management'])
+            ->group(function () {
+
+                Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
+                    ->name('index');
+
+                Route::resource('departments', DepartmentController::class)->except(['show']);
+                Route::resource('job-titles', JobTitleController::class)->except(['show']);
+                Route::resource('employees', EmployeeController::class)->except(['show']);
+
+                // Attendance
+                Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+                Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
+                Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
+
+                // Leaves
+                Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
+                Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
+                Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
+                Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
+                Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
+            });
     });
