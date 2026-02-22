@@ -25,6 +25,7 @@ class FeedTypeUpdateRequest extends BaseLivestockRequest
             'category' => ['required', Rule::in(['concentrate', 'roughage', 'supplement'])],
             'unit' => ['required', 'string', 'max:100'],
             'cost_per_unit' => ['nullable', 'numeric', 'min:0'],
+            'low_stock_threshold' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string'],
         ];
     }

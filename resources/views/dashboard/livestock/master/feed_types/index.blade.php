@@ -20,7 +20,7 @@
         <div class="table-container">
             <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
-                    <tr><th>{{ __('livestock.fields.id') }}</th><th>{{ __('livestock.fields.name') }}</th><th>{{ __('livestock.fields.category') }}</th><th>{{ __('livestock.fields.unit') }}</th><th>{{ __('livestock.fields.cost_per_unit') }}</th><th>{{ __('livestock.fields.actions') }}</th></tr>
+                    <tr><th>{{ __('livestock.fields.id') }}</th><th>{{ __('livestock.fields.name') }}</th><th>{{ __('livestock.fields.category') }}</th><th>{{ __('livestock.fields.unit') }}</th><th>{{ __('livestock.fields.cost_per_unit') }}</th><th>{{ __('livestock.fields.low_stock_threshold') }}</th><th>{{ __('livestock.fields.actions') }}</th></tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
@@ -30,6 +30,7 @@
                             <td>{{ __('livestock.options.' . $row->category) }}</td>
                             <td>{{ $row->unit }}</td>
                             <td>{{ $row->cost_per_unit ?? '-' }}</td>
+                            <td>{{ $row->low_stock_threshold }}</td>
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-white" href="{{ route('customer.livestock.feed-types.edit', ['locale' => $currentLocale, 'feed_type' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
                                 <form method="POST" action="{{ route('customer.livestock.feed-types.destroy', ['locale' => $currentLocale, 'feed_type' => $row->id]) }}">
@@ -40,7 +41,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6">{{ __('livestock.empty.no_feed_types') }}</td></tr>
+                        <tr><td colspan="7">{{ __('livestock.empty.no_feed_types') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
