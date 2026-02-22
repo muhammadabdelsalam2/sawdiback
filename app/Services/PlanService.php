@@ -2,69 +2,170 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Plan;
-
+use App\Repositories\Contracts\PlanRepositoryInterface;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Validation\ValidationException;
 class PlanService
 {
-    /**
-     * Return user's active plan (customize if you have different relations).
-     */
-    public function getUserPlan(?User $user): ?Plan
+    protected PlanRepositoryInterface $planRepository;
+
+    public function __construct(PlanRepositoryInterface $planRepository)
     {
-        if (!$user) {
-            return null;
-        }
-
-        // If you have a direct plan relation:
-        if (method_exists($user, 'plan') && $user->plan) {
-            return $user->plan;
-        }
-
-        // If you have a subscription relation:
-        if (method_exists($user, 'subscription') && $user->subscription) {
-            return $user->subscription->plan ?? null;
-        }
-
-        return null;
+        $this->planRepository = $planRepository;
     }
 
     /**
-     * Resolve plan features as array.
-     * This exists because your User::hasPlanFeature() expects it.
+     * Create a new plan with features JSON
      */
-    public function resolvedFeatures(?User $user): array
+    public function createPlan(array $data): Plan
     {
-        $plan = $this->getUserPlan($user);
+        // تحقق من features بناء على config
+        $featuresInput = $data['features'] ?? [];
+        $data['features'] = $this->resolvedFeatures($featuresInput);
 
-        if (!$plan) {
-            return [];
+        return $this->planRepository->create($data);
+    }
+    /**
+     * Get paginated plans
+     */
+    public function getPlans(int $perPage = 15)
+    {
+        return $this->planRepository->paginate($perPage);
+    }
+
+    /**
+     * Get a plan by id
+     */
+    public function getPlan(int $id)
+    {
+        return $this->planRepository->findById($id);
+    }
+
+
+
+    /**
+     * Update plan with new features JSON
+     */
+    public function updatePlan(int $id, array $data): bool
+    {
+        if (isset($data['feature_keys'])) {
+            $data['features'] = $this->buildFeaturesJson($data['feature_keys']);
         }
 
-        $features = $plan->features ?? [];
+        return $this->planRepository->update($id, $data);
+    }
 
-        // Handle legacy string JSON
-        if (!is_array($features)) {
-            $features = json_decode((string) $features, true) ?: [];
+    /**
+     * Delete a plan
+     */
+    public function deletePlan(int $id): bool
+    {
+        return $this->planRepository->delete($id);
+    }
+
+    /**
+     * Resolve features with defaults and DB values
+     */
+    public function resolvedFeatures(array $featuresJson): array
+    {
+        $definitions = config('plan_features');
+        $values = $featuresJson ?? [];
+
+        $resolved = [];
+
+        foreach ($definitions as $key => $def) {
+            $resolved[$key] = [
+                'label' => $def['label'] ?? $key,
+                'type' => $def['type'] ?? 'boolean',
+                'enabled' => $values[$key]['enabled'] ?? false,
+                'value' => $values[$key]['value'] ?? $def['default'] ?? null,
+            ];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Build features JSON from array of keys
+     */
+    protected function buildFeaturesJson(array $keys): array
+    {
+        $definitions = config('plan_features');
+        $features = [];
+
+        foreach ($keys as $key) {
+            if (!isset($definitions[$key]))
+                continue;
+
+            $def = $definitions[$key];
+
+            $features[$key] = [
+                'value' => $def['default'] ?? null,
+                'enabled' => true
+            ];
         }
 
         return $features;
     }
 
     /**
-     * Check if a feature is enabled.
-     * Convention: feature["enabled"] is the source of truth.
+     * Update plan features based on input and validate types.
+     *
+     * @param Plan $plan
+     * @param array $featuresInput
+     * @return Plan
+     *
+     * @throws ValidationException
      */
-    public function hasFeature(?User $user, string $featureKey): bool
+    public function updateFeatures(Plan $plan, array $featuresInput): Plan
     {
-        $features = $this->resolvedFeatures($user);
+        $resolvedFeatures = [];
+        $definitions = config('plan_features');
 
-        $feature = $features[$featureKey] ?? null;
+        foreach ($featuresInput as $key => $payload) {
+            $def = $definitions[$key] ?? null;
 
-        if (is_array($feature)) {
-            return (bool) ($feature['enabled'] ?? false);
+            if (!$def) {
+                continue; // تجاهل أي feature غير معرفة
+            }
+
+            $value = $payload['value'] ?? $def['default'] ?? null;
+
+            // تحقق من النوع
+            if ($def['type'] === 'boolean') {
+                if (!in_array($value, [0, 1, true, false, '0', '1', null], true)) {
+                    throw ValidationException::withMessages([
+                        'features.' . $key => __('plan.messages.feature_type_mismatch', [
+                            'key' => $key,
+                            'type' => __('plan.types.boolean'),
+                        ]),
+                    ]);
+                }
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif ($def['type'] === 'numeric') {
+                if (!is_numeric($value)) {
+                    throw ValidationException::withMessages([
+                        'features.' . $key => __('plan.messages.feature_type_mismatch', [
+                            'key' => $key,
+                            'type' => __('plan.types.numeric'),
+                        ]),
+                    ]);
+                }
+                $value = $value + 0;
+            }
+
+            $resolvedFeatures[$key] = [
+                'enabled' => (bool) ($payload['enabled'] ?? false),
+                'value' => $value,
+            ];
         }
 
-        return (bool) $feature;
+        $plan->features = $resolvedFeatures;
+        $plan->save();
+
+        return $plan;
     }
+
 }
