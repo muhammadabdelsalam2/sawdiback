@@ -43,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(LeaveRepositoryInterface::class, LeaveRepository::class);
         $this->app->bind(AttendanceRepositoryInterface::class, AttendanceRepository::class);
+        $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
 
         /**
          * ✅ Backward/Name-compat binding (SAFE)
@@ -64,10 +65,10 @@ class AppServiceProvider extends ServiceProvider
             $lang = session('locale', 'en');
 
             $view->with([
-                'currentLocale'   => session('locale_full', 'en-SA'),
-                'currentLang'     => session('locale', 'en'),
+                'currentLocale' => session('locale_full', 'en-SA'),
+                'currentLang' => session('locale', 'en'),
                 'currentCurrency' => session('currency'),
-                'direction'       => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
+                'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
             ]);
 
             // ✅ Subscription + Features Context
@@ -76,9 +77,9 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with([
                 'hasActiveSubscription' => $ctx['hasActiveSubscription'] ?? false,
-                'activeSubscription'    => $ctx['activeSubscription'] ?? null,
-                'planFeatures'          => $ctx['planFeatures'] ?? [],
-                'featureFlags'          => $ctx['featureFlags'] ?? [],
+                'activeSubscription' => $ctx['activeSubscription'] ?? null,
+                'planFeatures' => $ctx['planFeatures'] ?? [],
+                'featureFlags' => $ctx['featureFlags'] ?? [],
             ]);
         });
 
