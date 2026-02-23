@@ -34,29 +34,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // ✅ Plan Repo Binding (REQUIRED)
-        $this->app->bind(PlanRepositoryInterface::class, PlanRepository::class);
 
-        // ✅ HR Repo Bindings (REQUIRED for HR module controllers)
-        $this->app->bind(DepartmentRepositoryInterface::class, DepartmentRepository::class);
-        $this->app->bind(JobTitleRepositoryInterface::class, JobTitleRepository::class);
-        $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
-        $this->app->bind(LeaveRepositoryInterface::class, LeaveRepository::class);
-        $this->app->bind(AttendanceRepositoryInterface::class, AttendanceRepository::class);
-        $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
-
-        /**
-         * ✅ Backward/Name-compat binding (SAFE)
-         * لو في كود قديم/كنترولرز بتطلب:
-         * App\Repositories\Contracts\LeaveRequestRepositoryInterface
-         * هنربطها على نفس LeaveRepository بدون ما نكسر شغل.
-         *
-         * IMPORTANT: استخدمنا string بدل ::class عشان الـ IDE ميعملش خط أحمر لو interface مش موجودة.
-         */
-        $legacyLeaveInterface = 'App\\Repositories\\Contracts\\LeaveRequestRepositoryInterface';
-        if (interface_exists($legacyLeaveInterface)) {
-            $this->app->bind($legacyLeaveInterface, LeaveRepository::class);
-        }
     }
 
     public function boot(): void

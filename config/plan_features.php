@@ -195,6 +195,12 @@ return [
         'default' => false,
         'description' => 'Use your own domain',
     ],
+    'hr_management' => [
+        'label' => 'Custom Domain',
+        'type' => 'boolean',
+        'default' => false,
+        'description' => 'Use your own domain',
+    ],
 
     /*
     |--------------------------------------------------------------------------

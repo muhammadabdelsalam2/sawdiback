@@ -30,8 +30,7 @@
                         @if($plan->is_featured)
                             <div class="d-flex  align-items-center justify-content-center">
 
-                                <span
-                                    class="badge  bg-success col-4  mt-3 px-3 py-2 featured-badge">
+                                <span class="badge  bg-success col-4  mt-3 px-3 py-2 featured-badge">
                                     {{ __('app.most_popular') }}
                                 </span>
                             </div>

@@ -63,5 +63,5 @@ return [
     'terms_title' => 'Terms of Service',
     'privacy_title' => 'Privacy Policy',
     'last_updated' => 'Last Updated',
-
+    'invalid_credentials' => 'Invalid Credentials'
 ];
