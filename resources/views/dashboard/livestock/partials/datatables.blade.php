@@ -43,7 +43,7 @@
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', initLivestockTables);
             } else {
-                initLivestockTables();
+                initLivestockTables() && [];
             }
         })();
     </script>

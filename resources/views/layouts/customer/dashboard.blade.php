@@ -58,7 +58,7 @@
     <!-- Custom JS -->
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
     <script>
-        (function() {
+        (function () {
             const dataTableLanguage = {
                 search: @json(__('datatable.search')),
                 lengthMenu: @json(__('datatable.show')) + ' ' + @json(__('datatable.show_menu')) + ' ' + @json(__('datatable.entries')),
@@ -79,19 +79,19 @@
 
                 const tables = jQuery('#content table').not('.no-datatable');
 
-                tables.each(function() {
+                tables.each(function () {
                     if (jQuery.fn.dataTable.isDataTable(this)) return;
 
                     const $table = jQuery(this);
                     const columnCount = $table.find('thead th').length;
-                    const colspannedRows = $table.find('tbody tr').filter(function() {
+                    const colspannedRows = $table.find('tbody tr').filter(function () {
                         return jQuery(this).find('td[colspan], td[rowspan]').length > 0;
                     });
 
                     if (colspannedRows.length) {
                         let hasComplexRows = false;
 
-                        colspannedRows.each(function() {
+                        colspannedRows.each(function () {
                             const $row = jQuery(this);
                             const $cells = $row.children('td');
                             const $firstCell = $cells.first();
@@ -111,8 +111,17 @@
                         }
                     }
 
+                    const valid = $table.find('tbody tr').toArray().every(function (tr) {
+                        return jQuery(tr).find('td').length === columnCount;
+                    });
+
+                    if (!valid) {
+                        console.warn('Skipped DataTable due to column mismatch:', this);
+                        return;
+                    }
+
                     const noSortIndexes = [];
-                    $table.find('thead th').each(function(idx) {
+                    $table.find('thead th').each(function (idx) {
                         if (jQuery(this).hasClass('no-sort')) {
                             noSortIndexes.push(idx);
                         }
@@ -141,7 +150,7 @@
                     .not('.no-select-search')
                     .not('.select2-hidden-accessible');
 
-                selects.each(function() {
+                selects.each(function () {
                     const $select = jQuery(this);
                     const inModal = $select.closest('.modal').length > 0;
 
@@ -156,7 +165,7 @@
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     initGlobalDataTables();
                     initGlobalSelectSearch();
                 });
@@ -166,7 +175,6 @@
             }
         })();
     </script>
-
     @stack('scripts')
 </body>
 

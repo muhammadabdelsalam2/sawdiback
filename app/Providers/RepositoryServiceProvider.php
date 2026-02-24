@@ -23,6 +23,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // Customer Module
         \App\Repositories\Contracts\CustomerRepositoryInterface::class => \App\Repositories\CustomerRepository::class,
+        \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class => \App\Repositories\CustomerSubscriptionRepository::class,
     ];
     public function register(): void
     {
