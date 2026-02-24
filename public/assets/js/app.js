@@ -28,18 +28,18 @@ $(document).ready(function () {
                     // Show all cards using their original cycle
                     var cardDefaultCycle = $card.data('cycle');
                     price = (cardDefaultCycle === 'monthly') ? $card.data('monthly') :
-                            (cardDefaultCycle === 'weekly') ? $card.data('weekly') :
+                        (cardDefaultCycle === 'weekly') ? $card.data('weekly') :
                             (cardDefaultCycle === 'yearly') ? $card.data('yearly') :
-                            $card.data('monthly'); // fallback
+                                $card.data('monthly'); // fallback
                     label = (cardDefaultCycle === 'monthly') ? $card.data('monthly-label') :
-                            (cardDefaultCycle === 'weekly') ? $card.data('weekly-label') :
+                        (cardDefaultCycle === 'weekly') ? $card.data('weekly-label') :
                             (cardDefaultCycle === 'yearly') ? $card.data('yearly-label') :
-                            $card.data('monthly-label');
+                                $card.data('monthly-label');
                     break;
             }
 
             $card.find('.price-display').fadeOut(100, function () {
-                $(this).html(parseFloat(price).toFixed(2) + ' ' + currency + 
+                $(this).html(parseFloat(price).toFixed(2) + ' ' + currency +
                     ' <small class="text-muted">' + label + '</small>').fadeIn(100);
             });
 
@@ -52,3 +52,45 @@ $(document).ready(function () {
         });
     });
 });
+
+
+const swiper = new Swiper(".heroSwiper", {
+    loop: true,
+    spaceBetween: 30,
+    centeredSlides: true,
+    autoplay: {
+        delay: 4000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+    },
+    // Adds a nice smooth transition
+    effect: "coverflow",
+    coverflowEffect: {
+        rotate: 0,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: false,
+    },
+});
+
+
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            // Optional: Custom logic to highlight specific errors
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()

@@ -17,7 +17,7 @@
 
         @include('settings.cities._flash')
 
-        <form action="{{ route('settings.cities.update', ['locale' => $activeLocale, 'city' => $city]) }}" method="POST">
+        <form action="{{ route('superadmin.setting.cities.update', ['locale' => $activeLocale, 'city' => $city]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -25,7 +25,7 @@
 
             <div class="d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-primary-green">Update</button>
-                <a href="{{ route('settings.cities.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Cancel</a>
+                <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Cancel</a>
             </div>
         </form>
     </div>

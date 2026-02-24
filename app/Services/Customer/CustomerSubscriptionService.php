@@ -14,80 +14,144 @@ class CustomerSubscriptionService
         private readonly CustomerSubscriptionRepositoryInterface $repo
     ) {}
 
-    public function getCurrent(string $tenantId): ?Subscription
+    public function getLatest(string $tenantId): ?Subscription
     {
-        return $this->repo->getCurrentForTenant($tenantId);
+        return $this->repo->getLatestForTenant($tenantId);
     }
 
+    public function getActive(string $tenantId): ?Subscription
+    {
+        return $this->repo->getActiveForTenant($tenantId);
+    }
+
+    public function getPending(string $tenantId): ?Subscription
+    {
+        return $this->repo->getPendingForTenant($tenantId);
+    }
+
+    /**
+     * Customer flow: create REQUEST only (PENDING).
+     * Activation must happen via SuperAdmin approval/payment flow later.
+     */
     public function subscribe(string $tenantId, int $customerId, int $planId): Subscription
     {
         return DB::transaction(function () use ($tenantId, $customerId, $planId) {
-            $active = Subscription::query()
-                ->where('tenant_id', $tenantId)
-                ->active()
-                ->first();
 
+            $active = $this->repo->getActiveForTenant($tenantId);
             if ($active) {
                 throw ValidationException::withMessages([
                     'subscription' => 'Tenant already has an active subscription.',
                 ]);
             }
 
-            $subscription = $this->repo->createSubscription([
-                'tenant_id' => $tenantId,
-                'customer_id' => $customerId,
-                'plan_id' => $planId,
-                'status' => Subscription::STATUS_ACTIVE,
-                'start_at' => now(),
-                'renewal_at' => now()->addMonth(),
-            ]);
-
-            $this->logHistory($subscription->id, 'subscribe', null, Subscription::STATUS_ACTIVE, $customerId, [
-                'plan_id' => $planId,
-            ]);
-
-            return $subscription;
-        });
-    }
-
-    public function changePlan(string $tenantId, int $customerId, int $newPlanId): Subscription
-    {
-        return DB::transaction(function () use ($tenantId, $customerId, $newPlanId) {
-            $subscription = Subscription::query()
-                ->where('tenant_id', $tenantId)
-                ->active()
-                ->orderByDesc('id')
-                ->first();
-
-            if (!$subscription) {
+            $pending = $this->repo->getPendingForTenant($tenantId);
+            if ($pending) {
                 throw ValidationException::withMessages([
-                    'subscription' => 'No active subscription found for this tenant.',
+                    'subscription' => 'There is already a pending subscription request.',
                 ]);
             }
 
-            $oldPlanId = $subscription->plan_id;
-
-            $this->repo->updateSubscription($subscription, [
-                'plan_id' => $newPlanId,
+            // Create a pending request (no dates yet)
+            $subscription = $this->repo->createSubscription([
+                'tenant_id'   => $tenantId,
+                'customer_id' => $customerId,
+                'plan_id'     => $planId,
+                'status'      => Subscription::STATUS_PENDING,
+                'start_at'    => null,
+                'end_at'      => null,
+                'renewal_at'  => null,
+                'canceled_at' => null,
+                'metadata'    => [
+                    'request_type' => 'new_subscription',
+                    'requested_plan_id' => $planId,
+                    'payment_mode' => 'manual_or_checkout',
+                ],
             ]);
 
-            $this->logHistory($subscription->id, 'change_plan', $subscription->status, $subscription->status, $customerId, [
-                'old_plan_id' => $oldPlanId,
-                'new_plan_id' => $newPlanId,
-            ]);
+            $this->logHistory(
+                $subscription->id,
+                'requested_subscription',
+                null,
+                Subscription::STATUS_PENDING,
+                $customerId,
+                ['plan_id' => $planId]
+            );
 
             return $subscription->fresh(['plan.currency']);
         });
     }
 
+    /**
+     * Customer change plan: REQUEST only (PENDING).
+     * No direct update on active subscription.
+     */
+    public function changePlan(string $tenantId, int $customerId, int $newPlanId): Subscription
+    {
+        return DB::transaction(function () use ($tenantId, $customerId, $newPlanId) {
+
+            $pending = $this->repo->getPendingForTenant($tenantId);
+            if ($pending) {
+                throw ValidationException::withMessages([
+                    'subscription' => 'There is already a pending subscription request.',
+                ]);
+            }
+
+            $active = $this->repo->getActiveForTenant($tenantId);
+            if (!$active) {
+                throw ValidationException::withMessages([
+                    'subscription' => 'No active subscription found for this tenant.',
+                ]);
+            }
+
+            if ((int) $active->plan_id === (int) $newPlanId) {
+                throw ValidationException::withMessages([
+                    'plan_id' => 'You are already subscribed to this plan.',
+                ]);
+            }
+
+            // Create a pending request record (separate row) to be approved/processed later
+            $request = $this->repo->createSubscription([
+                'tenant_id'   => $tenantId,
+                'customer_id' => $customerId,
+                'plan_id'     => $newPlanId,
+                'status'      => Subscription::STATUS_PENDING,
+                'start_at'    => null,
+                'end_at'      => null,
+                'renewal_at'  => null,
+                'canceled_at' => null,
+                'metadata'    => [
+                    'request_type' => 'change_plan',
+                    'requested_plan_id' => $newPlanId,
+                    'from_subscription_id' => $active->id,
+                    'from_plan_id' => $active->plan_id,
+                    'payment_mode' => 'manual_or_checkout',
+                ],
+            ]);
+
+            $this->logHistory(
+                $request->id,
+                'requested_change_plan',
+                null,
+                Subscription::STATUS_PENDING,
+                $customerId,
+                [
+                    'old_plan_id' => $active->plan_id,
+                    'new_plan_id' => $newPlanId,
+                ]
+            );
+
+            return $request->fresh(['plan.currency']);
+        });
+    }
+
+    /**
+     * Customer cancel is allowed only when ACTIVE.
+     */
     public function cancel(string $tenantId, int $customerId): Subscription
     {
         return DB::transaction(function () use ($tenantId, $customerId) {
-            $subscription = Subscription::query()
-                ->where('tenant_id', $tenantId)
-                ->active()
-                ->orderByDesc('id')
-                ->first();
+
+            $subscription = $this->repo->getActiveForTenant($tenantId);
 
             if (!$subscription) {
                 throw ValidationException::withMessages([
@@ -104,7 +168,7 @@ class CustomerSubscriptionService
 
             $this->logHistory($subscription->id, 'cancel', $from, Subscription::STATUS_CANCELED, $customerId);
 
-            return $subscription->fresh();
+            return $subscription->fresh(['plan.currency']);
         });
     }
 

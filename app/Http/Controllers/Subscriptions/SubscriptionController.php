@@ -14,6 +14,9 @@ use App\Models\User;
 use App\Services\Subscriptions\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Http\Requests\Subscriptions\SubscriptionApproveRequest;
+use App\Http\Requests\Subscriptions\SubscriptionRejectRequest;
+
 
 class SubscriptionController extends Controller
 {
@@ -99,4 +102,27 @@ class SubscriptionController extends Controller
             ->route('superadmin.subscriptions.show', ['locale' => session('locale_full', 'en-SA'), 'subscription' => $subscription->id])
             ->with('success', __('subscriptions.messages.subscription_expired'));
     }
+
+    public function approve(SubscriptionApproveRequest $request, string $locale, Subscription $subscription): RedirectResponse
+{
+    $this->subscriptionService->approvePending($subscription, auth()->id());
+
+    return redirect()
+        ->route('superadmin.subscriptions.show', ['locale' => session('locale_full', 'en-SA'), 'subscription' => $subscription->id])
+        ->with('success', __('subscriptions.messages.subscription_approved'));
+}
+
+public function reject(SubscriptionRejectRequest $request, string $locale, Subscription $subscription): RedirectResponse
+{
+    $this->subscriptionService->rejectPending(
+        $subscription,
+        $request->validated('reason'),
+        auth()->id()
+    );
+
+    return redirect()
+        ->route('superadmin.subscriptions.show', ['locale' => session('locale_full', 'en-SA'), 'subscription' => $subscription->id])
+        ->with('success', __('subscriptions.messages.subscription_rejected'));
+}
+
 }

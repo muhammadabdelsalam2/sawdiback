@@ -3,50 +3,64 @@
 namespace App\Providers;
 
 use App\Models\Tenant;
-use App\Models\LivestockAnimal;
-use App\Observers\LivestockAnimalObserver;
 use App\Observers\TenantObserver;
-use App\Repositories\Contracts\PlanRepositoryInterface;
-use App\Repositories\PlanRepository;
+use App\Repositories\Contracts\CustomerRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
+
+use App\Services\PlanFeatureService;
+
+// Plan Repo
+use App\Repositories\Contracts\PlanRepositoryInterface;
+use App\Repositories\CustomerRepository;
+use App\Repositories\PlanRepository;
+
+// HR Contracts
+use App\Repositories\Contracts\DepartmentRepositoryInterface;
+use App\Repositories\Contracts\JobTitleRepositoryInterface;
+use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Repositories\Contracts\LeaveRepositoryInterface;
+use App\Repositories\Contracts\AttendanceRepositoryInterface;
+
+// HR Repos
+use App\Repositories\DepartmentRepository;
+use App\Repositories\JobTitleRepository;
+use App\Repositories\EmployeeRepository;
+use App\Repositories\LeaveRepository;
+use App\Repositories\AttendanceRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
-        $this->app->bind(
-            PlanRepositoryInterface::class,
-            PlanRepository::class
-
-
-        );
-        $this->app->bind(
-    \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class,
-    \App\Repositories\CustomerSubscriptionRepository::class
-);
 
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         View::composer('*', function ($view) {
             $lang = session('locale', 'en');
+
             $view->with([
                 'currentLocale' => session('locale_full', 'en-SA'),
                 'currentLang' => session('locale', 'en'),
                 'currentCurrency' => session('currency'),
                 'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
             ]);
+
+            // ✅ Subscription + Features Context
+            $service = app(PlanFeatureService::class);
+            $ctx = $service->contextFor(Auth::user());
+
+            $view->with([
+                'hasActiveSubscription' => $ctx['hasActiveSubscription'] ?? false,
+                'activeSubscription' => $ctx['activeSubscription'] ?? null,
+                'planFeatures' => $ctx['planFeatures'] ?? [],
+                'featureFlags' => $ctx['featureFlags'] ?? [],
+            ]);
         });
+
         Tenant::observe(TenantObserver::class);
-        LivestockAnimal::observe(LivestockAnimalObserver::class);
     }
 }

@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.rtl.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/svg.png')}}">
 
+    <link rel="shortcut icon" href="{{ asset('assets/images/svg.png')}}" type="image/x-icon">
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/pages/landing.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/pages/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     @stack('styles')
 </head>
 
@@ -31,9 +33,10 @@
     @include('shared.footer')
     <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
-
     @stack('scripts')
+
 </body>
 
 </html>

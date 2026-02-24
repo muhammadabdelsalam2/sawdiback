@@ -131,3 +131,25 @@ h3 {
         font-size: 0.9rem;
     }
 }
+
+.heroSwiper {
+    width: 100%;
+    max-width: 900px;
+    /* Limits size to look like a desktop app */
+    margin: 0 auto;
+}
+
+.swiper-slide img {
+    transition: transform 0.5s ease;
+}
+
+/* Active slide effect */
+.swiper-slide-active img {
+    transform: scale(1.02);
+}
+
+/* Change Swiper theme color to EL-SAWADY Green */
+:root {
+    --swiper-theme-color: #2D5A27;
+    --swiper-pagination-bullet-inactive-color: #cbd5e0;
+}

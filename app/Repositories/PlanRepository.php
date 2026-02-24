@@ -67,8 +67,12 @@ class PlanRepository implements PlanRepositoryInterface
 
         return $plan;
     }
-    public function allWithRelations(array $relations = []):Collection
+    public function allWithRelations(array $relations = []): Collection
     {
         return Plan::with($relations)->get();
+    }
+    public function findById(int $id): Plan
+    {
+        return Plan::find($id);
     }
 }

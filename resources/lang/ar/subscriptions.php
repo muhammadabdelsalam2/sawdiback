@@ -7,6 +7,7 @@ return [
         'subscriptions' => 'الاشتراكات',
         'history' => 'سجل الاشتراك',
     ],
+
     'actions' => [
         'save' => 'حفظ',
         'edit' => 'تعديل',
@@ -25,6 +26,7 @@ return [
         'cancel' => 'إلغاء',
         'expire' => 'إنهاء',
     ],
+
     'fields' => [
         'name' => 'الاسم',
         'slug' => 'المعرف',
@@ -53,11 +55,13 @@ return [
         'changed_by' => 'تم التغيير بواسطة',
         'created_at' => 'تاريخ الإنشاء',
     ],
+
     'billing_cycles' => [
         'weekly' => 'أسبوعي',
         'monthly' => 'شهري',
         'yearly' => 'سنوي',
     ],
+
     'statuses' => [
         'pending' => 'قيد الانتظار',
         'active' => 'نشط',
@@ -65,6 +69,7 @@ return [
         'expired' => 'منتهي',
         'suspended' => 'معلق',
     ],
+
     'messages' => [
         'plan_created' => 'تم إنشاء الباقة بنجاح.',
         'plan_updated' => 'تم تحديث الباقة بنجاح.',
@@ -78,11 +83,15 @@ return [
         'subscription_renewed' => 'تم تجديد الاشتراك بنجاح.',
         'subscription_canceled' => 'تم إلغاء الاشتراك بنجاح.',
         'subscription_expired' => 'تم إنهاء الاشتراك بنجاح.',
+        'subscription_approved' => 'تمت الموافقة على الاشتراك بنجاح.',
+        'subscription_rejected' => 'تم رفض طلب الاشتراك.',
     ],
+
     'general' => [
         'yes' => 'نعم',
         'no' => 'لا',
     ],
+
     'empty' => [
         'no_data' => 'لا توجد بيانات.',
     ],

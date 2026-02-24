@@ -23,7 +23,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form action="{{ route('settings.theme.update', ['locale' => $activeLocale]) }}" method="POST">
+        <form action="{{ route('superadmin.setting.theme.update', ['locale' => $activeLocale]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -77,7 +77,7 @@
 
             <div class="d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-primary-green">Save</button>
-                <a href="{{ route('settings.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Back</a>
+                <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Back</a>
             </div>
         </form>
     </div>

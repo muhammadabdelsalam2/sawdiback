@@ -48,13 +48,13 @@ class PlanService
     /**
      * Update plan with new features JSON
      */
-    public function updatePlan(int $id, array $data): bool
+    public function updatePlan(Plan $plan, array $data): Plan
     {
         if (isset($data['feature_keys'])) {
             $data['features'] = $this->buildFeaturesJson($data['feature_keys']);
         }
 
-        return $this->planRepository->update($id, $data);
+        return $this->planRepository->update($plan, $data);
     }
 
     /**

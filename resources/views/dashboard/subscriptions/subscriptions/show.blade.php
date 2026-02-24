@@ -19,46 +19,71 @@
             <p><strong>{{ __('subscriptions.fields.renewal_at') }}:</strong> {{ optional($subscription->renewal_at)->toDateTimeString() }}</p>
         </div>
 
-        <div class="bg-white p-3 rounded mb-3">
-            <h5>{{ __('subscriptions.actions.change_plan') }}</h5>
-            <form method="POST" action="{{ route('superadmin.subscriptions.change-plan', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}" class="row g-2">
-                @csrf
-                <div class="col-md-6">
-                    <select name="plan_id" class="form-select" required>
-                        @foreach ($plans as $plan)
-                            <option value="{{ $plan->id }}" @selected($subscription->plan_id === $plan->id)>{{ $plan->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <button class="btn btn-primary" type="submit">{{ __('subscriptions.actions.change_plan') }}</button>
-                </div>
-            </form>
-        </div>
+        {{-- Approve/Reject visible ONLY when pending --}}
+        @if($subscription->status === \App\Models\Subscription::STATUS_PENDING)
+            <div class="bg-white p-3 rounded mb-3">
+                <h5>Pending Request</h5>
 
-        <div class="bg-white p-3 rounded mb-3">
-            <h5>{{ __('subscriptions.actions.renew') }}</h5>
-            <form method="POST" action="{{ route('superadmin.subscriptions.renew', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}" class="row g-2">
-                @csrf
-                <div class="col-md-6">
-                    <input type="datetime-local" class="form-control" name="from_date">
-                </div>
-                <div class="col-md-6">
-                    <button class="btn btn-success" type="submit">{{ __('subscriptions.actions.renew') }}</button>
-                </div>
-            </form>
-        </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <form method="POST" action="{{ route('superadmin.subscriptions.approve', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}">
+                        @csrf
+                        <button class="btn btn-success" type="submit">Approve</button>
+                    </form>
 
-        <div class="bg-white p-3 rounded mb-3 d-flex gap-2">
-            <form method="POST" action="{{ route('superadmin.subscriptions.cancel', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}">
-                @csrf
-                <button class="btn btn-warning" type="submit">{{ __('subscriptions.actions.cancel') }}</button>
-            </form>
-            <form method="POST" action="{{ route('superadmin.subscriptions.expire', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}">
-                @csrf
-                <button class="btn btn-danger" type="submit">{{ __('subscriptions.actions.expire') }}</button>
-            </form>
-        </div>
+                    <form method="POST" action="{{ route('superadmin.subscriptions.reject', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}" class="d-flex gap-2 flex-wrap align-items-center">
+                        @csrf
+                        <input type="text" name="reason" class="form-control" placeholder="Reject reason (optional)" style="max-width: 320px;">
+                        <button class="btn btn-outline-danger" type="submit">Reject</button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        {{-- Hide other management actions while pending (UI safety) --}}
+        @if($subscription->status !== \App\Models\Subscription::STATUS_PENDING)
+
+            <div class="bg-white p-3 rounded mb-3">
+                <h5>{{ __('subscriptions.actions.change_plan') }}</h5>
+                <form method="POST" action="{{ route('superadmin.subscriptions.change-plan', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}" class="row g-2">
+                    @csrf
+                    <div class="col-md-6">
+                        <select name="plan_id" class="form-select" required>
+                            @foreach ($plans as $plan)
+                                <option value="{{ $plan->id }}" @selected($subscription->plan_id === $plan->id)>{{ $plan->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-primary" type="submit">{{ __('subscriptions.actions.change_plan') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-3 rounded mb-3">
+                <h5>{{ __('subscriptions.actions.renew') }}</h5>
+                <form method="POST" action="{{ route('superadmin.subscriptions.renew', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}" class="row g-2">
+                    @csrf
+                    <div class="col-md-6">
+                        <input type="datetime-local" class="form-control" name="from_date">
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-success" type="submit">{{ __('subscriptions.actions.renew') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white p-3 rounded mb-3 d-flex gap-2">
+                <form method="POST" action="{{ route('superadmin.subscriptions.cancel', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}">
+                    @csrf
+                    <button class="btn btn-warning" type="submit">{{ __('subscriptions.actions.cancel') }}</button>
+                </form>
+                <form method="POST" action="{{ route('superadmin.subscriptions.expire', ['locale' => $currentLocale, 'subscription' => $subscription->id]) }}">
+                    @csrf
+                    <button class="btn btn-danger" type="submit">{{ __('subscriptions.actions.expire') }}</button>
+                </form>
+            </div>
+
+        @endif
 
         <div class="bg-white p-3 rounded">
             <h5>{{ __('subscriptions.titles.history') }}</h5>

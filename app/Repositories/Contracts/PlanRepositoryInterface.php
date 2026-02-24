@@ -55,4 +55,7 @@ interface PlanRepositoryInterface
      * Toggle plan active status
      */
     public function toggleStatus(Plan $plan): Plan;
+
+
+    public function findById(int $id): Plan;
 }

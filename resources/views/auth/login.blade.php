@@ -16,11 +16,7 @@
                             <div>
                                 <div class="d-flex align-items-center mb-4">
                                     <div class="bg-white rounded p-2 me-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="#2D5A27" class="bi bi-patch-check-fill" viewBox="0 0 16 16">
-                                            <path
-                                                d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01-.622-.636z" />
-                                        </svg>
+                                       <img width="50px" src="{{ asset('assets/images/svg.png')}}" alt="This Is Main LOGO">
                                     </div>
                                     <span class="farm-logo-text fs-5">
                                         {{ __('auth.farm_name') }}

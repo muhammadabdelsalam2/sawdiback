@@ -120,4 +120,9 @@ class LivestockAnimal extends Model
     {
         return $this->hasMany(AnimalStatusHistory::class, 'animal_id');
     }
+
+    public function feedConsumptions(): HasMany
+    {
+        return $this->hasMany(FeedConsumption::class, 'animal_id');
+    }
 }

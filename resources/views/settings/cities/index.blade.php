@@ -14,14 +14,15 @@
                 <p class="dashboard-desc mb-0">Manage cities linked to countries.</p>
             </div>
 
-            <a href="{{ route('settings.cities.create', ['locale' => $activeLocale]) }}" class="btn btn-primary-green">
+            <a href="{{ route('superadmin.setting.cities.create', ['locale' => $activeLocale]) }}"
+                class="btn btn-primary-green">
                 <i class="fa-solid fa-plus me-2"></i>Create City
             </a>
         </div>
 
         @include('settings.cities._flash')
-
-        <form method="GET" action="{{ route('settings.cities.index', ['locale' => $activeLocale]) }}" class="mb-3">
+        <form method="GET" action="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}"
+            class="mb-3">
             <div class="row g-2 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Filter by Country</label>
@@ -37,7 +38,8 @@
 
                 <div class="col-md-4 d-flex gap-2">
                     <button class="btn btn-outline-white" type="submit">Apply</button>
-                    <a class="btn btn-outline-white" href="{{ route('settings.cities.index', ['locale' => $activeLocale]) }}">Reset</a>
+                    <a class="btn btn-outline-white"
+                        href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}">Reset</a>
                 </div>
             </div>
         </form>
@@ -68,16 +70,14 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('settings.cities.edit', ['locale' => $activeLocale, 'city' => $city]) }}"
-                                       class="btn btn-sm btn-outline-white me-1">
+                                    <a href="{{ route('superadmin.setting.cities.edit', ['locale' => $activeLocale, 'city' => $city]) }}"
+                                        class="btn btn-sm btn-outline-white me-1">
                                         Edit
                                     </a>
 
                                     <form
-                                        action="{{ route('settings.cities.destroy', ['locale' => $activeLocale, 'city' => $city]) }}"
-                                        method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Delete this city?');">
+                                        action="{{ route('superadmin.setting.cities.destroy', ['locale' => $activeLocale, 'city' => $city]) }}"
+                                        method="POST" class="d-inline" onsubmit="return confirm('Delete this city?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Subscriptions\CancelRequest;
 use App\Http\Requests\Customer\Subscriptions\ChangePlanRequest;
 use App\Http\Requests\Customer\Subscriptions\SubscribeRequest;
+use App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface;
 use App\Services\Customer\CustomerSubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,7 +14,8 @@ use Illuminate\View\View;
 class CustomerSubscriptionController extends Controller
 {
     public function __construct(
-        private readonly CustomerSubscriptionService $service
+        private readonly CustomerSubscriptionService $service,
+        private readonly CustomerSubscriptionRepositoryInterface $repo
     ) {}
 
     public function index(string $locale): View
@@ -21,13 +23,24 @@ class CustomerSubscriptionController extends Controller
         $user = auth()->user();
         $tenantId = (string) $user->tenant_id;
 
-        $subscription = $tenantId ? $this->service->getCurrent($tenantId) : null;
+        $activeSubscription = $tenantId ? $this->service->getActive($tenantId) : null;
+        $pendingRequest     = $tenantId ? $this->service->getPending($tenantId) : null;
+        $latestSubscription = $tenantId ? $this->service->getLatest($tenantId) : null;
 
-        // Plans for choosing/upgrading (active only)
-        $plans = app(\App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class)
-            ->listActivePlans(15);
+        // What to show in "My Subscription" card:
+        // - If pending exists, show it (because user just requested and is waiting)
+        // - Else show active
+        // - Else show latest (e.g. expired)
+        $subscription = $pendingRequest ?? $activeSubscription ?? $latestSubscription;
 
-        return view('dashboard.customer.subscription.index', compact('subscription', 'plans'));
+        $plans = $this->repo->listActivePlans(15);
+
+        return view('dashboard.customer.subscription.index', [
+            'subscription'       => $subscription,
+            'activeSubscription' => $activeSubscription,
+            'pendingRequest'     => $pendingRequest,
+            'plans'              => $plans,
+        ]);
     }
 
     public function subscribe(SubscribeRequest $request, string $locale): RedirectResponse
@@ -38,11 +51,15 @@ class CustomerSubscriptionController extends Controller
             return back()->withErrors(['tenant' => 'No tenant linked to this user yet.']);
         }
 
-        $this->service->subscribe((string)$user->tenant_id, (int)$user->id, (int)$request->validated()['plan_id']);
+        $this->service->subscribe(
+            (string) $user->tenant_id,
+            (int) $user->id,
+            (int) $request->validated()['plan_id']
+        );
 
         return redirect()
             ->route('customer.subscription.index', ['locale' => $locale])
-            ->with('success', 'Subscription activated successfully.');
+            ->with('success', 'Subscription request submitted. Waiting for approval/payment.');
     }
 
     public function changePlan(ChangePlanRequest $request, string $locale): RedirectResponse
@@ -53,11 +70,15 @@ class CustomerSubscriptionController extends Controller
             return back()->withErrors(['tenant' => 'No tenant linked to this user yet.']);
         }
 
-        $this->service->changePlan((string)$user->tenant_id, (int)$user->id, (int)$request->validated()['plan_id']);
+        $this->service->changePlan(
+            (string) $user->tenant_id,
+            (int) $user->id,
+            (int) $request->validated()['plan_id']
+        );
 
         return redirect()
             ->route('customer.subscription.index', ['locale' => $locale])
-            ->with('success', 'Plan changed successfully.');
+            ->with('success', 'Plan change request submitted. Waiting for approval/payment.');
     }
 
     public function cancel(CancelRequest $request, string $locale): RedirectResponse
@@ -68,7 +89,7 @@ class CustomerSubscriptionController extends Controller
             return back()->withErrors(['tenant' => 'No tenant linked to this user yet.']);
         }
 
-        $this->service->cancel((string)$user->tenant_id, (int)$user->id);
+        $this->service->cancel((string) $user->tenant_id, (int) $user->id);
 
         return redirect()
             ->route('customer.subscription.index', ['locale' => $locale])

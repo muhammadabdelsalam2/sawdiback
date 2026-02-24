@@ -5,6 +5,7 @@
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
     @endphp
+
     <nav class="sidebar-nav mt-4">
         <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}"
             class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
@@ -45,9 +46,8 @@
         </div>
 
         @role('SuperAdmin')
-
         <div class="nav-dropdown">
-            <a href="{{ route('superadmin.plans.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
+            <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}"
                 class="nav-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
                 <i class="bi bi-gem nav-icon"></i>
                 <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
@@ -55,42 +55,79 @@
         </div>
 
         <div class="nav-dropdown">
-            <a href="{{ route('superadmin.subscriptions.index', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
+            <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}"
                 class="nav-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
                 <i class="bi bi-arrow-repeat nav-icon"></i>
                 <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
             </a>
         </div>
-
         @endrole
 
-
         <div class="sidebar-bottom">
+
+
             @can('roles.manage')
-                <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
-                    class="nav-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
-                    <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
-                </a>
-                <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}"
+
+
+                <div
+                    class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+
+                    <a href="javascript:void(0)"
+                        class="nav-item has-dropdown {{request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                        <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
+                        <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
+                        <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                    </a>
+
+                    <div
+                        class="dropdown-container {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'show' : '' }}">
+
+                        <a href="{{ route('superadmin.setting.countries.index', ['locale' => $currentLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.setting.countries.*') ? 'active' : '' }}">
+                            {{ __('dashboard.sidebar.countries') }}
+                        </a>
+
+                        <a href="{{ route('superadmin.setting.cities.index', ['locale' => $currentLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.setting.cities.*') ? 'active' : '' }}">
+                            {{ __('dashboard.sidebar.cities') }}
+                        </a>
+
+                        <a href="{{ route('superadmin.setting.theme.index', ['locale' => $currentLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.setting.theme.*') ? 'active' : '' }}">
+                            {{ __('dashboard.sidebar.theme') }}
+                        </a>
+
+                        @can('roles.manage')
+                            <a href="{{ route('superadmin.access-management', ['locale' => $currentLocale]) }}"
+                                class="nav-item w-100 {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                                {{ __('dashboard.sidebar.settings.permissionsManagement') }}
+                            </a>
+                        @endcan
+
+                    </div>
+                </div>
+
+                {{-- User Management --}}
+                <a href="{{ route('superadmin.users.index', ['locale' => $currentLocale]) }}"
                     class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{__('superadmin.dashboard.user_management')}}</span>
+                    <span class="nav-label">User Management</span>
                 </a>
+
             @endcan
+
             <!-- Link-style logout -->
             <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="nav-item d-flex align-items-center">
-
                 <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
                 <span class="nav-label">{{ __('dashboard.sidebar.logout') }}</span>
             </a>
 
             <!-- Hidden logout form -->
-            <form id="logout-form" action="{{ route('logout', $currentLocale) }}" method="POST" class="d-none">
+            <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST"
+                class="d-none">
                 @csrf
             </form>
-
-
         </div>
+    </nav>
 </aside>

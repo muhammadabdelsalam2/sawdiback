@@ -41,6 +41,7 @@ class LivestockManagementSeeder extends Seeder
             AnimalFeedingLogsSeeder::class,
             AnimalWeightLogsSeeder::class,
             AnimalStatusHistorySeeder::class,
+            CropsFeedSeeder::class,
         ]);
     }
 }

@@ -20,6 +20,10 @@
         <label class="form-label">{{ __('livestock.fields.cost_per_unit') }}</label>
         <input type="number" step="0.01" min="0" name="cost_per_unit" class="form-control" value="{{ old('cost_per_unit', $feedType->cost_per_unit ?? '') }}">
     </div>
+    <div class="col-md-6">
+        <label class="form-label">{{ __('livestock.fields.low_stock_threshold') }}</label>
+        <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control" value="{{ old('low_stock_threshold', $feedType->low_stock_threshold ?? 0) }}">
+    </div>
     <div class="col-12">
         <label class="form-label">{{ __('livestock.fields.notes') }}</label>
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $feedType->notes ?? '') }}</textarea>

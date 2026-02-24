@@ -5,6 +5,11 @@
         $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
+
+        $features = auth()->check() ? auth()->user()->planFeatures() : [];
+
+        // Feature flag (new structure: ['hr_management' => ['enabled' => bool, ...]])
+        $hrEnabled = (bool) ($features['hr_management']['enabled'] ?? false);
     @endphp
 
     {{-- You Can Start Get Features About Current Subscription Plan auth()->user()->planFeatures() --}}
@@ -18,19 +23,19 @@
         </a>
 
         {{-- Subscription --}}
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}">
-        <span class="nav-icon">
-            <i class="fa-solid fa-credit-card"></i>
-        </span>
-        <span class="nav-label">My Subscription</span>
-    </a>
-</li>
-
+        <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}"
+            class="nav-item {{ request()->routeIs('customer.subscription.*') ? 'active' : '' }}">
+            <span class="nav-icon">
+                <i class="fa-solid fa-credit-card"></i>
+            </span>
+            <span class="nav-label">My Subscription</span>
+        </a>
 
         {{-- Livestock --}}
-        <div class="nav-dropdown">
-            <a href="javascript:void(0)" class="nav-item has-dropdown">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-2.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.livestock') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -63,12 +68,24 @@
         </div>
 
         {{-- Crops & Feed --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.crops-feed.*') || request()->routeIs('crops-feed.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.crops-feed.*') || request()->routeIs('crops-feed.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-4.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.crops_feed') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.crops-feed.crops.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.crops.*') ? 'active' : '' }}">{{ __('crops_feed.titles.crops') }}</a>
+                <a href="{{ route('customer.crops-feed.feed.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.feed.*') ? 'active' : '' }}">{{ __('crops_feed.titles.feed_management') }}</a>
+                <a href="{{ route('customer.crops-feed.reports.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.crops-feed.reports.*') ? 'active' : '' }}">{{ __('crops_feed.titles.reports') }}</a>
+                <a href="{{ route('customer.livestock.feed-types.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
+            </div>
         </div>
 
         {{-- Inventory --}}
@@ -107,14 +124,50 @@
             </a>
         </div>
 
-        {{-- HR Management --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
-                <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
-            </a>
-        </div>
+        {{-- HR Management (Only if enabled in plan features) --}}
+        @if ($hrEnabled)
+            <div
+                class="nav-dropdown {{ request()->routeIs('customer.hr.*') || request()->routeIs('hr.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+                <a href="javascript:void(0)"
+                    class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
+                    <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                </a>
+
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">
+                        HR Dashboard
+                    </a>
+
+                    <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">
+                        Departments
+                    </a>
+
+                    <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">
+                        Job Titles
+                    </a>
+
+                    <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">
+                        Employees
+                    </a>
+
+                    <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">
+                        Attendance
+                    </a>
+
+                    <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">
+                        Leave Requests
+                    </a>
+                </div>
+            </div>
+        @endif
 
         {{-- Maintenance --}}
         <div class="nav-dropdown">
@@ -147,12 +200,12 @@
                         {{ __('dashboard.sidebar.countries') }}
                     </a>
 
-                    <a href="{{ route('settings.cities.index', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.cities.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.cities') }}
                     </a>
 
-                    <a href="{{ route('settings.theme.edit', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.theme.edit', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.theme.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.theme') }}
                     </a>
@@ -166,12 +219,10 @@
                 <span class="nav-label">User Management</span>
             </a>
 
-
         @endcan
 
         {{-- Logout --}}
-        <a href="#"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
             class="nav-item d-flex align-items-center">
             <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
             <span class="nav-label">{{ __('dashboard.sidebar.logout') }}</span>
