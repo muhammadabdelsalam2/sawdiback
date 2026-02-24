@@ -55,7 +55,7 @@
     <!-- Custom JS -->
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
     <script>
-        (function() {
+        (function () {
             const dataTableLanguage = {
                 search: @json(__('datatable.search')),
                 lengthMenu: @json(__('datatable.show')) + ' ' + @json(__('datatable.show_menu')) + ' ' + @json(__('datatable.entries')),
@@ -76,11 +76,23 @@
 
                 const tables = jQuery('#content table').not('.no-datatable');
 
-                tables.each(function() {
+                tables.each(function () {
+
                     if (jQuery.fn.dataTable.isDataTable(this)) return;
 
+                    // ✅ FIX: validate column count
+                    const thCount = jQuery(this).find('thead th').length;
+                    const valid = jQuery(this).find('tbody tr').toArray().every(tr => {
+                        return jQuery(tr).find('td').length === thCount;
+                    });
+
+                    if (!valid) {
+                        console.warn('Skipped DataTable due to column mismatch:', this);
+                        return;
+                    }
+
                     const noSortIndexes = [];
-                    jQuery(this).find('thead th').each(function(idx) {
+                    jQuery(this).find('thead th').each(function (idx) {
                         if (jQuery(this).hasClass('no-sort')) {
                             noSortIndexes.push(idx);
                         }
@@ -98,6 +110,7 @@
                             orderable: false
                         }] : []
                     });
+
                 });
             }
 
@@ -108,7 +121,6 @@
             }
         })();
     </script>
-
     @stack('scripts')
 </body>
 
