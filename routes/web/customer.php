@@ -11,6 +11,8 @@ use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
 use App\Http\Controllers\CropsFeed\CropController;
 use App\Http\Controllers\CropsFeed\FeedManagementController;
+use App\Http\Controllers\Warehouse\InventoryProductController;
+use App\Http\Controllers\Warehouse\WarehouseController;
 
 use App\Http\Controllers\Customer\HR\DepartmentController;
 use App\Http\Controllers\Customer\HR\JobTitleController;
@@ -74,17 +76,17 @@ Route::prefix('{locale}')
             Route::get('alerts/under-treatment', [LivestockOperationsController::class, 'underTreatmentAnimals'])->name('alerts.under-treatment');
         });
 
-        Route::prefix('crops-feed')->name('crops-feed.')->group(function () {
-            Route::resource('crops', CropController::class);
-            Route::post('crops/growth-stages', [CropController::class, 'storeGrowthStage'])->name('crops.growth-stages.store');
-            Route::post('crops/cost-items', [CropController::class, 'storeCostItem'])->name('crops.cost-items.store');
+        Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::resource('products', InventoryProductController::class)->except(['show']);
 
-            Route::get('feed', [FeedManagementController::class, 'index'])->name('feed.index');
-            Route::post('feed/stock-movements', [FeedManagementController::class, 'storeStockMovement'])->name('feed.stock-movements.store');
-            Route::post('feed/consumptions', [FeedManagementController::class, 'storeConsumption'])->name('feed.consumptions.store');
-            Route::post('feed/crop-allocations', [FeedManagementController::class, 'storeCropAllocation'])->name('feed.crop-allocations.store');
+            Route::get('/', [WarehouseController::class, 'index'])->name('index');
+            Route::post('batches', [WarehouseController::class, 'storeBatch'])->name('batches.store');
+            Route::post('movements', [WarehouseController::class, 'storeMovement'])->name('movements.store');
+            Route::post('production', [WarehouseController::class, 'storeProduction'])->name('production.store');
+            Route::post('deliveries', [WarehouseController::class, 'storeDelivery'])->name('deliveries.store');
 
-            Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
+            Route::get('alerts', [WarehouseController::class, 'alerts'])->name('alerts.index');
+            Route::get('traceability', [WarehouseController::class, 'traceability'])->name('traceability.index');
         });
 
         Route::prefix('crops-feed')->name('crops-feed.')->group(function () {
