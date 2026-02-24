@@ -82,7 +82,7 @@ class CityController extends Controller
             ]);
 
             return redirect()
-                ->route('settings.cities.index', ['locale' => $request->route('locale')])
+                ->route('superadmin.setting.cities.index', ['locale' => $request->route('locale')])
                 ->with('success', 'City created successfully.');
         } catch (\Throwable $e) {
             return back()
@@ -118,7 +118,7 @@ class CityController extends Controller
             ]);
 
             return redirect()
-                ->route('settings.cities.index', ['locale' => $request->route('locale')])
+                ->route('superadmin.setting.cities.index', ['locale' => $request->route('locale')])
                 ->with('success', 'City updated successfully.');
         } catch (\Throwable $e) {
             return back()
@@ -136,7 +136,7 @@ class CityController extends Controller
             $cityModel->delete();
 
             return redirect()
-                ->route('settings.cities.index', ['locale' => $locale])
+                ->route('superadmin.setting.cities.index', ['locale' => $locale])
                 ->with('success', 'City deleted successfully.');
         } catch (\Throwable $e) {
             return back()->with('error', 'Failed to delete city.');

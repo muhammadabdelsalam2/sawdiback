@@ -26,6 +26,11 @@ return [
         'theme' => 'Theme',
 
         'logout' => 'Logout',
+
+        // System Settings
+        'settings' => [
+            'permissionsManagement' => 'Permissions Management'
+        ],
     ],
 
     'overview_title' => 'Dashboard Overview',
@@ -90,5 +95,6 @@ return [
     'no_plan_feature_4' => 'Generate reports and insights',
 
     // Dashboard stats (example reuse)
+
 
 ];

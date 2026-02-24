@@ -17,13 +17,13 @@
 
         @include('settings.countries._flash')
 
-        <form action="{{ route('settings.countries.store', ['locale' => $activeLocale]) }}" method="POST">
+        <form action="{{ route('superadmin.setting.countries.store', ['locale' => $activeLocale]) }}" method="POST">
             @csrf
-            @include('settings.countries._form', ['country' => null])
+            @include('superadmin.setting.countries._form', ['country' => null])
 
             <div class="d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-primary-green">Save</button>
-                <a href="{{ route('settings.countries.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Cancel</a>
+                <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Cancel</a>
             </div>
         </form>
     </div>

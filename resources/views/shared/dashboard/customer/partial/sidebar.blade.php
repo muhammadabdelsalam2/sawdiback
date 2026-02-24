@@ -32,8 +32,10 @@
         </a>
 
         {{-- Livestock --}}
-        <div class="nav-dropdown">
-            <a href="javascript:void(0)" class="nav-item has-dropdown">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-2.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.livestock') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -66,8 +68,10 @@
         </div>
 
         {{-- Crops & Feed --}}
-        <div class="nav-dropdown">
-            <a href="javascript:void(0)" class="nav-item has-dropdown">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.crops-feed.*') || request()->routeIs('crops-feed.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.crops-feed.*') || request()->routeIs('crops-feed.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-4.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.crops_feed') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -122,7 +126,8 @@
 
         {{-- HR Management (Only if enabled in plan features) --}}
         @if ($hrEnabled)
-            <div class="nav-dropdown">
+            <div
+                class="nav-dropdown {{ request()->routeIs('customer.hr.*') || request()->routeIs('hr.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
                 <a href="javascript:void(0)"
                     class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
@@ -195,12 +200,12 @@
                         {{ __('dashboard.sidebar.countries') }}
                     </a>
 
-                    <a href="{{ route('settings.cities.index', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.cities.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.cities') }}
                     </a>
 
-                    <a href="{{ route('settings.theme.edit', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.theme.edit', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.theme.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.theme') }}
                     </a>
@@ -217,8 +222,7 @@
         @endcan
 
         {{-- Logout --}}
-        <a href="#"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
             class="nav-item d-flex align-items-center">
             <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
             <span class="nav-label">{{ __('dashboard.sidebar.logout') }}</span>

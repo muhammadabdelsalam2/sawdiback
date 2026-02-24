@@ -53,8 +53,3 @@ Route::prefix('{locale}')
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     });
 
-// =====================
-// Modular Route Files
-// =====================
-require __DIR__ . '/web/customer.php';
-require __DIR__ . '/web/superadmin.php';

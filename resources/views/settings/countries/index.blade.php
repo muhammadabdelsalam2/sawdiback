@@ -13,7 +13,7 @@
                 <h1 class="dashboard-title mb-1">Countries</h1>
                 <p class="dashboard-desc mb-0">Manage countries used across the system.</p>
             </div>
-            <a href="{{ route('settings.countries.create', ['locale' => $activeLocale]) }}" class="btn btn-primary-green">
+            <a href="{{ route('superadmin.setting.countries.create', ['locale' => $activeLocale]) }}" class="btn btn-primary-green">
                 <i class="fa-solid fa-plus me-2"></i>Create Country
             </a>
         </div>
@@ -50,13 +50,13 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('settings.countries.edit', ['locale' => $activeLocale, 'country' => $country]) }}"
+                                    <a href="{{ route('superadmin.setting.countries.edit', ['locale' => $activeLocale, 'country' => $country]) }}"
                                        class="btn btn-sm btn-outline-white me-1">
                                         Edit
                                     </a>
 
                                     <form
-                                        action="{{ route('settings.countries.destroy', ['locale' => $activeLocale, 'country' => $country]) }}"
+                                        action="{{ route('superadmin.setting.countries.destroy', ['locale' => $activeLocale, 'country' => $country]) }}"
                                         method="POST"
                                         class="d-inline"
                                         onsubmit="return confirm('Delete this country?');">
