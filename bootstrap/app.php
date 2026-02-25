@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ApiErrorMiddleware;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\EnsureFeatureEnabled;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -18,8 +19,27 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
+
+            // ===== Web Routes =====
             Route::middleware('web')->group(function () {
+
+                // Load main web.php file
+                require base_path('routes/web.php');
+
+                // Load extra web routes in routes/web/*.php
                 foreach (glob(base_path('routes/web/*.php')) as $file) {
+                    require $file;
+                }
+            });
+
+            // ===== API Routes =====
+            Route::prefix('api')->middleware('api')->group(function () {
+
+                // Load main api.php file
+                require base_path('routes/api.php');
+
+                // Load extra api routes in routes/api/*.php if you have them
+                foreach (glob(base_path('routes/api/*.php')) as $file) {
                     require $file;
                 }
             });
@@ -45,6 +65,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // ✅ REQUIRED FOR FEATURE GATING
             'feature' => EnsureFeatureEnabled::class,
+        ]);
+
+        // Append API error middleware
+        $middleware->appendToGroup('api', [
+            ApiErrorMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
