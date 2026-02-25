@@ -63,5 +63,19 @@ return [
     'terms_title' => 'Terms of Service',
     'privacy_title' => 'Privacy Policy',
     'last_updated' => 'Last Updated',
-    'invalid_credentials' => 'Invalid Credentials'
+    'invalid_credentials' => 'Invalid Credentials',
+        // General messages
+    'register_success' => 'Registration successful.',
+    'login_success' => 'Login successful.',
+    'logout_success' => 'Logout successful.',
+    'otp_sent' => 'OTP code has been sent successfully.',
+    'otp_verified' => 'OTP verified successfully.',
+    'user_not_found' => 'User not found.',
+    'password_reset_success' => 'Password has been reset successfully.',
+
+    // Validation messages
+    'email_required' => 'Email is required.',
+    'phone_required' => 'Phone number is required.',
+    'otp_required' => 'OTP code is required.',
+    'otp_invalid' => 'OTP code is invalid or expired.',
 ];
