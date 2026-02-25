@@ -24,6 +24,14 @@ class RepositoryServiceProvider extends ServiceProvider
         // Customer Module
         \App\Repositories\Contracts\CustomerRepositoryInterface::class => \App\Repositories\CustomerRepository::class,
         \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class => \App\Repositories\CustomerSubscriptionRepository::class,
+
+        // Sales & Distribution Module
+        \App\Repositories\Contracts\SalesDistribution\SalesCustomerRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesCustomerRepository::class,
+        \App\Repositories\Contracts\SalesDistribution\SalesContractRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesContractRepository::class,
+        \App\Repositories\Contracts\SalesDistribution\SalesOrderRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesOrderRepository::class,
+        \App\Repositories\Contracts\SalesDistribution\SalesShipmentRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesShipmentRepository::class,
+        \App\Repositories\Contracts\SalesDistribution\SalesInvoiceRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesInvoiceRepository::class,
+        \App\Repositories\Contracts\SalesDistribution\SalesPaymentRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesPaymentRepository::class,
     ];
     public function register(): void
     {

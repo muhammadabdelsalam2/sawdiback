@@ -17,6 +17,13 @@ use App\Http\Controllers\Customer\HR\JobTitleController;
 use App\Http\Controllers\Customer\HR\EmployeeController;
 use App\Http\Controllers\Customer\HR\AttendanceController;
 use App\Http\Controllers\Customer\HR\LeaveRequestController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesContractController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesCustomerController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesDistributionDashboardController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesInvoiceController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesOrderController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesPaymentController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesShipmentController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
@@ -98,6 +105,20 @@ Route::prefix('{locale}')
             Route::post('feed/crop-allocations', [FeedManagementController::class, 'storeCropAllocation'])->name('feed.crop-allocations.store');
 
             Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
+        });
+
+        Route::prefix('sales-distribution')->name('sales-distribution.')->group(function () {
+            Route::get('/', [SalesDistributionDashboardController::class, 'index'])->name('dashboard');
+
+            Route::resource('customers', SalesCustomerController::class);
+            Route::resource('contracts', SalesContractController::class);
+            Route::resource('orders', SalesOrderController::class);
+            Route::resource('shipments', SalesShipmentController::class);
+            Route::resource('invoices', SalesInvoiceController::class);
+
+            Route::post('invoices/{invoice}/payments', [SalesPaymentController::class, 'store'])->name('invoices.payments.store');
+            Route::put('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'update'])->name('invoices.payments.update');
+            Route::delete('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'destroy'])->name('invoices.payments.destroy');
         });
 
         // =========================
