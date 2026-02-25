@@ -2,7 +2,13 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\OtpRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\LeaveRepository;
+use App\Repositories\OtpRepository;
+use App\Repositories\UserRepository;
+use App\Services\API\Auth\Contracts\OtpSenderFactory;
+use App\Services\API\Auth\Contracts\OtpSenderInterface;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -24,9 +30,21 @@ class RepositoryServiceProvider extends ServiceProvider
         // Customer Module
         \App\Repositories\Contracts\CustomerRepositoryInterface::class => \App\Repositories\CustomerRepository::class,
         \App\Repositories\Contracts\CustomerSubscriptionRepositoryInterface::class => \App\Repositories\CustomerSubscriptionRepository::class,
+        UserRepositoryInterface::class => UserRepository::class,
+        OtpRepositoryInterface::class => OtpRepository::class,
+        // OTP Repository
     ];
     public function register(): void
     {
+        $this->app->bind(OtpSenderInterface::class, function ($app) {
+            return new class implements OtpSenderInterface {
+                public function send(string $identifier, string $code): void
+                {
+                    $sender = OtpSenderFactory::make($identifier);
+                    $sender->send($identifier, $code);
+                }
+            };
+        });
         foreach ($this->repositories as $interface => $implementation) {
             $this->app->bind($interface, $implementation);
         }

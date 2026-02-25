@@ -49,4 +49,19 @@ return [
     'terms_title' => 'شروط الخدمة',
     'privacy_title' => 'سياسة الخصوصية',
     'last_updated' => 'آخر تحديث',
+      // General messages
+    'register_success' => 'تم التسجيل بنجاح.',
+    'login_success' => 'تم تسجيل الدخول بنجاح.',
+    'logout_success' => 'تم تسجيل الخروج بنجاح.',
+    'otp_sent' => 'تم إرسال رمز التحقق OTP بنجاح.',
+    'otp_verified' => 'تم التحقق من رمز التحقق OTP بنجاح.',
+    'invalid_credentials' => 'بيانات اعتماد غير صحيحة.',
+    'user_not_found' => 'المستخدم غير موجود.',
+    'password_reset_success' => 'تم إعادة تعيين كلمة المرور بنجاح.',
+
+    // Validation messages
+    'email_required' => 'البريد الإلكتروني مطلوب.',
+    'phone_required' => 'رقم الهاتف مطلوب.',
+    'otp_required' => 'رمز التحقق OTP مطلوب.',
+    'otp_invalid' => 'رمز التحقق OTP غير صالح أو انتهت صلاحيته.',
 ];
