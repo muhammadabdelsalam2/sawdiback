@@ -49,7 +49,6 @@ return [
     'full_name' => 'FULL NAME',
     'company_name' => 'COMPANY NAME',
     'business_email' => 'BUSINESS EMAIL',
-    'password' => 'PASSWORD',
     'confirm_password' => 'CONFIRM PASSWORD',
     'agree_to' => 'I agree to the',
     'terms' => 'Terms of Service',
@@ -78,4 +77,80 @@ return [
     'phone_required' => 'Phone number is required.',
     'otp_required' => 'OTP code is required.',
     'otp_invalid' => 'OTP code is invalid or expired.',
+
+     /*
+    |--------------------------------------------------------------------------
+    | General
+    |--------------------------------------------------------------------------
+    */
+
+    'success' => 'Operation completed successfully.',
+    'failed' => 'Authentication failed.',
+    'unauthorized' => 'Unauthorized action.',
+    'forbidden' => 'Access denied.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Registration
+    |--------------------------------------------------------------------------
+    */
+
+    'register_success' => 'Registration successful. Please verify your account.',
+    'user_already_exists' => 'User already exists.',
+    'account_not_active' => 'Your account is not active. Please verify your account.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login
+    |--------------------------------------------------------------------------
+    */
+
+    'login_success' => 'Login successful.',
+    'logout_success' => 'Logout successful.',
+    'invalid_credentials' => 'Invalid login credentials.',
+    'invalid_password' => 'Incorrect password.',
+    'user_not_found' => 'User not found.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Verification
+    |--------------------------------------------------------------------------
+    */
+
+    'email_not_verified' => 'Your email address is not verified.',
+    'phone_not_verified' => 'Your phone number is not verified.',
+    'account_verified' => 'Account verified successfully.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | OTP
+    |--------------------------------------------------------------------------
+    */
+
+    'otp_sent' => 'OTP has been sent successfully.',
+    'otp_verified' => 'OTP verified successfully.',
+    'invalid_otp' => 'Invalid or expired OTP code.',
+    'otp_expired' => 'OTP has expired.',
+    'otp_already_used' => 'OTP has already been used.',
+    'otp_resent' => 'OTP has been resent successfully.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Reset
+    |--------------------------------------------------------------------------
+    */
+
+    'password_reset_success' => 'Password has been reset successfully.',
+    'password_updated' => 'Password updated successfully.',
+    'invalid_reset_token' => 'Invalid or expired reset token.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Social Login
+    |--------------------------------------------------------------------------
+    */
+
+    'social_login_success' => 'Logged in successfully via :provider.',
+    'social_account_linked' => 'Social account linked successfully.',
+    'provider_not_supported' => 'Authentication provider not supported.',
 ];

@@ -20,6 +20,7 @@ class Tenant extends Model
         'name',
         'slug',
         'status',
+        'user_id',
     ];
 
     protected $casts = [

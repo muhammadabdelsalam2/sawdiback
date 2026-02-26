@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Http\Requests\Api\Auth\VerifyOtpRequest;
 use App\Http\Requests\Api\Auth\Password\ForgotPasswordRequest;
 
 use App\Services\API\Auth\AuthService;
@@ -12,18 +13,24 @@ use App\Services\API\Auth\AuthService;
 use App\DTOs\Auth\LoginDTO;
 use App\DTOs\Auth\RegisterDTO;
 use App\Http\Requests\Api\Password\ResetPasswordRequest;
-use App\Http\Requests\Api\Password\ForgotPasswordRequest;
+use App\Http\Requests\Api\Auth\ResendOtpRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Request;
-
+use App\DTOs\Auth\VerifyOtpDTO;
+use App\DTOs\Auth\SendOtpDTO;
+use App\Services\API\Auth\OtpService;
+use App\Repositories\UserRepository;
 class AuthController extends Controller
 {
     public function __construct(
-        protected AuthService $authService
-    ) {}
+        protected AuthService $authService,
+        private OtpService $otpService,
+        private UserRepository $userRepository
+    ) {
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -49,14 +56,20 @@ class AuthController extends Controller
     */
     public function login(LoginRequest $request): JsonResponse
     {
-        
         $dto = LoginDTO::fromRequest($request);
         $result = $this->authService->login($dto);
+        if ($result['success'] == false) {
+            return ApiResponse::error(
+                message: $result['message'],
+                errors: $result['errors'] ?? [],
+                code: $result['code']
+            );
+        }
 
         return ApiResponse::success(
-            $result['data'],
-            $result['message'],
-            $result['code']
+            data: $result['data'],
+            message: $result['message'],
+            code: $result['code']
         );
     }
 
@@ -139,5 +152,68 @@ class AuthController extends Controller
             'status' => true,
             'message' => __('auth.password_reset_success')
         ]);
+    }
+
+public function verifyOtp(VerifyOtpRequest $request): JsonResponse
+{
+    $result = $this->authService->verifyOtp(
+        VerifyOtpDTO::fromRequest($request)
+    );
+
+    return ApiResponse::success(
+        data: $result['data'],
+        message: $result['message'],
+        message: $result['nextEndpoint'],
+        code: $result['code']
+    );
+}
+
+  public function resendOtp(ResendOtpRequest $request): JsonResponse
+    {
+        $identifier = $request->identifier;
+
+        // Determine OTP type automatically
+        $user = $this->userRepository->findByIdentifierValue($identifier);
+        $type = $this->determineOtpType($user);
+
+        // Create DTO for OTP
+        $dto = new SendOtpDTO(
+            identifier: $identifier,
+            type: $type
+        );
+
+        // Send or resend OTP
+        $this->otpService->resend($dto);
+
+
+        
+
+        return response()->json([
+            'status' => true,
+            'message' => __('auth.otp_sent'),
+            'data' => [
+                'identifier' => $identifier,
+                'type' => $type
+            ]
+        ]);
+    }
+
+    /**
+     * Automatically detect OTP type based on user state
+     */
+    private function determineOtpType(?object $user): string
+    {
+        if (!$user) {
+            // New user: registration OTP
+            return OtpType::REGISTER;
+        }
+
+        if (!$user->is_active || !$user->email_verified_at) {
+            // Not verified yet: verification OTP
+            return 'verify_email';
+        }
+
+        // Existing verified user: forgot password OTP
+        return OtpType::FORGOT_PASSWORD;
     }
 }

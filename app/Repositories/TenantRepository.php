@@ -2,9 +2,12 @@
 namespace App\Repositories;
 
 use App\Models\Tenant;
+use App\Models\User;
+use App\Repositories\Contracts\TenantRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
-class TenantRepository
+class TenantRepository implements TenantRepositoryInterface
 {
     protected Tenant $model;
 
@@ -41,5 +44,17 @@ class TenantRepository
     public function withPlan(string $id): ?Tenant
     {
         return $this->model->with('plan')->find($id);
+    }
+
+    public function createTenantForUser(User $user): void
+    {
+        $this->model->create([
+            'id' => (string) Str::uuid(),
+            'name' => $user->name,
+            'slug' => Str::slug($user->name),
+            'user_id' => $user->id,
+            'status' => 'active',
+            'subscription_plan_id' => $user->subscription_plan_id,
+        ]);
     }
 }

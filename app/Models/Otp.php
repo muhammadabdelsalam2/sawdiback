@@ -13,6 +13,7 @@ class Otp extends Model
         'type',         // login, register, reset_password, etc.
         'expires_at',
         'used_at',      // optional: when OTP was used
+        'is_used',      // optional: when OTP was used
     ];
 
     protected $dates = [
@@ -20,6 +21,10 @@ class Otp extends Model
         'used_at',
         'created_at',
         'updated_at',
+    ];
+      protected $casts = [
+        'expires_at' => 'datetime',
+        'used_at' => 'datetime',
     ];
 
     // Check if OTP is expired

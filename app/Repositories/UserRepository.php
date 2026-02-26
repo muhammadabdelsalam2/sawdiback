@@ -154,7 +154,7 @@ class UserRepository
         $user->tokens()->delete();
     }
 
- 
+
 
 
 
@@ -163,5 +163,14 @@ class UserRepository
         return User::where('email', $identifier)
             ->orWhere('phone', $identifier)
             ->exists();
+    }
+
+    public function findByIdentifierValue(string $identifier): ?User
+    {
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return $this->findByEmail($identifier);
+        }
+
+        return $this->findByPhone($identifier);
     }
 }

@@ -6,6 +6,7 @@ use App\DTOs\Auth\LoginDTO;
 use App\DTOs\Auth\RegisterDTO;
 use App\DTOs\Auth\SendOtpDTO;
 use App\DTOs\Auth\SocialLoginDTO;
+use App\DTOs\Auth\VerifyOtpDTO;
 use App\Enums\OtpType;
 use App\Models\User;
 use App\Repositories\Contracts\OtpRepositoryInterface;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Services\API\Auth\Contracts\OtpSenderInterface;
 use App\Support\ServiceResult;
+use GrahamCampbell\ResultType\Success;
 
 class AuthService
 {
@@ -44,9 +46,8 @@ class AuthService
 
     public function login(LoginDTO $dto): array
     {
-        // Find user by identifier (email/username/etc.)
+        // Find user by identifier (email or phone)
         $user = $this->userRepository->findByIdentifier($dto);
-
         if (!$user) {
             return ServiceResult::error(
                 message: __('auth.user_not_found'),
@@ -56,7 +57,17 @@ class AuthService
             );
         }
 
-        // Check password
+        // 🚨 Check if account is active
+        if (!$user->is_active) {
+            return ServiceResult::error(
+                message: __('auth.account_not_active'),
+                nextEndpoint: 'auth/resend-otp',
+                errors: ['account' => __('auth.account_not_active')],
+                code: 403
+            );
+        }
+
+        // 🔐 Check password
         if (!Hash::check($dto->password, $user->password)) {
             return ServiceResult::error(
                 message: __('auth.invalid_password'),
@@ -66,11 +77,37 @@ class AuthService
             );
         }
 
-        // Create token and return success response
+        // 🔎 Determine login type (email or phone)
+        $identifier = $dto->identifier;
+
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+
+            if (!$user->email_verified_at) {
+                return ServiceResult::error(
+                    message: __('auth.email_not_verified'),
+                    nextEndpoint: 'auth/resend-otp',
+                    errors: ['email' => __('auth.email_not_verified')],
+                    code: 403
+                );
+            }
+
+        } else {
+
+            if (!$user->phone_verified_at) {
+                return ServiceResult::error(
+                    message: __('auth.phone_not_verified'),
+                    nextEndpoint: 'auth/resend-otp',
+                    errors: ['phone' => __('auth.phone_not_verified')],
+                    code: 403
+                );
+            }
+        }
+
+        // ✅ Everything is valid → Create token
         $tokenResponse = $this->createTokenResponse($user);
 
         return ServiceResult::success(
-            data: $tokenResponse,
+            data: $tokenResponse ?? null,
             message: __('auth.login_success'),
             code: 200
         );
@@ -100,8 +137,9 @@ class AuthService
         ]);
 
         // Assign role
-        $user->assignRole('customer');
-
+        $user->assignRole('Customer');
+resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
+    ->createTenantForUser($user);
         // Prepare DTO for OTP
         $otpDto = new SendOtpDTO(
             $dto->email ?? $dto->phone, // identifier
@@ -109,12 +147,16 @@ class AuthService
         );
 
         // Send OTP via OtpService
-        $this->otpService->send($otpDto);
+      $otp =  $this->otpService->send($otpDto);
 
-        return [
-            'identifier' => $dto->email ?? $dto->phone,
-            'message' => __('auth.otp_sent')
-        ];
+
+           return ServiceResult::success(
+        data: $otp ,
+        message: __('auth.otp_sent'),
+        nextEndpoint:route('api.auth.verifyOtp'),
+        code: 200
+    );
+  
     }
 
     /*
@@ -133,7 +175,7 @@ class AuthService
                 'password' => Hash::make($dto->password),
             ]);
 
-            $user->assignRole('super_admin');
+            $user->assignRole('SuperAdmin');
 
             return $user;
         });
@@ -172,7 +214,7 @@ class AuthService
                         'avatar' => $dto->avatar,
                     ]);
 
-                    $user->assignRole('customer');
+                    $user->assignRole('Customer');
 
                 } else {
 
@@ -251,5 +293,49 @@ class AuthService
             ]);
         }
     }
+
+public function verifyOtp(VerifyOtpDTO $dto): array
+{
+    $otp = $this->otpService->verify($dto->identifier, $dto->code);
+
+    $user = $this->userRepository->findByIdentifierValue($dto->identifier);
+
+    if (!$user) {
+        return ServiceResult::error(
+            message: __('auth.user_not_found'),
+            nextEndpoint: null,
+            errors: ['identifier' => __('auth.user_not_found')],
+            code: 404
+        );
+    }
+    // 🔥 Use type directly from OTP
+    switch ($otp->type) {
+        case 'register':
+            $this->userRepository->update($user, [
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]);
+            break;
+
+        case 'forgot_password':
+            // Allow password reset
+            break;
+
+        case 'login':
+            // Maybe generate token
+            break;
+    }
+
+    return ServiceResult::success(
+        data: $user,
+        message: __('auth.account_verified'),
+        nextEndpoint: route('api.auth.verifyOtp'),
+        code: 200
+    );
+}
+
+
+
+
 
 }

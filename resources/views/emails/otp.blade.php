@@ -1,16 +1,21 @@
-@component('mail::message')
-# Hello!
+@component('mail::message', ['logo' => $logo])
+{{-- Logo --}}
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ $logo }}" alt="{{ config('app.name') }}" style="max-width: 150px; width: 100%; height: auto;">
+</div>
 
-Your OTP code for **{{ ucfirst($type) }}** is:
+# {{ __('mail.hello') }}
+
+{{ __('mail.otp_request', ['type' => ucfirst(__($type))]) }}
 
 @component('mail::panel')
 # {{ $code }}
 @endcomponent
 
-This code will expire in **10 minutes**.
+{{ __('mail.otp_expire') }}
 
-If you did not request this, please ignore this email.
+{{ __('mail.ignore_notice') }}
 
-Thanks,<br>
+{{ __('mail.thanks') }}<br>
 {{ config('app.name') }}
 @endcomponent

@@ -29,7 +29,8 @@ use App\Repositories\JobTitleRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\LeaveRepository;
 use App\Repositories\AttendanceRepository;
-
+use App\Models\User;
+use App\Observers\UserObserver;
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+
         View::composer('*', function ($view) {
             $lang = session('locale', 'en');
 
@@ -62,5 +64,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Tenant::observe(TenantObserver::class);
+       User::observe(UserObserver::class);
+
     }
 }
