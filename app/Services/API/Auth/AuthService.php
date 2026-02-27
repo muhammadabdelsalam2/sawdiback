@@ -57,7 +57,7 @@ class AuthService
             );
         }
 
-        // 🚨 Check if account is active
+        // Check if account is active
         // if (!$user->is_active) {
         //     return ServiceResult::error(
         //         message: __('auth.account_not_active'),
@@ -67,7 +67,7 @@ class AuthService
         //     );
         // }
 
-        // 🔐 Check password
+        //  Check password
         if (!Hash::check($dto->password, $user->password)) {
             return ServiceResult::error(
                 message: __('auth.invalid_password'),
@@ -115,7 +115,7 @@ class AuthService
 
     /*
     |--------------------------------------------------------------------------
-    | Register Customer
+    | Register Client
     |--------------------------------------------------------------------------
     */
     public function register(RegisterDTO $dto): array
@@ -137,7 +137,7 @@ class AuthService
         ]);
 
         // Assign role
-        $user->assignRole('Customer');
+        $user->assignRole('Client');
         resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
             ->createTenantForUser($user);
         // Prepare DTO for OTP
@@ -147,13 +147,13 @@ class AuthService
         );
 
         // Send OTP via OtpService
-        $otp = $this->otpService->send($otpDto);
+        $otp = $this->otpService->send($otpDto,$user);
 
-    
+
         return ServiceResult::success(
             data: $otp,
             message: __('auth.otp_sent'),
-            nextEndpoint: route('api.auth.verifyOtp'),
+            nextEndpoint: route('api.account.verifyOtp'),
             code: 200
         );
 
@@ -214,7 +214,7 @@ class AuthService
                         'avatar' => $dto->avatar,
                     ]);
 
-                    $user->assignRole('Customer');
+                    $user->assignRole('Client');
 
                 } else {
 
@@ -334,7 +334,7 @@ class AuthService
         return ServiceResult::success(
             data: $user,
             message: __('auth.account_verified'),
-            nextEndpoint: route('api.auth.verifyOtp'),
+            nextEndpoint: route('api.account.verifyOtp'),
             code: 200
         );
     }

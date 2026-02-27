@@ -170,7 +170,6 @@ public function verifyOtp(VerifyOtpRequest $request): JsonResponse
 public function resendOtp(ResendOtpRequest $request): JsonResponse
 {
     $identifier = $request->identifier;
-dd($request);
     // Detect identifier type (email or phone)
     $identifierType = $this->detectIdentifierType($identifier);
 

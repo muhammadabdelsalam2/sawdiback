@@ -37,6 +37,10 @@ class RolePermissionSeeder extends Seeder
             'name' => 'SuperAdmin',
             'guard_name' => 'web',
         ]);
+        $clientRole = Role::firstOrCreate([
+            'name' => 'Client',
+            'guard_name' => 'api',
+        ]);
 
         $customerRole->syncPermissions(['dashboard.view']);
         $superAdminRole->syncPermissions($permissions);
