@@ -1,25 +1,47 @@
 <IfModule mod_rewrite.c>
+    # ----------------------------
+    # Basic Options
+    # ----------------------------
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    # ----------------------------
+    # Authorization Header Support
+    # ----------------------------
+    # Pass the Authorization header to PHP (needed for APIs)
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+    # ----------------------------
+    # X-XSRF-Token Support
+    # ----------------------------
+    RewriteCond %{HTTP:X-XSRF-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-TOKEN}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # ----------------------------
+    # Redirect Trailing Slashes (Except Directories)
+    # ----------------------------
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # ----------------------------
+    # Send All Requests To Front Controller
+    # ----------------------------
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # ----------------------------
+    # Optional: Dynamic Public Path Handling
+    # ----------------------------
+    # If project is in a subfolder, e.g., example.com/project/public
+    # This automatically rewrites requests to public
+    # Uncomment if needed
+    # RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f [OR]
+    # RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -d
+    # RewriteRule ^(.*)$ /public/$1 [L]
 </IfModule>
