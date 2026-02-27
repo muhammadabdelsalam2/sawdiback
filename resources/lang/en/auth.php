@@ -63,7 +63,7 @@ return [
     'privacy_title' => 'Privacy Policy',
     'last_updated' => 'Last Updated',
     'invalid_credentials' => 'Invalid Credentials',
-        // General messages
+    // General messages
     'register_success' => 'Registration successful.',
     'login_success' => 'Login successful.',
     'logout_success' => 'Logout successful.',
@@ -78,11 +78,11 @@ return [
     'otp_required' => 'OTP code is required.',
     'otp_invalid' => 'OTP code is invalid or expired.',
 
-     /*
-    |--------------------------------------------------------------------------
-    | General
-    |--------------------------------------------------------------------------
-    */
+    /*
+   |--------------------------------------------------------------------------
+   | General
+   |--------------------------------------------------------------------------
+   */
 
     'success' => 'Operation completed successfully.',
     'failed' => 'Authentication failed.',
@@ -128,7 +128,7 @@ return [
     */
 
     'otp_sent' => 'OTP has been sent successfully.',
-    'otp_verified' => 'OTP verified successfully.',
+    // 'otp_verified' => 'OTP verified successfully.',
     'invalid_otp' => 'Invalid or expired OTP code.',
     'otp_expired' => 'OTP has expired.',
     'otp_already_used' => 'OTP has already been used.',
@@ -153,4 +153,9 @@ return [
     'social_login_success' => 'Logged in successfully via :provider.',
     'social_account_linked' => 'Social account linked successfully.',
     'provider_not_supported' => 'Authentication provider not supported.',
+
+    // Password Reset
+    'password_reset_token_expired' => 'Password reset token has expired. Please request a new one.',
+    'otp_not_verified' => 'OTP has not been verified. Please verify OTP before resetting password.',
+    'invalid_password_reset_token' => 'Invalid password reset token.',
 ];

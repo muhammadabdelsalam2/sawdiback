@@ -167,53 +167,108 @@ public function verifyOtp(VerifyOtpRequest $request): JsonResponse
         code: $result['code']
     );
 }
+public function resendOtp(ResendOtpRequest $request): JsonResponse
+{
+    $identifier = $request->identifier;
+dd($request);
+    // Detect identifier type (email or phone)
+    $identifierType = $this->detectIdentifierType($identifier);
 
-  public function resendOtp(ResendOtpRequest $request): JsonResponse
-    {
-        $identifier = $request->identifier;
+    // Find user by identifier
+    $user = $this->userRepository->findByIdentifierValue($identifier);
 
-        // Determine OTP type automatically
-        $user = $this->userRepository->findByIdentifierValue($identifier);
-        $type = $this->determineOtpType($user);
+    // Determine OTP type based on full logic
+    $type = $this->determineOtpType(
+        identifier: $identifier,
+        identifierType: $identifierType,
+        user: $user
+    );
 
-        // Create DTO for OTP
-        $dto = new SendOtpDTO(
-            identifier: $identifier,
-            type: $type
-        );
+    // Create DTO
+    $dto = new SendOtpDTO(
+        identifier: $identifier,
+        type: $type
+    );
 
-        // Send or resend OTP
-        $this->otpService->resend($dto);
+    // Resend OTP
+    $this->otpService->resend($dto);
 
+    return response()->json([
+        'status' => true,
+        'message' => __('auth.otp_sent'),
+        'data' => [
+            'identifier' => $identifier,
+            'type' => $type
+        ]
+    ]);
+}
 
-        
+private function detectIdentifierType(string $identifier): string
+{
+    if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+        return 'email';
+    }
 
-        return response()->json([
-            'status' => true,
-            'message' => __('auth.otp_sent'),
-            'data' => [
-                'identifier' => $identifier,
-                'type' => $type
-            ]
-        ]);
+    return 'phone';
+}
+    /**
+ * Determine OTP type based on:
+ * - Identifier type (email or phone)
+ * - User existence
+ * - Verification status
+ * - Activation status
+ */
+private function determineOtpType(
+    string $identifier,
+    string $identifierType,
+    ?object $user
+): string {
+
+    /**
+     * Case 1: User does not exist
+     * This means we are sending OTP for registration
+     */
+    if (!$user) {
+        return OtpType::REGISTER;
     }
 
     /**
-     * Automatically detect OTP type based on user state
+     * Case 2: Identifier is email
      */
-    private function determineOtpType(?object $user): string
-    {
-        if (!$user) {
-            // New user: registration OTP
-            return OtpType::REGISTER;
+    if ($identifierType === 'email') {
+
+        // Email not verified yet
+        if (is_null($user->email_verified_at)) {
+            return OtpType::VERIFY_EMAIL;
         }
 
-        if (!$user->is_active || !$user->email_verified_at) {
-            // Not verified yet: verification OTP
-            return 'verify_email';
+        // Email verified but account not active
+        if (!$user->is_active) {
+            return OtpType::VERIFY_EMAIL;
         }
-
-        // Existing verified user: forgot password OTP
-        return OtpType::FORGOT_PASSWORD;
     }
+
+    /**
+     * Case 3: Identifier is phone
+     */
+    if ($identifierType === 'phone') {
+
+        // Phone not verified yet
+        if (is_null($user->phone_verified_at)) {
+            return OtpType::VERIFY_PHONE;
+        }
+
+        // Phone verified but account not active
+        if (!$user->is_active) {
+            return OtpType::VERIFY_PHONE;
+        }
+    }
+
+    /**
+     * Case 4:
+     * User exists and fully verified
+     * This means we are sending OTP for forgot password
+     */
+    return OtpType::FORGOT_PASSWORD;
+}
 }

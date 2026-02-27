@@ -58,14 +58,14 @@ class AuthService
         }
 
         // 🚨 Check if account is active
-        if (!$user->is_active) {
-            return ServiceResult::error(
-                message: __('auth.account_not_active'),
-                nextEndpoint: 'auth/resend-otp',
-                errors: ['account' => __('auth.account_not_active')],
-                code: 403
-            );
-        }
+        // if (!$user->is_active) {
+        //     return ServiceResult::error(
+        //         message: __('auth.account_not_active'),
+        //         nextEndpoint: 'auth/resend-otp',
+        //         errors: ['account' => __('auth.account_not_active')],
+        //         code: 403
+        //     );
+        // }
 
         // 🔐 Check password
         if (!Hash::check($dto->password, $user->password)) {
@@ -138,8 +138,8 @@ class AuthService
 
         // Assign role
         $user->assignRole('Customer');
-resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
-    ->createTenantForUser($user);
+        resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
+            ->createTenantForUser($user);
         // Prepare DTO for OTP
         $otpDto = new SendOtpDTO(
             $dto->email ?? $dto->phone, // identifier
@@ -147,16 +147,16 @@ resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
         );
 
         // Send OTP via OtpService
-      $otp =  $this->otpService->send($otpDto);
+        $otp = $this->otpService->send($otpDto);
 
+    
+        return ServiceResult::success(
+            data: $otp,
+            message: __('auth.otp_sent'),
+            nextEndpoint: route('api.auth.verifyOtp'),
+            code: 200
+        );
 
-           return ServiceResult::success(
-        data: $otp ,
-        message: __('auth.otp_sent'),
-        nextEndpoint:route('api.auth.verifyOtp'),
-        code: 200
-    );
-  
     }
 
     /*
@@ -294,45 +294,50 @@ resolve(\App\Repositories\Contracts\TenantRepositoryInterface::class)
         }
     }
 
-public function verifyOtp(VerifyOtpDTO $dto): array
-{
-    $otp = $this->otpService->verify($dto->identifier, $dto->code);
+    public function verifyOtp(VerifyOtpDTO $dto): array
+    {
+        $otp = $this->otpService->verify($dto->identifier, $dto->code);
 
-    $user = $this->userRepository->findByIdentifierValue($dto->identifier);
+        $user = $this->userRepository->findByIdentifierValue($dto->identifier);
 
-    if (!$user) {
-        return ServiceResult::error(
-            message: __('auth.user_not_found'),
-            nextEndpoint: null,
-            errors: ['identifier' => __('auth.user_not_found')],
-            code: 404
+        if (!$user) {
+            return ServiceResult::error(
+                message: __('auth.user_not_found'),
+                nextEndpoint: null,
+                errors: ['identifier' => __('auth.user_not_found')],
+                code: 404
+            );
+        }
+        // Use type directly from OTP
+        switch ($otp->type) {
+            case 'register':
+                $this->userRepository->update($user, [
+                    'email_verified_at' => now(),
+                    'is_active' => true,
+                ]);
+                break;
+            case 'verify_email':
+                $this->userRepository->update($user, [
+                    'email_verified_at' => now(),
+                ]);
+                break;
+
+            case 'forgot_password':
+                // Allow password reset
+                break;
+
+            case 'login':
+                // Maybe generate token
+                break;
+        }
+
+        return ServiceResult::success(
+            data: $user,
+            message: __('auth.account_verified'),
+            nextEndpoint: route('api.auth.verifyOtp'),
+            code: 200
         );
     }
-    // 🔥 Use type directly from OTP
-    switch ($otp->type) {
-        case 'register':
-            $this->userRepository->update($user, [
-                'email_verified_at' => now(),
-                'is_active' => true,
-            ]);
-            break;
-
-        case 'forgot_password':
-            // Allow password reset
-            break;
-
-        case 'login':
-            // Maybe generate token
-            break;
-    }
-
-    return ServiceResult::success(
-        data: $user,
-        message: __('auth.account_verified'),
-        nextEndpoint: route('api.auth.verifyOtp'),
-        code: 200
-    );
-}
 
 
 
