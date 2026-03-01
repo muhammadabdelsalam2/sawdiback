@@ -214,3 +214,19 @@
     opacity: 0.6;
     box-shadow: none;
 }
+
+/* Warehouse filter select width fix (Select2 in page-head forms) */
+.warehouse-filter-select + .select2-container {
+    min-width: 280px !important;
+}
+
+.warehouse-filter-select + .select2-container .select2-selection__rendered {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .warehouse-filter-select + .select2-container {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+}

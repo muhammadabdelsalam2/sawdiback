@@ -89,12 +89,22 @@
         </div>
 
         {{-- Inventory --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.inventory') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.inventory.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.index') ? 'active' : '' }}">{{ __('warehouse.titles.warehouse') }}</a>
+                <a href="{{ route('customer.inventory.products.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.products.*') ? 'active' : '' }}">{{ __('warehouse.titles.products') }}</a>
+                <a href="{{ route('customer.inventory.alerts.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.alerts.*') ? 'active' : '' }}">{{ __('warehouse.titles.alerts') }}</a>
+                <a href="{{ route('customer.inventory.traceability.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.traceability.*') ? 'active' : '' }}">{{ __('warehouse.titles.traceability') }}</a>
+            </div>
         </div>
 
         {{-- Sales & Distribution --}}
