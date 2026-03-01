@@ -50,11 +50,10 @@ class PasswordService
             type: OtpType::FORGOT_PASSWORD
         );
 
-        $this->otpService->send($dto, $user);
-
+       $otp =  $this->otpService->send($dto, $user);
         return ServiceResult::success(
             message: __('auth.otp_sent'),
-            data: null,
+            data: ['otp' => $otp?->code],
             code: 200,
             nextEndpoint: route('api.password.change')
         );

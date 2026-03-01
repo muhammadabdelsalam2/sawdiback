@@ -22,7 +22,7 @@ class OtpService
     /**
      * Send a new OTP
      */
-    public function send(SendOtpDTO $dto, User $user): void
+    public function send(SendOtpDTO $dto, User $user): Otp
     {
         // 1️⃣ Check if there's a valid OTP already
         $existingOtp = $this->otpRepository->findValidOtpByIdentifierAndType(
@@ -37,7 +37,7 @@ class OtpService
             $code = random_int(100000, 999999);
 
             // 3️⃣ Store new OTP in database
-            $this->otpRepository->create([
+         $otp =    $this->otpRepository->create([
                 'identifier' => $dto->identifier,
                 'code' => $code,
                 'type' => $dto->type,
@@ -50,6 +50,7 @@ class OtpService
         // 4️⃣ Send OTP via appropriate channel
         $sender = OtpSenderFactory::make($dto->identifier);
         $sender->send($dto->identifier, $code, $dto->type);
+        return $existingOtp ?? $otp;
     }
 
     /**
@@ -116,7 +117,7 @@ public function verify(string $identifier, string $code): Otp
             ]);
         }
 
-        if ($otp->type === OtpType::VERIFY_PHONEphp) {
+        if ($otp->type === OtpType::VERIFY_PHONE) {
             $user->update([
                 'phone_verified_at' => now(),
             ]);
