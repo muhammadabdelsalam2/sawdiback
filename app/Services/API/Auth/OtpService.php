@@ -24,7 +24,7 @@ class OtpService
      */
     public function send(SendOtpDTO $dto, User $user): Otp
     {
-        // 1️⃣ Check if there's a valid OTP already
+        //  Check if there's a valid OTP already
         $existingOtp = $this->otpRepository->findValidOtpByIdentifierAndType(
             $dto->identifier,
             $dto->type
@@ -33,10 +33,10 @@ class OtpService
         if ($existingOtp) {
             $code = $existingOtp->code; // reuse the existing code
         } else {
-            // 2️⃣ Generate new 6-digit OTP
+            //  Generate new 6-digit OTP
             $code = random_int(100000, 999999);
 
-            // 3️⃣ Store new OTP in database
+            //  Store new OTP in database
          $otp =    $this->otpRepository->create([
                 'identifier' => $dto->identifier,
                 'code' => $code,
@@ -47,7 +47,7 @@ class OtpService
             ]);
         }
 
-        // 4️⃣ Send OTP via appropriate channel
+        //  Send OTP via appropriate channel
         $sender = OtpSenderFactory::make($dto->identifier);
         $sender->send($dto->identifier, $code, $dto->type);
         return $existingOtp ?? $otp;
