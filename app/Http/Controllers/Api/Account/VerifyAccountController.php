@@ -32,7 +32,7 @@ class VerifyAccountController extends Controller
     $result = $this->authService->verifyOtp(
         VerifyOtpDTO::fromRequest($request)
     );
-    
+
     return ApiResponse::success(
         data: $result['data'],
         message: $result['message'],
@@ -43,28 +43,28 @@ public function resendOtp(ResendOtpRequest $request): JsonResponse
 {
     $identifier = $request->identifier;
 
-    // 1️⃣ Detect identifier type (email or phone)
+    // Step:one  Detect identifier type (email or phone)
     $identifierType = $this->detectIdentifierType($identifier);
 
-    // 2️⃣ Find user by identifier
+    // Step:2 Find user by identifier
     $user = $this->userRepository->findByIdentifierValue($identifier);
 
-    // 3️⃣ Determine OTP type based on full logic
+    // Step:3 Determine OTP type based on full logic
     $type = $this->determineOtpType(
         identifierType: $identifierType,
         user: $user
     );
 
-    // 4️⃣ Create DTO
+    // Step:4 Create DTO
     $dto = new SendOtpDTO(
         identifier: $identifier,
         type: $type
     );
 
-    // 5️⃣ Resend OTP
+    // Step:5 Resend OTP
     $this->otpService->resend($dto, $user);
 
-    // 6️⃣ Return response (without leaking OTP in production)
+    // Step:6  Return response (without leaking OTP in production)
     $responseData = [
         'identifier' => $identifier,
         'type' => $type,

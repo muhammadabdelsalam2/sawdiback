@@ -17,7 +17,7 @@ class DemoDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1️⃣ SuperAdmin
+        // Step:1 SuperAdmin
         $superAdmin = User::updateOrCreate(
             ['email' => 'admin@elsawady.com'],
             [
@@ -27,7 +27,7 @@ class DemoDataSeeder extends Seeder
         );
         $superAdmin->assignRole('SuperAdmin');
 
-        // 2️⃣ Customer
+        // Step:2 Customer
         $customer = User::updateOrCreate(
             ['email' => 'customer@elsawady.com'],
             [
@@ -48,14 +48,14 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
-        // تأكد الآن من أن $tenant->id موجود
+
         $this->command->info("The Tenant Id Is => $tenant->id");
 
-        // Assign tenant_id to customer
+        // Step:3 Assign tenant_id to customer
         $customer->tenant_id = $tenant->id;
         $customer->save();
 
-        // 4️⃣ Create Plans with Features JSON
+        // Step:4 Create Plans with Features JSON
         $featureKeys = [
             ['key' => 'max_users', 'type' => 'numeric'],
             ['key' => 'advanced_reports', 'type' => 'boolean'],
@@ -77,7 +77,7 @@ class DemoDataSeeder extends Seeder
             $plan->save();
         });
 
-        // 5️⃣ Create Subscription for the Tenant
+        // Step:5 Create Subscription for the Tenant
         $plan = $plans->random();
 
         Subscription::create([
