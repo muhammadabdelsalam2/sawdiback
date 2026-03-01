@@ -43,3 +43,18 @@
     border-color: #234c14 !important;
     color: #fff !important;
 }
+
+.dataTables_wrapper .dt-buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dataTables_wrapper .dt-buttons .btn {
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 0;
+}

@@ -108,12 +108,28 @@
         </div>
 
         {{-- Sales & Distribution --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.sales_distribution') }}</span>
+                <span class="nav-label">{{ __('sales_dist.sidebar.title') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.sales-distribution.dashboard', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.dashboard') ? 'active' : '' }}">{{ __('sales_dist.sidebar.dashboard') }}</a>
+                <a href="{{ route('customer.sales-distribution.customers.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.customers.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.customers') }}</a>
+                <a href="{{ route('customer.sales-distribution.contracts.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.contracts.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.contracts') }}</a>
+                <a href="{{ route('customer.sales-distribution.orders.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.orders.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.orders') }}</a>
+                <a href="{{ route('customer.sales-distribution.shipments.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.shipments.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.shipments') }}</a>
+                <a href="{{ route('customer.sales-distribution.invoices.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.sales-distribution.invoices.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.invoices') }}</a>
+            </div>
         </div>
 
         {{-- Procurement --}}
