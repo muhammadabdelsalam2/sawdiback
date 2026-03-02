@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'hero_title' => 'The Next-Gen <span class="text-green">ERP Ecosystem.</span>',
-    'hero_text' => 'Streamline your entire enterprise with EL-Sawady. From advanced resource planning to real-time financial analytics, unify your business operations on a single, high-performance SaaS platform.',
+
     'start_trial' => 'Start 14-Day Free Trial',
     'request_demo' => 'Request Enterprise Demo',
 
@@ -49,27 +48,7 @@ return [
     'nav_language' => 'Language', // optional label for dropdown
 
 
-    // Features Section
-    'features_title' => 'Everything you need to <span class="text-green">scale.</span>',
-    'features_subtitle' => 'Built for high-performance agricultural enterprises.',
 
-    // Feature 1
-    'feature_1_title' => 'Real-time Yield Data',
-    'feature_1_text' => 'Analyze your daily milk and crop production with precision tracking and predictive AI modeling.',
-
-    // Feature 2
-    'feature_2_title' => 'Profit Maximization',
-    'feature_2_text' => 'Integrated financial tools to monitor average daily profit and resource expenditure per head.',
-
-    // Feature 3
-    'feature_3_title' => 'Smart Inventory',
-    'feature_3_text' => 'Automated supply chain alerts. Get notified before feed stocks hit critical levels.',
-
-
-    // CTA Section
-    'cta_title' => 'Ready to unify your business operations?',
-    'cta_text' => 'Join 500+ global enterprises scaling with EL-SAWADY ERP.',
-    'cta_button' => 'Start Your Free Trial',
 
 
     // Footer Section
@@ -88,4 +67,49 @@ return [
     "yearly" => 'Yearly',
     "weekly" => 'Weekly',
 
-];
+    'organic_badge' => '100% Organic Farm',
+
+    'hero_title' => 'Fresh & Natural Products From Elsawady Farm',
+    'hero_text' => 'From our land to your table. We grow with passion and care.',
+    'explore_products' => 'Explore Products',
+    'contact_us' => 'Contact Us',
+
+    'about_title' => 'Our Story',
+    'about_text' => 'Elsawady Farm has been cultivating premium crops using sustainable and natural farming methods.',
+    'years_experience' => 'Years of Experience',
+    'natural_products' => 'Natural Products',
+
+    'why_choose_title' => 'Why Choose Elsawady Farm?',
+    'why_choose_subtitle' => 'We believe in quality, sustainability, and trust.',
+
+    'feature_1_title' => 'Organic Farming',
+    'feature_1_text' => 'No harmful chemicals. Just natural farming methods.',
+
+    'feature_2_title' => 'Fresh Harvest',
+    'feature_2_text' => 'Daily fresh harvest delivered directly.',
+
+    'feature_3_title' => 'Trusted Quality',
+    'feature_3_text' => 'Supplying families and businesses with confidence.',
+
+    'products_title' => 'Our Fresh Products',
+    'products_subtitle' => 'Seasonal vegetables, fruits, and herbs.',
+
+    'cta_title' => 'Order Fresh Products Today',
+    'cta_text' => 'Contact us now to check availability and place your order.',
+    'cta_button' => 'Order via WhatsApp',
+
+'product_1_name' => 'Fresh Tomatoes',
+'product_1_desc' => 'Naturally grown red tomatoes full of flavor.',
+
+'product_2_name' => 'Organic Cucumbers',
+'product_2_desc' => 'Crisp and refreshing cucumbers harvested daily.',
+
+'product_3_name' => 'Sweet Strawberries',
+'product_3_desc' => 'Juicy seasonal strawberries grown with care.',
+
+'product_4_name' => 'Fresh Mint',
+'product_4_desc' => 'Aromatic green mint perfect for cooking and tea.',
+
+'product_5_name' => 'Bell Peppers',
+'product_5_desc' => 'Colorful and healthy peppers rich in vitamins.',
+    ];
