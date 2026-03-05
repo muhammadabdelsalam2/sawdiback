@@ -67,7 +67,10 @@ interface UserRepositoryInterface
     */
 
     public function getAll(): Collection;
-
+    /**
+     * Find user by identifier (email or phone)
+     */
+    public function findByIdentifierValue(string $identifier): ?User;
     public function paginate(int $perPage = 15);
 
 

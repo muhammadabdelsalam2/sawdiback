@@ -14,14 +14,18 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens ,Notifiable, HasRoles;
-
+    use HasFactory, HasApiTokens, Notifiable, HasRoles;
+protected $guard_name = 'api';
     protected $fillable = [
         'tenant_id',
         'name',
         'phone',
         'email',
         'password',
+        'email_verified_at',
+        'phone_verified_at',
+        'password_reset_token',
+        'password_reset_at',
     ];
 
     protected $hidden = [
@@ -34,6 +38,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_reset_at' => 'datetime',
         ];
     }
 
@@ -113,4 +118,10 @@ class User extends Authenticatable
 
         return $default;
     }
+
+    public function otps()
+    {
+        return $this->hasMany(Otp::class);
+    }
+    // Is Pas
 }

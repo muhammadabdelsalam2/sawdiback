@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('type'); // login, register, forgot_password, reset_password, resend
             $table->boolean('is_used')->default(false); // mark as used
             $table->timestamp('expires_at'); // expiration time
+               $table->timestamp('used_at')->nullable(); // mark as used
+
             $table->timestamps();
 
             $table->index(['identifier', 'type']); // optimize lookups

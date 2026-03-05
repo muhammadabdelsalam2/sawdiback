@@ -10,7 +10,6 @@ interface OtpRepositoryInterface
 
     public function invalidateOldOtp(string $identifier, string $type): void;
 
-    public function findValidOtp(string $identifier, string $code, string $type): ?Otp;
-
+public function findValidOtp(string $identifier, string $code, ?string $type = null): ?Otp;
     public function markAsUsed(Otp $otp): void;
 }

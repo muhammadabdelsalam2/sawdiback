@@ -54,6 +54,8 @@ class RegisterRequest extends FormRequest
                 'string',
                 'min:8',
             ],
+            // Terms And Conditions 
+             'terms_conditions' => 'accepted|boolean|in:1|required',
         ];
     }
 }

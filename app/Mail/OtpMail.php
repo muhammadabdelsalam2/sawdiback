@@ -16,6 +16,8 @@ class OtpMail extends Mailable
     public string $code;
     public string $identifier;
     public string $type;
+        public $logo;
+
     /**
      * Create a new message instance.
      */
@@ -24,6 +26,8 @@ class OtpMail extends Mailable
         $this->code = $code;
         $this->identifier = $identifier;
         $this->type = $type;
+                $this->logo = asset('assets/images/svg.png'); // pass dynamically
+
     }
 
     /**

@@ -3,6 +3,7 @@ namespace App\Repositories;
 
 use App\DTOs\Auth\LoginDTO;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class UserRepository
@@ -154,7 +155,7 @@ class UserRepository
         $user->tokens()->delete();
     }
 
- 
+
 
 
 
@@ -163,5 +164,46 @@ class UserRepository
         return User::where('email', $identifier)
             ->orWhere('phone', $identifier)
             ->exists();
+    }
+
+    public function findByIdentifierValue(string $identifier): ?User
+    {
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return $this->findByEmail($identifier);
+        }
+
+        return $this->findByPhone($identifier);
+    }
+
+    public function passwordResetToken(User $user): void
+    {
+        $token = bin2hex(random_bytes(32));
+        $user->update([
+            'password_reset_token' => $token,
+            // Set token expiration time (e.g., 60 minutes from now)
+            'password_reset_at' => now()->addMinutes(10),
+        ]);
+
+
+    }
+
+
+    public function forgetPasswordToken(User $user): void
+    {
+        $user->update([
+            'password_reset_token' => null,
+            'password_reset_at' => now(),
+        ]);
+    }
+    public function findByPasswordResetToken(string $token): ?User
+    {
+        return User::where('password_reset_token', $token)->first();
+    }
+     public function clearPasswordResetToken(User $user): void
+    {
+        $user->update([
+            'password_reset_token' => null,
+            'password_reset_at' => null,
+        ]);
     }
 }
