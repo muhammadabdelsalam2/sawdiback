@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1/{locale}')->group(function () {
 
     /*
     |--------------------------------------------------------------------------

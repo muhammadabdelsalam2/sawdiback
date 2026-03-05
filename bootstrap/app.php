@@ -3,6 +3,7 @@
 use App\Http\Middleware\ApiErrorMiddleware;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\EnsureFeatureEnabled;
+use App\Http\Middleware\SetLocaleApi;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -60,6 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Append API error middleware
         $middleware->appendToGroup('api', [
             ApiErrorMiddleware::class,
+            SetLocaleApi::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
