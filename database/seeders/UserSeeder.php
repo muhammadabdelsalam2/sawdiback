@@ -15,7 +15,6 @@ class UserSeeder extends Seeder
         $superAdmin = User::updateOrCreate(
             ['email' => 'admin@elsawady.com'],
             [
-                'name' => 'Super Admin',
                 'password' => 'password123',
             ]
         );
@@ -23,7 +22,6 @@ class UserSeeder extends Seeder
         $customer = User::updateOrCreate(
             ['email' => 'customer@elsawady.com'],
             [
-                'name' => 'Default Customer',
                 'password' => 'password123',
             ]
         );
