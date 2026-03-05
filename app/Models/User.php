@@ -15,7 +15,6 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasFactory, HasApiTokens, Notifiable, HasRoles;
-protected $guard_name = 'api';
     protected $fillable = [
         'tenant_id',
         'name',

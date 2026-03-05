@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Auth;
+namespace App\Http\Requests\Api\Account;
 
 use Illuminate\Foundation\Http\FormRequest;
-
-class LoginRequest extends FormRequest
+use Illuminate\Validation\Rule;
+class UpdateAccountRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,14 @@ class LoginRequest extends FormRequest
     {
         return [
             //
-            'identifier' => ['required', 'string'],
+             'name' => ['required', 'string', 'max:255'],
+
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore(auth()->id()),
+            ],
         ];
     }
 }

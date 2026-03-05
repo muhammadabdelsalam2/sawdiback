@@ -14,6 +14,9 @@ use  App\Repositories\Contracts\TenantRepositoryInterface;
 use  App\Repositories\TenantRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
+use App\Repositories\ClientRepository;
+use App\Repositories\Contracts\ClientRepositoryInterface;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -44,7 +47,8 @@ class RepositoryServiceProvider extends ServiceProvider
 
         UserRepositoryInterface::class => UserRepository::class,
         OtpRepositoryInterface::class => OtpRepository::class,
-        TenantRepositoryInterface::class =>  TenantRepository::class
+        TenantRepositoryInterface::class =>  TenantRepository::class,
+        ClientRepositoryInterface::class => ClientRepository::class,
         // OTP Repository
 
     ];

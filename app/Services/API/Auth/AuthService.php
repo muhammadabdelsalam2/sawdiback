@@ -67,17 +67,14 @@ class AuthService
         //     );
         // }
 
-        //  Check password
-        if (!Hash::check($dto->password, $user->password)) {
-            return ServiceResult::error(
-                message: __('auth.invalid_password'),
-                nextEndpoint: null,
-                errors: ['password' => __('auth.invalid_password')],
-                code: 422
-            );
-        }
+        // Send OTP for login verification
+        $otpDto = new SendOtpDTO(
+            $dto->identifier, // identifier
+            OtpType::LOGIN   // type
+        );
+        $otp = $this->otpService->send($otpDto, $user);
 
-        // 🔎 Determine login type (email or phone)
+        // Determine login type (email or phone)
         $identifier = $dto->identifier;
 
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
@@ -106,8 +103,13 @@ class AuthService
         // ✅ Everything is valid → Create token
         $tokenResponse = $this->createTokenResponse($user);
 
+        $otpData = $otp->only([
+            'identifier',
+            'code',
+            'type'
+        ]);
         return ServiceResult::success(
-            data: $tokenResponse ?? null,
+            data: $otpData,
             message: __('auth.login_success'),
             code: 200
         );
@@ -129,10 +131,8 @@ class AuthService
 
         // Create user but do NOT activate yet (optional)
         $user = $this->userRepository->create([
-            'name' => $dto->name,
             'email' => $dto->email,
             'phone' => $dto->phone,
-            'password' => Hash::make($dto->password),
             // optionally add 'is_active' => false
         ]);
 
@@ -147,7 +147,8 @@ class AuthService
         );
 
         // Send OTP via OtpService
-        $otp = $this->otpService->send($otpDto,$user);
+        $otp = $this->otpService->send($otpDto, $user);
+
 
 
         return ServiceResult::success(
@@ -169,10 +170,8 @@ class AuthService
         return DB::transaction(function () use ($dto) {
 
             $user = $this->userRepository->create([
-                'name' => $dto->name,
                 'email' => $dto->email,
                 'phone' => $dto->phone,
-                'password' => Hash::make($dto->password),
             ]);
 
             $user->assignRole('SuperAdmin');
@@ -207,11 +206,9 @@ class AuthService
                 if (!$user) {
 
                     $user = $this->userRepository->create([
-                        'name' => $dto->name,
                         'email' => $dto->email,
                         'provider' => $dto->provider,
                         'provider_id' => $dto->providerId,
-                        'avatar' => $dto->avatar,
                     ]);
 
                     $user->assignRole('Client');
@@ -315,25 +312,46 @@ class AuthService
                     'email_verified_at' => now(),
                     'is_active' => true,
                 ]);
+                $message = __('auth.account_verified');
                 break;
             case 'verify_email':
                 $this->userRepository->update($user, [
                     'email_verified_at' => now(),
                 ]);
+                $message = __('auth.email_verified');
+                break;
+            case 'verify_phone':
+                $this->userRepository->update($user, [
+                    'phone_verified_at' => now(),
+                ]);
+                $message = __('auth.phone_verified');
+                break;
+                $this->userRepository->update($user, [
+                    'email_verified_at' => now(),
+                ]);
+                $message = __('auth.email_verified');
                 break;
 
             case 'forgot_password':
                 // Allow password reset
+                $message = __('auth.otp_verified');
                 break;
 
             case 'login':
                 // Maybe generate token
+                $token = $this->createTokenResponse($user);
+                $user->setAttribute('token', $token['token']);
+                $message = __('auth.login_success');
                 break;
+            default:
+                $message = __('auth.otp_verified');
         }
 
         return ServiceResult::success(
-            data: $user,
-            message: __('auth.account_verified'),
+            data: [
+                'user' => $user ?? null,
+            ],
+            message: $message,
             nextEndpoint: route('api.account.verifyOtp'),
             code: 200
         );

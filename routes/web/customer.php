@@ -29,10 +29,9 @@ use App\Http\Controllers\Customer\SalesDistribution\SalesShipmentController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
-    ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
+    ->middleware(['set.locale', 'auth', 'role:Customer'])
     ->name('customer.')
     ->group(function () {
-
         // =========================
         // Subscription (Always Allowed)
         // =========================
@@ -131,23 +130,23 @@ Route::prefix('{locale}')
             ->middleware(['feature:hr_management'])
             ->group(function () {
 
-                Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
-                    ->name('index');
+            Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
+                ->name('index');
 
-                Route::resource('departments', DepartmentController::class)->except(['show']);
-                Route::resource('job-titles', JobTitleController::class)->except(['show']);
-                Route::resource('employees', EmployeeController::class)->except(['show']);
+            Route::resource('departments', DepartmentController::class)->except(['show']);
+            Route::resource('job-titles', JobTitleController::class)->except(['show']);
+            Route::resource('employees', EmployeeController::class)->except(['show']);
 
-                // Attendance
-                Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-                Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
-                Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
+            // Attendance
+            Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+            Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
+            Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
 
-                // Leaves
-                Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
-                Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
-                Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
-                Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
-                Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
-            });
+            // Leaves
+            Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
+            Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
+            Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
+            Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
+            Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
+        });
     });

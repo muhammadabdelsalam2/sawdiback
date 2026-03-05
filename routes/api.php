@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Account\AccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
@@ -35,10 +36,16 @@ Route::prefix('v1')->group(function () {
             Route::controller(PasswordManagmentController::class)
                 ->prefix('password')
                 ->group(function () {
-                    Route::post('forget', 'forgotPassword')->name('api.password.forget');
-                    Route::post('forget/verify', 'verifyOtp')->name('api.password.verify');
-                    Route::post('change', 'resetPassword')->name('api.password.change');
-                });
+                Route::post('forget', 'forgotPassword')->name('api.password.forget');
+                Route::post('forget/verify', 'verifyOtp')->name('api.password.verify');
+                Route::post('change', 'resetPassword')->name('api.password.change');
+            });
+
+            // Compelete account setup (if needed)
+            Route::middleware(['auth:sanctum'])->group(function () {
+                Route::post('complete-setup', [AccountController::class, 'complete'])->name('api.account.completeSetup');
+
+            });
         });
 
     /*

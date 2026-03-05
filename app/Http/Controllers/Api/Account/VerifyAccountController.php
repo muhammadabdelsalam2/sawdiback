@@ -19,7 +19,7 @@ use App\Enums\OtpType;
 class VerifyAccountController extends Controller
 {
     //
-        public function __construct(
+    public function __construct(
         protected AuthService $authService,
         private OtpService $otpService,
         private OtpRepository $otpRepository,
@@ -28,129 +28,130 @@ class VerifyAccountController extends Controller
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
-{
-    $result = $this->authService->verifyOtp(
-        VerifyOtpDTO::fromRequest($request)
-    );
+    {
+        $result = $this->authService->verifyOtp(
+            VerifyOtpDTO::fromRequest($request)
+        );
 
-    return ApiResponse::success(
-        data: $result['data'],
-        message: $result['message'],
-        code: $result['code']
-    );
-}
-public function resendOtp(ResendOtpRequest $request): JsonResponse
-{
-    $identifier = $request->identifier;
 
-    // Step:one  Detect identifier type (email or phone)
-    $identifierType = $this->detectIdentifierType($identifier);
-
-    // Step:2 Find user by identifier
-    $user = $this->userRepository->findByIdentifierValue($identifier);
-
-    // Step:3 Determine OTP type based on full logic
-    $type = $this->determineOtpType(
-        identifierType: $identifierType,
-        user: $user
-    );
-
-    // Step:4 Create DTO
-    $dto = new SendOtpDTO(
-        identifier: $identifier,
-        type: $type
-    );
-
-    // Step:5 Resend OTP
-    $this->otpService->resend($dto, $user);
-
-    // Step:6  Return response (without leaking OTP in production)
-    $responseData = [
-        'identifier' => $identifier,
-        'type' => $type,
-    ];
-
-    // Show OTP only in local/testing environment
-    if (app()->environment('local')) {
-        $existingOtp = $this->otpRepository
-            ->findValidOtpByIdentifierAndType($identifier, $type);
-
-        $responseData['otp_code'] = $existingOtp?->code;
+        return ApiResponse::success(
+            data: $result['data'],
+            message: $result['message'],
+            code: $result['code']
+        );
     }
+    public function resendOtp(ResendOtpRequest $request): JsonResponse
+    {
+        $identifier = $request->identifier;
 
-    return response()->json([
-        'status' => true,
-        'message' => __('auth.otp_sent'),
-        'data' => $responseData
-    ]);
-}
+        // Step:one  Detect identifier type (email or phone)
+        $identifierType = $this->detectIdentifierType($identifier);
 
+        // Step:2 Find user by identifier
+        $user = $this->userRepository->findByIdentifierValue($identifier);
 
-/**
- * Determine OTP type based on:
- * - Identifier type
- * - User existence
- * - Verification state
- * - Activation state
- */
-private function determineOtpType(
-    string $identifierType,
-    ?object $user
-): string {
+        // Step:3 Determine OTP type based on full logic
+        $type = $this->determineOtpType(
+            identifierType: $identifierType,
+            user: $user
+        );
 
-    /**
-     * Case 1: User does not exist
-     * Registration flow
-     */
-    if (!$user) {
-        return OtpType::REGISTER;
-    }
+        // Step:4 Create DTO
+        $dto = new SendOtpDTO(
+            identifier: $identifier,
+            type: $type
+        );
 
-    /**
-     * Case 2: Email identifier
-     */
-    if ($identifierType === 'email') {
+        // Step:5 Resend OTP
+        $this->otpService->resend($dto, $user);
 
-        // Email not verified
-        if (is_null($user->email_verified_at)) {
-            return OtpType::VERIFY_EMAIL;
+        // Step:6  Return response (without leaking OTP in production)
+        $responseData = [
+            'identifier' => $identifier,
+            'type' => $type,
+        ];
+
+        // Show OTP only in local/testing environment
+        if (app()->environment('local')) {
+            $existingOtp = $this->otpRepository
+                ->findValidOtpByIdentifierAndType($identifier, $type);
+
+            $responseData['otp_code'] = $existingOtp?->code;
         }
 
-        // Account inactive
-        if (!$user->is_active) {
-            return OtpType::VERIFY_EMAIL;
-        }
+        return response()->json([
+            'status' => true,
+            'message' => __('auth.otp_sent'),
+            'data' => $responseData
+        ]);
     }
+
 
     /**
-     * Case 3: Phone identifier
+     * Determine OTP type based on:
+     * - Identifier type
+     * - User existence
+     * - Verification state
+     * - Activation state
      */
-    if ($identifierType === 'phone') {
+    private function determineOtpType(
+        string $identifierType,
+        ?object $user
+    ): string {
 
-        // Phone not verified
-        if (is_null($user->phone_verified_at)) {
-            return OtpType::VERIFY_PHONE;
+        /**
+         * Case 1: User does not exist
+         * Registration flow
+         */
+        if (!$user) {
+            return OtpType::REGISTER;
         }
 
-        // Account inactive
-        if (!$user->is_active) {
-            return OtpType::VERIFY_PHONE;
+        /**
+         * Case 2: Email identifier
+         */
+        if ($identifierType === 'email') {
+
+            // Email not verified
+            if (is_null($user->email_verified_at)) {
+                return OtpType::VERIFY_EMAIL;
+            }
+
+            // Account inactive
+            if (!$user->is_active) {
+                return OtpType::VERIFY_EMAIL;
+            }
         }
-    }
 
-    /**
-     * Case 4:
-     * User exists and fully verified
-     * Forgot password flow
-     */
-    return OtpType::FORGOT_PASSWORD;
-}
-private function detectIdentifierType(string $identifier): string
-{
-    if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-        return 'email';
-    }
+        /**
+         * Case 3: Phone identifier
+         */
+        if ($identifierType === 'phone') {
 
-    return 'phone';
-}
+            // Phone not verified
+            if (is_null($user->phone_verified_at)) {
+                return OtpType::VERIFY_PHONE;
+            }
+
+            // Account inactive
+            if (!$user->is_active) {
+                return OtpType::VERIFY_PHONE;
+            }
+        }
+
+        /**
+         * Case 4:
+         * User exists and fully verified
+         * Forgot password flow
+         */
+        return OtpType::FORGOT_PASSWORD;
+    }
+    private function detectIdentifierType(string $identifier): string
+    {
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return 'email';
+        }
+
+        return 'phone';
+    }
 }

@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('tenants', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('slug')->unique();
             $table->enum('status', ['active', 'suspended', 'trial'])->default('trial');
             $table->foreignId('subscription_plan_id')->nullable()->constrained('subscriptions')->cascadeOnUpdate()->nullOnDelete();
