@@ -308,11 +308,20 @@ class AuthService
         // Use type directly from OTP
         switch ($otp->type) {
             case 'register':
-                $this->userRepository->update($user, [
-                    'email_verified_at' => now(),
+                $updateData = [
                     'is_active' => true,
-                ]);
+                ];
+                // Detect identifier type (email or phone)
+                if (filter_var($dto->identifier, FILTER_VALIDATE_EMAIL)) {
+                    $updateData['email_verified_at'] = now();
+                } else {
+                    $updateData['phone_verified_at'] = now();
+                }
+
+                $this->userRepository->update($user, $updateData);
+
                 $message = __('auth.account_verified');
+
                 break;
             case 'verify_email':
                 $this->userRepository->update($user, [

@@ -17,7 +17,6 @@ class AccountController extends Controller
     public function complete(UpdateAccountRequest $request): JsonResponse
     {
         $dto = UpdateAccountDTO::fromRequest($request);
-    dd($dto);
         $result = $this->accountService->updateAccount($dto);
 
         if (!$result['success']) {

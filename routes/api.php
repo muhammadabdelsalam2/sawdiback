@@ -23,7 +23,7 @@ Route::prefix('v1')->group(function () {
         });
 
     Route::prefix('account')
-        ->middleware('guest:sanctum')
+        ->middleware(['guest:sanctum', 'throttle:5,1']) // Limit to 5 attempts per minute
         ->group(function () {
 
             // Account verification
@@ -43,8 +43,8 @@ Route::prefix('v1')->group(function () {
 
             // Compelete account setup (if needed)
             Route::middleware(['auth:sanctum'])->group(function () {
-                Route::post('complete-setup', [AccountController::class, 'complete'])->name('api.account.completeSetup');
-
+                Route::post('complete-setup', [AccountController::class, 'complete'])
+                    ->name('api.account.completeSetup')->withoutMiddleware('guest:sanctum');
             });
         });
 
