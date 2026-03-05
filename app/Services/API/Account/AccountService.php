@@ -3,6 +3,7 @@
 namespace App\Services\API\Account;
 
 use App\DTOs\Account\UpdateAccountDTO;
+use App\Http\Resources\UserResource;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
 
@@ -10,7 +11,8 @@ class AccountService
 {
     public function __construct(
         protected ClientRepositoryInterface $clientRepository
-    ) {}
+    ) {
+    }
 
     public function updateAccount(UpdateAccountDTO $dto): array
     {
@@ -28,6 +30,7 @@ class AccountService
         $data = [
             'name' => $dto->name,
             'email' => $dto->email,
+            'is_completed' => true,
         ];
 
         // If email changed → reset verification
@@ -40,7 +43,7 @@ class AccountService
         return [
             'success' => true,
             'message' => __('account.updated_successfully'),
-            'data' => $user,
+            'data' => new UserResource($user),
             'code' => 200
         ];
     }

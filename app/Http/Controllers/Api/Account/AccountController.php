@@ -12,13 +12,13 @@ class AccountController extends Controller
 {
     public function __construct(
         protected AccountService $accountService
-    ) {}
+    ) {
+    }
 
     public function complete(UpdateAccountRequest $request): JsonResponse
     {
         $dto = UpdateAccountDTO::fromRequest($request);
         $result = $this->accountService->updateAccount($dto);
-
         if (!$result['success']) {
             return response()->json([
                 'status' => false,
