@@ -150,11 +150,10 @@ class AuthService
         $otp = $this->otpService->send($otpDto, $user);
 
 
-
         return ServiceResult::success(
             data: $otp,
             message: __('auth.otp_sent'),
-            nextEndpoint: route('api.account.verifyOtp'),
+            nextEndpoint: route('api.account.verifyOtp', ['locale' => app()->getLocale()]),
             code: 200
         );
 
@@ -366,7 +365,7 @@ class AuthService
                 'user' => $user ?? null,
             ],
             message: $message,
-            nextEndpoint: route('api.account.verifyOtp'),
+            nextEndpoint: route('api.account.verifyOtp', ['locale' => app()->getLocale()]),
             code: 200
         );
     }

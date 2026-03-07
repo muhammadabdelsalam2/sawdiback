@@ -10,11 +10,13 @@ use App\Repositories\UserRepository;
 use App\Services\API\Auth\Contracts\OtpSenderFactory;
 use App\Services\API\Auth\Contracts\OtpSenderInterface;
 use Illuminate\Support\ServiceProvider;
-use  App\Repositories\Contracts\TenantRepositoryInterface;
-use  App\Repositories\TenantRepository;
+use App\Repositories\Contracts\TenantRepositoryInterface;
+use App\Repositories\TenantRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
+use App\Repositories\CategoryRepository;
 use App\Repositories\ClientRepository;
+use App\Repositories\Contracts\Api\CategoryRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -47,8 +49,9 @@ class RepositoryServiceProvider extends ServiceProvider
 
         UserRepositoryInterface::class => UserRepository::class,
         OtpRepositoryInterface::class => OtpRepository::class,
-        TenantRepositoryInterface::class =>  TenantRepository::class,
+        TenantRepositoryInterface::class => TenantRepository::class,
         ClientRepositoryInterface::class => ClientRepository::class,
+        CategoryRepositoryInterface::class => CategoryRepository::class,
         // OTP Repository
 
     ];
@@ -79,7 +82,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-                User::observe(UserObserver::class);
+        User::observe(UserObserver::class);
 
     }
 }
