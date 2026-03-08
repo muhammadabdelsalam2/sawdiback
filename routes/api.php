@@ -6,6 +6,10 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
 
+
+require __DIR__ . '/api/ecommerce.php';
+
+
 Route::prefix('v1/{locale}')->group(function () {
 
     /*

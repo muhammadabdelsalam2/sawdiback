@@ -49,7 +49,7 @@ class ProfileOverviewResource extends JsonResource
 
             'settings' => [
                 'notifications' => false,
-                'appearance' => $this->appearance_mode ?? 'system',
+                'appearance' => 'system',
                 'language' => $language,
             ],
 
