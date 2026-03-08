@@ -39,7 +39,7 @@ class AccountService
                 'success' => false,
                 'message' => __('auth.user_not_found'),
                 'data' => null,
-                'code' => 404
+                'code' => 404,
             ];
         }
 
@@ -60,7 +60,7 @@ class AccountService
             'success' => true,
             'message' => __('account.updated_successfully'),
             'data' => new UserResource($user),
-            'code' => 200
+            'code' => 200,
         ];
     }
 
@@ -110,6 +110,8 @@ class AccountService
         }
 
         $data = [];
+        $oldAvatar = $user->avatar;
+        $newAvatarPath = null;
 
         if ($request->filled('name')) {
             $data['name'] = $request->string('name')->toString();
@@ -124,17 +126,8 @@ class AccountService
         }
 
         if ($request->hasFile('avatar')) {
-            $oldAvatar = $user->avatar;
-
-            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
-
-            if (
-                !empty($oldAvatar) &&
-                !filter_var($oldAvatar, FILTER_VALIDATE_URL) &&
-                Storage::disk('public')->exists($oldAvatar)
-            ) {
-                Storage::disk('public')->delete($oldAvatar);
-            }
+            $newAvatarPath = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $newAvatarPath;
         }
 
         if (empty($data)) {
@@ -148,15 +141,40 @@ class AccountService
 
         $data['is_completed'] = true;
 
-        $this->clientRepository->update($user, $data);
-        $user->refresh();
+        try {
+            $this->clientRepository->update($user, $data);
+            $user->refresh();
 
-        return [
-            'success' => true,
-            'message' => 'Profile updated successfully.',
-            'data' => new ProfileOverviewResource($user),
-            'code' => 200,
-        ];
+            if (
+                $newAvatarPath &&
+                !empty($oldAvatar) &&
+                !filter_var($oldAvatar, FILTER_VALIDATE_URL) &&
+                Storage::disk('public')->exists($oldAvatar)
+            ) {
+                Storage::disk('public')->delete($oldAvatar);
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Profile updated successfully.',
+                'data' => new ProfileOverviewResource($user),
+                'code' => 200,
+            ];
+        } catch (Throwable $e) {
+            if (
+                $newAvatarPath &&
+                Storage::disk('public')->exists($newAvatarPath)
+            ) {
+                Storage::disk('public')->delete($newAvatarPath);
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Unable to update profile right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
     }
 
     /**
@@ -411,9 +429,7 @@ class AccountService
             return [
                 'success' => false,
                 'message' => 'Unable to delete account right now.',
-                'data' => [
-                    'error' => $e->getMessage(),
-                ],
+                'data' => null,
                 'code' => 422,
             ];
         }
