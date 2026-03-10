@@ -5,14 +5,21 @@ namespace App\Services\API\Account;
 use App\DTOs\Account\UpdateAccountDTO;
 use App\DTOs\Auth\SendOtpDTO;
 use App\Http\Resources\ProfileOverviewResource;
+use App\Http\Resources\UserAddressResource;
+use App\Http\Resources\UserNotificationSettingsResource;
+use App\Http\Resources\UserPaymentMethodResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\UserAddress;
+use App\Models\UserNotificationSetting;
+use App\Models\UserPaymentMethod;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\OtpRepository;
 use App\Repositories\UserRepository;
 use App\Services\API\Auth\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -78,6 +85,7 @@ class AccountService
             ];
         }
 
+        $user->loadMissing(['addresses', 'paymentMethods', 'notificationSetting']);
         $user->refresh();
 
         return [
@@ -373,6 +381,353 @@ class AccountService
         ];
     }
 
+    public function getAddressBook(): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Address book loaded successfully.',
+            'data' => $this->addressBookPayload($user),
+            'code' => 200,
+        ];
+    }
+
+    public function storeAddress(array $data): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        try {
+            DB::transaction(function () use ($user, $data) {
+                $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
+
+                $address = $user->addresses()->create([
+                    'label' => $data['label'] ?? null,
+                    'recipient_name' => $data['recipient_name'] ?? null,
+                    'phone' => $data['phone'] ?? null,
+                    'address_line_1' => $data['address_line_1'],
+                    'address_line_2' => $data['address_line_2'] ?? null,
+                    'building' => $data['building'] ?? null,
+                    'floor' => $data['floor'] ?? null,
+                    'apartment' => $data['apartment'] ?? null,
+                    'city' => $data['city'] ?? null,
+                    'country' => $data['country'] ?? null,
+                    'postal_code' => $data['postal_code'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                    'is_default' => $shouldBeDefault,
+                ]);
+
+                if ($shouldBeDefault) {
+                    $this->normalizeUserAddressDefaults($user, $address->id);
+                } else {
+                    $this->normalizeUserAddressDefaults($user);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Address added successfully.',
+                'data' => $this->addressBookPayload($user->fresh()),
+                'code' => 201,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to save address right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
+    public function updateAddress(UserAddress $address, array $data): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        if ((int) $address->user_id !== (int) $user->id) {
+            return [
+                'success' => false,
+                'message' => 'Address not found.',
+                'data' => null,
+                'code' => 404,
+            ];
+        }
+
+        try {
+            DB::transaction(function () use ($user, $address, $data) {
+                $address->fill([
+                    'label' => $data['label'] ?? $address->label,
+                    'recipient_name' => array_key_exists('recipient_name', $data) ? $data['recipient_name'] : $address->recipient_name,
+                    'phone' => array_key_exists('phone', $data) ? $data['phone'] : $address->phone,
+                    'address_line_1' => $data['address_line_1'] ?? $address->address_line_1,
+                    'address_line_2' => array_key_exists('address_line_2', $data) ? $data['address_line_2'] : $address->address_line_2,
+                    'building' => array_key_exists('building', $data) ? $data['building'] : $address->building,
+                    'floor' => array_key_exists('floor', $data) ? $data['floor'] : $address->floor,
+                    'apartment' => array_key_exists('apartment', $data) ? $data['apartment'] : $address->apartment,
+                    'city' => array_key_exists('city', $data) ? $data['city'] : $address->city,
+                    'country' => array_key_exists('country', $data) ? $data['country'] : $address->country,
+                    'postal_code' => array_key_exists('postal_code', $data) ? $data['postal_code'] : $address->postal_code,
+                    'notes' => array_key_exists('notes', $data) ? $data['notes'] : $address->notes,
+                    'is_default' => array_key_exists('is_default', $data) ? (bool) $data['is_default'] : $address->is_default,
+                ]);
+
+                $address->save();
+
+                if (!empty($data['is_default'])) {
+                    $this->normalizeUserAddressDefaults($user, $address->id);
+                } else {
+                    $this->normalizeUserAddressDefaults($user);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Address updated successfully.',
+                'data' => $this->addressBookPayload($user->fresh()),
+                'code' => 200,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to update address right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
+    public function deleteAddress(UserAddress $address): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        if ((int) $address->user_id !== (int) $user->id) {
+            return [
+                'success' => false,
+                'message' => 'Address not found.',
+                'data' => null,
+                'code' => 404,
+            ];
+        }
+
+        try {
+            DB::transaction(function () use ($user, $address) {
+                $wasDefault = (bool) $address->is_default;
+
+                $address->delete();
+
+                if ($wasDefault) {
+                    $this->normalizeUserAddressDefaults($user);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Address deleted successfully.',
+                'data' => $this->addressBookPayload($user->fresh()),
+                'code' => 200,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to delete address right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
+    public function getPaymentMethods(): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Payment methods loaded successfully.',
+            'data' => $this->paymentMethodsPayload($user),
+            'code' => 200,
+        ];
+    }
+
+    public function storePaymentMethod(array $data): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        try {
+            DB::transaction(function () use ($user, $data) {
+                $shouldBeDefault = !empty($data['is_default']) || !$user->paymentMethods()->exists();
+
+                $paymentMethod = $user->paymentMethods()->create([
+                    'brand' => $data['brand'],
+                    'last_four' => $data['last_four'],
+                    'expiry_month' => (int) $data['expiry_month'],
+                    'expiry_year' => (int) $data['expiry_year'],
+                    'holder_name' => $data['holder_name'] ?? null,
+                    'gateway' => $data['gateway'] ?? null,
+                    'gateway_reference' => $data['gateway_reference'] ?? null,
+                    'is_default' => $shouldBeDefault,
+                ]);
+
+                if ($shouldBeDefault) {
+                    $this->normalizeUserPaymentMethodDefaults($user, $paymentMethod->id);
+                } else {
+                    $this->normalizeUserPaymentMethodDefaults($user);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Payment method added successfully.',
+                'data' => $this->paymentMethodsPayload($user->fresh()),
+                'code' => 201,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to save payment method right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
+    public function deletePaymentMethod(UserPaymentMethod $paymentMethod): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        if ((int) $paymentMethod->user_id !== (int) $user->id) {
+            return [
+                'success' => false,
+                'message' => 'Payment method not found.',
+                'data' => null,
+                'code' => 404,
+            ];
+        }
+
+        try {
+            DB::transaction(function () use ($user, $paymentMethod) {
+                $wasDefault = (bool) $paymentMethod->is_default;
+
+                $paymentMethod->delete();
+
+                if ($wasDefault) {
+                    $this->normalizeUserPaymentMethodDefaults($user);
+                }
+            });
+
+            return [
+                'success' => true,
+                'message' => 'Payment method deleted successfully.',
+                'data' => $this->paymentMethodsPayload($user->fresh()),
+                'code' => 200,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to delete payment method right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
+    public function getNotificationSettings(): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        $setting = UserNotificationSetting::query()->firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'order_updates' => false,
+                'sms_updates' => false,
+                'promotions_deals' => false,
+                'new_products' => false,
+            ]
+        );
+
+        return [
+            'success' => true,
+            'message' => 'Notification settings loaded successfully.',
+            'data' => new UserNotificationSettingsResource($setting),
+            'code' => 200,
+        ];
+    }
+
+    public function updateNotificationSettings(array $data): array
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user) {
+            return $this->userNotFoundResponse();
+        }
+
+        try {
+            $setting = UserNotificationSetting::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'order_updates' => false,
+                    'sms_updates' => false,
+                    'promotions_deals' => false,
+                    'new_products' => false,
+                ]
+            );
+
+            $setting->fill([
+                'order_updates' => array_key_exists('order_updates', $data) ? (bool) $data['order_updates'] : $setting->order_updates,
+                'sms_updates' => array_key_exists('sms_updates', $data) ? (bool) $data['sms_updates'] : $setting->sms_updates,
+                'promotions_deals' => array_key_exists('promotions_deals', $data) ? (bool) $data['promotions_deals'] : $setting->promotions_deals,
+                'new_products' => array_key_exists('new_products', $data) ? (bool) $data['new_products'] : $setting->new_products,
+            ]);
+
+            $setting->save();
+
+            return [
+                'success' => true,
+                'message' => 'Notification settings updated successfully.',
+                'data' => new UserNotificationSettingsResource($setting->fresh()),
+                'code' => 200,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Unable to update notification settings right now.',
+                'data' => null,
+                'code' => 422,
+            ];
+        }
+    }
+
     public function logout(?User $user): array
     {
         if (!$user) {
@@ -432,6 +787,108 @@ class AccountService
                 'data' => null,
                 'code' => 422,
             ];
+        }
+    }
+
+    private function authenticatedUser(): ?User
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user;
+    }
+
+    private function userNotFoundResponse(): array
+    {
+        return [
+            'success' => false,
+            'message' => __('auth.user_not_found'),
+            'data' => null,
+            'code' => 404,
+        ];
+    }
+
+    private function addressBookPayload(User $user): array
+    {
+        $addresses = $user->addresses()
+            ->orderByDesc('is_default')
+            ->latest('id')
+            ->get();
+
+        return [
+            'items' => UserAddressResource::collection($addresses),
+            'default_address_id' => $addresses->firstWhere('is_default', true)?->id,
+            'count' => $addresses->count(),
+        ];
+    }
+
+    private function paymentMethodsPayload(User $user): array
+    {
+        $paymentMethods = $user->paymentMethods()
+            ->orderByDesc('is_default')
+            ->latest('id')
+            ->get();
+
+        return [
+            'items' => UserPaymentMethodResource::collection($paymentMethods),
+            'default_payment_method_id' => $paymentMethods->firstWhere('is_default', true)?->id,
+            'count' => $paymentMethods->count(),
+        ];
+    }
+
+    private function normalizeUserAddressDefaults(User $user, ?int $preferredId = null): void
+    {
+        $query = $user->addresses();
+
+        if (!$query->exists()) {
+            return;
+        }
+
+        if ($preferredId) {
+            $query->where('id', '!=', $preferredId)->update(['is_default' => false]);
+            $query->whereKey($preferredId)->update(['is_default' => true]);
+            return;
+        }
+
+        $currentDefault = $query->where('is_default', true)->orderBy('id')->first();
+
+        if ($currentDefault) {
+            $query->where('id', '!=', $currentDefault->id)->update(['is_default' => false]);
+            return;
+        }
+
+        $fallback = $query->orderBy('id')->first();
+
+        if ($fallback) {
+            $query->whereKey($fallback->id)->update(['is_default' => true]);
+        }
+    }
+
+    private function normalizeUserPaymentMethodDefaults(User $user, ?int $preferredId = null): void
+    {
+        $query = $user->paymentMethods();
+
+        if (!$query->exists()) {
+            return;
+        }
+
+        if ($preferredId) {
+            $query->where('id', '!=', $preferredId)->update(['is_default' => false]);
+            $query->whereKey($preferredId)->update(['is_default' => true]);
+            return;
+        }
+
+        $currentDefault = $query->where('is_default', true)->orderBy('id')->first();
+
+        if ($currentDefault) {
+            $query->where('id', '!=', $currentDefault->id)->update(['is_default' => false]);
+            return;
+        }
+
+        $fallback = $query->orderBy('id')->first();
+
+        if ($fallback) {
+            $query->whereKey($fallback->id)->update(['is_default' => true]);
         }
     }
 }

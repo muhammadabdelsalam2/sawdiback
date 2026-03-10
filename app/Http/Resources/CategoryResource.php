@@ -6,57 +6,23 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
-class ProfileOverviewResource extends JsonResource
+class CategoryResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $avatar = $this->avatar;
+        $image = $this->image ?? null;
 
-        if ($avatar && !filter_var($avatar, FILTER_VALIDATE_URL)) {
-            $avatar = Storage::disk('public')->url($avatar);
+        if ($image && !filter_var($image, FILTER_VALIDATE_URL)) {
+            $image = Storage::disk('public')->url($image);
         }
 
-        $language = $this->preferred_language
-            ?? $this->current_locale
-            ?? $request->route('locale')
-            ?? app()->getLocale();
-
         return [
-            'user' => [
-                'id' => $this->id,
-                'tenant_id' => $this->tenant_id,
-                'name' => $this->name,
-                'avatar' => $avatar,
-                'phone' => $this->phone,
-                'email' => $this->email,
-                'is_completed' => (bool) $this->is_completed,
-            ],
-
-            'personal_information' => [
-                'phone' => $this->phone,
-                'email' => $this->email,
-                'linked_accounts' => [
-                    'google' => !empty($this->google_id),
-                    'facebook' => !empty($this->facebook_id),
-                ],
-            ],
-
-            'my_shopping' => [
-                'wallet_points' => 0,
-                'address_book_count' => 0,
-                'payment_methods_count' => 0,
-            ],
-
-            'settings' => [
-                'notifications' => false,
-                'appearance' => $this->appearance_mode ?? 'system',
-                'language' => $language,
-            ],
-
-            'actions' => [
-                'can_logout' => true,
-                'can_delete_account' => true,
-            ],
+            'id' => $this->id,
+            'name' => $this->name ?? null,
+            'slug' => $this->slug ?? null,
+            'image' => $image,
+            'description' => $this->description ?? null,
+            'is_active' => isset($this->is_active) ? (bool) $this->is_active : true,
         ];
     }
 }
