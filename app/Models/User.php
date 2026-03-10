@@ -61,6 +61,21 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class, 'customer_id');
     }
 
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(UserPaymentMethod::class);
+    }
+
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(UserNotificationSetting::class);
+    }
+
     public function planFeatures(): array
     {
         $this->loadMissing([

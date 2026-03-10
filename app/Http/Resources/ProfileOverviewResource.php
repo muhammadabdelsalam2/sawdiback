@@ -21,6 +21,25 @@ class ProfileOverviewResource extends JsonResource
             ?? $request->route('locale')
             ?? app()->getLocale();
 
+        $addressBookCount = $this->relationLoaded('addresses')
+            ? $this->addresses->count()
+            : $this->addresses()->count();
+
+        $paymentMethodsCount = $this->relationLoaded('paymentMethods')
+            ? $this->paymentMethods->count()
+            : $this->paymentMethods()->count();
+
+        $notificationSetting = $this->relationLoaded('notificationSetting')
+            ? $this->notificationSetting
+            : $this->notificationSetting()->first();
+
+        $hasNotifications = (bool) (
+            $notificationSetting?->order_updates ||
+            $notificationSetting?->sms_updates ||
+            $notificationSetting?->promotions_deals ||
+            $notificationSetting?->new_products
+        );
+
         return [
             'user' => [
                 'id' => $this->id,
@@ -43,13 +62,13 @@ class ProfileOverviewResource extends JsonResource
 
             'my_shopping' => [
                 'wallet_points' => 0,
-                'address_book_count' => 0,
-                'payment_methods_count' => 0,
+                'address_book_count' => $addressBookCount,
+                'payment_methods_count' => $paymentMethodsCount,
             ],
 
             'settings' => [
-                'notifications' => false,
-                'appearance' => 'system',
+                'notifications' => $hasNotifications,
+                'appearance' => $this->appearance_mode ?? 'system',
                 'language' => $language,
             ],
 
