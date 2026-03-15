@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Account\AccountController;
+use App\Http\Controllers\Api\Account\WalletController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
@@ -43,5 +44,15 @@ Route::prefix('v1/{locale}')
 
                 Route::post('/logout', 'logout')->name('logout');
                 Route::delete('/delete', 'destroy')->name('delete');
+            });
+
+        // Wallet Routes
+        Route::prefix('account/wallet')
+            ->name('account.wallet.')
+            ->controller(WalletController::class)
+            ->group(function () {
+                Route::get('/', 'show')->name('show');
+                Route::post('/top-up', 'topUp')->name('top_up');
+                Route::post('/convert-points', 'convertPoints')->name('convert_points');
             });
     });

@@ -2,22 +2,22 @@
 
 namespace App\Providers;
 
-use App\Repositories\Contracts\OtpRepositoryInterface;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\LeaveRepository;
-use App\Repositories\OtpRepository;
-use App\Repositories\UserRepository;
-use App\Services\API\Auth\Contracts\OtpSenderFactory;
-use App\Services\API\Auth\Contracts\OtpSenderInterface;
-use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\TenantRepositoryInterface;
-use App\Repositories\TenantRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ClientRepository;
 use App\Repositories\Contracts\Api\CategoryRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
+use App\Repositories\Contracts\OtpRepositoryInterface;
+use App\Repositories\Contracts\TenantRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\LeaveRepository;
+use App\Repositories\OtpRepository;
+use App\Repositories\TenantRepository;
+use App\Repositories\UserRepository;
+use App\Services\API\Auth\Contracts\OtpSenderFactory;
+use App\Services\API\Auth\Contracts\OtpSenderInterface;
+use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -47,14 +47,16 @@ class RepositoryServiceProvider extends ServiceProvider
         \App\Repositories\Contracts\SalesDistribution\SalesInvoiceRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesInvoiceRepository::class,
         \App\Repositories\Contracts\SalesDistribution\SalesPaymentRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesPaymentRepository::class,
 
+        // API / Ecommerce
+        \App\Repositories\Contracts\Api\WalletRepositoryInterface::class => \App\Repositories\WalletRepository::class,
+
         UserRepositoryInterface::class => UserRepository::class,
         OtpRepositoryInterface::class => OtpRepository::class,
         TenantRepositoryInterface::class => TenantRepository::class,
         ClientRepositoryInterface::class => ClientRepository::class,
         CategoryRepositoryInterface::class => CategoryRepository::class,
-        // OTP Repository
-
     ];
+
     public function register(): void
     {
         $this->app->bind(OtpSenderInterface::class, function ($app) {
@@ -66,6 +68,7 @@ class RepositoryServiceProvider extends ServiceProvider
                 }
             };
         });
+
         foreach ($this->repositories as $interface => $implementation) {
             $this->app->bind($interface, $implementation);
         }
@@ -76,13 +79,8 @@ class RepositoryServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
-        //
         User::observe(UserObserver::class);
-
     }
 }

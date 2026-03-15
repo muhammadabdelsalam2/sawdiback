@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasOne(UserNotificationSetting::class);
     }
 
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
     public function planFeatures(): array
     {
         $this->loadMissing([
