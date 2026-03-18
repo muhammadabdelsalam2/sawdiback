@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Account\AccountController;
 use App\Http\Controllers\Api\Account\WalletController;
+use App\Http\Controllers\Api\Plus\PlusController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
@@ -54,5 +55,21 @@ Route::prefix('v1/{locale}')
                 Route::get('/', 'show')->name('show');
                 Route::post('/top-up', 'topUp')->name('top_up');
                 Route::post('/convert-points', 'convertPoints')->name('convert_points');
+            });
+
+        // El-Sawadi Plus Routes
+        Route::prefix('plus')
+            ->name('plus.')
+            ->controller(PlusController::class)
+            ->group(function () {
+                Route::get('/', 'overview')->name('overview');
+                Route::get('/setup', 'setup')->name('setup');
+                Route::post('/', 'store')->name('store');
+                Route::get('/manage', 'manage')->name('manage');
+
+                Route::get('/manage-subscription', 'manageSubscription')->name('manage_subscription.show');
+                Route::patch('/manage-subscription', 'updateManageSubscription')->name('manage_subscription.update');
+
+                Route::post('/skip', 'skip')->name('skip');
             });
     });

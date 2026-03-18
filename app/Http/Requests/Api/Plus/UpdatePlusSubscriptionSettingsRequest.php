@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Requests\Api\Plus;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdatePlusSubscriptionSettingsRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $userId = $this->user()?->id;
+
+        return [
+            'auto_renew' => ['sometimes', 'boolean'],
+            'payment_method_id' => [
+                'sometimes',
+                'integer',
+                Rule::exists('user_payment_methods', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
+            ],
+            'vacation_mode' => ['sometimes', 'boolean'],
+            'cancel_subscription' => ['sometimes', 'boolean'],
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if (
+                !$this->has('auto_renew') &&
+                !$this->has('payment_method_id') &&
+                !$this->has('vacation_mode') &&
+                !$this->has('cancel_subscription')
+            ) {
+                $validator->errors()->add('settings', 'At least one setting must be provided for update.');
+            }
+        });
+    }
+}

@@ -7,12 +7,14 @@ use App\Observers\UserObserver;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ClientRepository;
 use App\Repositories\Contracts\Api\CategoryRepositoryInterface;
+use App\Repositories\Contracts\Api\PlusRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\Contracts\OtpRepositoryInterface;
 use App\Repositories\Contracts\TenantRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\LeaveRepository;
 use App\Repositories\OtpRepository;
+use App\Repositories\PlusRepository;
 use App\Repositories\TenantRepository;
 use App\Repositories\UserRepository;
 use App\Services\API\Auth\Contracts\OtpSenderFactory;
@@ -21,9 +23,6 @@ use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     protected array $repositories = [
         // Plan Module
         \App\Repositories\Contracts\PlanRepositoryInterface::class => \App\Repositories\PlanRepository::class,
@@ -49,6 +48,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         // API / Ecommerce
         \App\Repositories\Contracts\Api\WalletRepositoryInterface::class => \App\Repositories\WalletRepository::class,
+        PlusRepositoryInterface::class => PlusRepository::class,
 
         UserRepositoryInterface::class => UserRepository::class,
         OtpRepositoryInterface::class => OtpRepository::class,
