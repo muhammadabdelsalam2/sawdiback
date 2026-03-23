@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ApiErrorMiddleware;
+use App\Http\Middleware\CheckAuthorized;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\SetLocaleApi;
@@ -56,12 +57,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // ✅ REQUIRED FOR FEATURE GATING
             'feature' => EnsureFeatureEnabled::class,
+            'authorized' => CheckAuthorized::class,
         ]);
 
         // Append API error middleware
         $middleware->appendToGroup('api', [
             ApiErrorMiddleware::class,
             SetLocaleApi::class,
+            CheckAuthorized::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
