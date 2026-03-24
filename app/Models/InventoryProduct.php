@@ -19,6 +19,7 @@ class InventoryProduct extends Model
         'name',
         'image',
         'category',
+        'category_id',
         'unit',
         'track_expiry',
         'low_stock_threshold',
@@ -37,6 +38,11 @@ class InventoryProduct extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function batches(): HasMany
@@ -72,4 +78,3 @@ class InventoryProduct extends Model
         return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
     }
 }
-

@@ -9,9 +9,11 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.category') }}</label>
-        <select name="category" class="form-select" required>
-            @foreach (['feed', 'vet_medicine', 'equipment', 'animal_product'] as $cat)
-                <option value="{{ $cat }}" @selected(old('category', $product->category ?? '') === $cat)>{{ __('warehouse.options.' . $cat) }}</option>
+        <select name="category_id" class="form-select" required>
+            @foreach ($categories as $category)
+                <option value="{{ $category->id }}" @selected((int) old('category_id', $product->category_id ?? 0) === $category->id)>
+                    {{ $category->name ?? $category->code }}
+                </option>
             @endforeach
         </select>
     </div>
@@ -42,4 +44,3 @@
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $product->notes ?? '') }}</textarea>
     </div>
 </div>
-

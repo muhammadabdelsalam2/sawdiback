@@ -45,6 +45,11 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    public function inventoryProducts()
+    {
+        return $this->hasMany(InventoryProduct::class);
+    }
+
     public function addAttibute($locale)
     {
         return 'test';

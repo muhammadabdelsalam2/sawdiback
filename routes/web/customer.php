@@ -11,6 +11,7 @@ use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
 use App\Http\Controllers\CropsFeed\CropController;
 use App\Http\Controllers\CropsFeed\FeedManagementController;
+use App\Http\Controllers\Warehouse\InventoryCategoryController;
 use App\Http\Controllers\Warehouse\InventoryProductController;
 use App\Http\Controllers\Warehouse\WarehouseController;
 
@@ -83,6 +84,7 @@ Route::prefix('{locale}')
         });
 
         Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::resource('categories', InventoryCategoryController::class)->except(['show']);
             Route::resource('products', InventoryProductController::class)->except(['show']);
 
             Route::get('/', [WarehouseController::class, 'index'])->name('index');

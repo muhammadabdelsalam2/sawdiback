@@ -100,6 +100,8 @@
                     class="dropdown-item {{ request()->routeIs('customer.inventory.index') ? 'active' : '' }}">{{ __('warehouse.titles.warehouse') }}</a>
                 <a href="{{ route('customer.inventory.products.index', ['locale' => $activeLocale]) }}"
                     class="dropdown-item {{ request()->routeIs('customer.inventory.products.*') ? 'active' : '' }}">{{ __('warehouse.titles.products') }}</a>
+                <a href="{{ route('customer.inventory.categories.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.categories.*') ? 'active' : '' }}">{{ __('warehouse.titles.categories') }}</a>
                 <a href="{{ route('customer.inventory.alerts.index', ['locale' => $activeLocale]) }}"
                     class="dropdown-item {{ request()->routeIs('customer.inventory.alerts.*') ? 'active' : '' }}">{{ __('warehouse.titles.alerts') }}</a>
                 <a href="{{ route('customer.inventory.traceability.index', ['locale' => $activeLocale]) }}"

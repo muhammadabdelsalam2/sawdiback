@@ -4,8 +4,11 @@ return [
     'titles' => [
         'warehouse' => 'Warehouse Management',
         'products' => 'Inventory Products',
+        'categories' => 'Inventory Categories',
         'add_product' => 'Add Product',
         'edit_product' => 'Edit Product',
+        'add_category' => 'Add Category',
+        'edit_category' => 'Edit Category',
         'alerts' => 'Inventory Alerts',
         'traceability' => 'Product Traceability',
     ],
@@ -24,6 +27,7 @@ return [
         'save' => 'Save',
         'filter' => 'Filter',
         'add_product' => 'Add Product',
+        'add_category' => 'Add Category',
         'edit' => 'Edit',
         'delete' => 'Delete',
     ],
@@ -37,6 +41,7 @@ return [
         'low_stock_threshold' => 'Low Stock Threshold',
         'active' => 'Active',
         'notes' => 'Notes',
+        'sort_order' => 'Sort Order',
         'product' => 'Product',
         'batch' => 'Batch',
         'batch_number' => 'Batch Number',
@@ -75,6 +80,7 @@ return [
     ],
     'empty' => [
         'no_products' => 'No products found.',
+        'no_categories' => 'No categories found.',
         'no_stock_rows' => 'No stock rows available.',
         'no_batches' => 'No batches found.',
         'no_low_stock' => 'No low stock products.',
@@ -82,4 +88,3 @@ return [
         'no_delivery_items' => 'No delivery records found.',
     ],
 ];
-
