@@ -25,7 +25,6 @@ Route::prefix('v1/{locale}')
             ->controller(ProductController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
-                Route::get('/{slag}', 'byCategory')->name('index');
                 Route::get('show/{product}', 'show')->name('show');
             });
 
