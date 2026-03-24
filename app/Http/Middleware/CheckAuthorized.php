@@ -15,7 +15,6 @@ class CheckAuthorized
      */
     public function handle(Request $request, Closure $next): Response
     {
-        dd('test');
         // لو مفيش user أو مش authorized
         if (!auth()->check()) {
             return response()->json([

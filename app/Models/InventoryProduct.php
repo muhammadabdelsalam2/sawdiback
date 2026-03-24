@@ -11,12 +11,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InventoryProduct extends Model
 {
     use HasFactory;
-    use ScopedByTenant;
+    // use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'code',
         'name',
+        'image',
         'category',
         'unit',
         'track_expiry',
@@ -30,6 +31,8 @@ class InventoryProduct extends Model
         'is_active' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
     ];
+
+    protected $append = ['image_url'];
 
     public function tenant(): BelongsTo
     {
@@ -54,6 +57,19 @@ class InventoryProduct extends Model
     public function deliveryItems(): HasMany
     {
         return $this->hasMany(InventoryDeliveryItem::class);
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        // لو فيه صورة مرفوعة
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+
+        // ✅ Dynamic image باسم المنتج (API جاهز)
+        $name = urlencode($this->name);
+
+        return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
     }
 }
 

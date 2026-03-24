@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Model
 {
     //
- use SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -29,17 +29,11 @@ class Category extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
+    protected $appends = ['name'];
 
-    public function translations()
-    {
-        return $this->hasMany(CategoryTranslation::class);
-    }
+  
 
-    public function translation()
-    {
-        return $this->hasOne(CategoryTranslation::class)
-            ->where('locale', app()->getLocale());
-    }
+  
 
     public function parent()
     {
@@ -49,6 +43,11 @@ class Category extends Model
     public function children()
     {
         return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function addAttibute($locale)
+    {
+        return 'test';
     }
 
     /*
@@ -64,5 +63,26 @@ class Category extends Model
                 $model->tenant_id = app('currentTenant')->id;
             }
         });
+    }
+    // Relationship to translations
+    public function translations()
+    {
+        return $this->hasMany(CategoryTranslation::class);
+    }
+
+      public function translation()
+    {
+        return $this->hasOne(CategoryTranslation::class)
+            ->where('locale', app()->getLocale());
+    }
+    public function getNameAttribute()
+    {
+        $locale = app()->getLocale(); // current locale, e.g., 'en', 'ar'
+
+        // Get translation for the current locale
+        $translation = $this->translation;
+
+        // Fallback to default (e.g., first translation) if not found
+        return $translation?->name ?? $this->translation?->name ?? null;
     }
 }

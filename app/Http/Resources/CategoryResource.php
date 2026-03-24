@@ -18,11 +18,14 @@ class CategoryResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'name' => $this->name ?? null,
-            'slug' => $this->slug ?? null,
-            'image' => $image,
-            'description' => $this->description ?? null,
-            'is_active' => isset($this->is_active) ? (bool) $this->is_active : true,
+            'code' => $this->code,
+            'name' => $this->name, // uses your localized accessor
+            'notes' => $this->notes,
+            'image' => $this->image 
+                ? asset('storage/' . $this->image) 
+                : 'https://placehold.co/400x400/cccccc/000000?text='.$this->name,
+            'is_active' => $this->is_active,
+            'parent_id' => $this->parent_id,
         ];
     }
 }
