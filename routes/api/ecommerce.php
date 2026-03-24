@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
+use App\Http\Controllers\Api\Product\ProductController;
 
 Route::prefix('v1/{locale}')
     ->middleware(['auth:sanctum', 'role:Client'])
@@ -18,6 +19,13 @@ Route::prefix('v1/{locale}')
             ->controller(App\Http\Controllers\Api\CategoriesController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+            });
+        Route::prefix('products')
+            ->name('products.')
+            ->controller(ProductController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('show/{product}', 'show')->name('show');
             });
 
         // Account / Profile Routes

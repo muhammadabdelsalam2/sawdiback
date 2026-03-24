@@ -4,6 +4,9 @@ namespace App\Services\API;
 
 use App\DTOs\Api\CategoryDTO;
 use App\Repositories\CategoryRepository;
+use App\Http\Resources\CategoryResource;
+use App\Support\ServiceResult;
+
 
 class CategoryService
 {
@@ -12,10 +15,23 @@ class CategoryService
     ) {
     }
 
-    public function all()
-    {
-        return $this->categoryRepository->all();
-    }
+public function all()
+{
+    $categories = $this->categoryRepository->all(); // LengthAwarePaginator
+    $categoriesData = CategoryResource::collection($categories);
+
+    // Use separate key for resource name
+    $resourceName = __('ecommerce.category.name'); 
+
+    // Use resource name in the success message
+    $message = __('ecommerce.category.success', ['resource' => $resourceName]);
+
+    return ServiceResult::success(
+        data: $categoriesData,
+        message: $message,
+        code: 200
+    );
+}
 
     public function find(int $id): ?CategoryDTO
     {

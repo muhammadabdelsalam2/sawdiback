@@ -157,4 +157,5 @@ return [
     'password_reset_token_expired' => 'Password reset token has expired. Please request a new one.',
     'otp_not_verified' => 'OTP has not been verified. Please verify OTP before resetting password.',
     'invalid_password_reset_token' => 'Invalid password reset token.',
+    'unauthenticated' => 'You are not authenticated. Please login and try again.',
 ];

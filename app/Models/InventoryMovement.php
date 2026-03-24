@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class InventoryMovement extends Model
 {
     use HasFactory;
-    use ScopedByTenant;
+    // use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
