@@ -17,6 +17,7 @@ use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\OtpRepository;
 use App\Repositories\UserRepository;
 use App\Services\API\Auth\OtpService;
+use App\Services\API\Plus\PlusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,8 @@ class AccountService
         protected ClientRepositoryInterface $clientRepository,
         protected UserRepository $userRepository,
         protected OtpService $otpService,
-        protected OtpRepository $otpRepository
+        protected OtpRepository $otpRepository,
+        protected PlusService $plusService
     ) {
     }
 
@@ -88,10 +90,13 @@ class AccountService
         $user->loadMissing(['addresses', 'paymentMethods', 'notificationSetting']);
         $user->refresh();
 
+        $user->setAttribute('current_locale', $locale);
+        $user->setAttribute('plus_summary', $this->plusService->profileSummary($user));
+
         return [
             'success' => true,
             'message' => 'Profile loaded successfully.',
-            'data' => new ProfileOverviewResource($user->setAttribute('current_locale', $locale)),
+            'data' => new ProfileOverviewResource($user),
             'code' => 200,
         ];
     }

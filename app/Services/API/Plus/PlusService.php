@@ -180,6 +180,27 @@ class PlusService
         ];
     }
 
+    public function profileSummary(User $user): array
+    {
+        $subscription = $this->getNormalizedCurrentSubscription($user);
+
+        if (!$subscription) {
+            return [
+                'is_subscribed' => false,
+                'subscription_status' => null,
+                'ui_state' => 'landing',
+            ];
+        }
+
+        $upcomingDeliveries = $this->buildUpcomingDeliveries($subscription);
+
+        return [
+            'is_subscribed' => true,
+            'subscription_status' => $subscription->status,
+            'ui_state' => empty($upcomingDeliveries) ? 'empty_state' : 'manage_orders',
+        ];
+    }
+
     public function manageSubscription(User $user): array
     {
         $subscription = $this->getNormalizedCurrentSubscription($user);

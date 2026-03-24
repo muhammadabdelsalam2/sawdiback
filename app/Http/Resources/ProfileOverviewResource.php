@@ -40,7 +40,7 @@ class ProfileOverviewResource extends JsonResource
             $notificationSetting?->new_products
         );
 
-        return [
+        $response = [
             'user' => [
                 'id' => $this->id,
                 'tenant_id' => $this->tenant_id,
@@ -71,11 +71,21 @@ class ProfileOverviewResource extends JsonResource
                 'appearance' => $this->appearance_mode ?? 'system',
                 'language' => $language,
             ],
-
-            'actions' => [
-                'can_logout' => true,
-                'can_delete_account' => true,
-            ],
         ];
+
+        if (is_array($this->plus_summary ?? null)) {
+            $response['plus'] = [
+                'is_subscribed' => (bool) ($this->plus_summary['is_subscribed'] ?? false),
+                'subscription_status' => $this->plus_summary['subscription_status'] ?? null,
+                'ui_state' => $this->plus_summary['ui_state'] ?? 'landing',
+            ];
+        }
+
+        $response['actions'] = [
+            'can_logout' => true,
+            'can_delete_account' => true,
+        ];
+
+        return $response;
     }
 }
