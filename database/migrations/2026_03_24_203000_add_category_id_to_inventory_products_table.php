@@ -36,7 +36,7 @@ return new class extends Migration {
                     ->where('code', $code)
                     ->value('id');
 
-                if (!$categoryId) {
+                if (! $categoryId) {
                     $categoryId = DB::table('categories')->insertGetId([
                         'tenant_id' => $tenantId,
                         'parent_id' => null,
@@ -55,10 +55,23 @@ return new class extends Migration {
                         ->where('locale', $locale)
                         ->exists();
 
-                    if (!$exists) {
-                        $slug = Str::slug($name);
-                        if ($slug === '') {
-                            $slug = Str::slug($code . '-' . $locale);
+                    if (! $exists) {
+                        $baseSlug = Str::slug($name);
+                        if ($baseSlug === '') {
+                            $baseSlug = Str::slug($code . '-' . $locale);
+                        }
+
+                        $slug = $baseSlug;
+                        $counter = 1;
+
+                        while (
+                            DB::table('category_translations')
+                                ->where('locale', $locale)
+                                ->where('slug', $slug)
+                                ->exists()
+                        ) {
+                            $slug = $baseSlug . '-' . $counter;
+                            $counter++;
                         }
 
                         DB::table('category_translations')->insert([
