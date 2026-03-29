@@ -37,6 +37,7 @@ return [
         'name' => 'الاسم',
         'category' => 'الفئة',
         'unit' => 'الوحدة',
+        'tax' => 'الضريبة',
         'track_expiry' => 'متابعة الصلاحية',
         'low_stock_threshold' => 'حد التنبيه',
         'active' => 'نشط',
@@ -88,3 +89,4 @@ return [
         'no_delivery_items' => 'لا يوجد سجل تسليم.',
     ],
 ];
+

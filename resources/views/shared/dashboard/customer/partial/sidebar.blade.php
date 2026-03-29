@@ -117,6 +117,19 @@
             </div>
         </div>
 
+        {{-- E-Commerce --}}
+        <div class="nav-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
+                <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
+                <span class="nav-label">{{ __('dashboard.sidebar.ecommerce') }}</span>
+                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+            </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.ecommerce.orders.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.ecommerce.orders.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.ecommerce_orders') }}</a>
+            </div>
+        </div>
+
         {{-- Sales & Distribution --}}
         <div
             class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">

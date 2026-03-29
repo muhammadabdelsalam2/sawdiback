@@ -13,6 +13,7 @@ class UserAddress extends Model
     protected $fillable = [
         'user_id',
         'label',
+        'type',
         'recipient_name',
         'phone',
         'address_line_1',
@@ -20,10 +21,13 @@ class UserAddress extends Model
         'building',
         'floor',
         'apartment',
+        'landmark',
         'city',
         'country',
         'postal_code',
         'notes',
+        'latitude',
+        'longitude',
         'is_default',
     ];
 
@@ -31,6 +35,8 @@ class UserAddress extends Model
     {
         return [
             'is_default' => 'boolean',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 

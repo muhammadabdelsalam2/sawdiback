@@ -28,6 +28,68 @@ Route::prefix('v1/{locale}')
                 Route::get('show/{product}', 'show')->name('show');
             });
 
+        // Cart Routes
+        Route::prefix('cart')
+            ->name('cart.')
+            ->controller(App\Http\Controllers\Api\Ecommerce\CartController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('items', 'add')->name('items.add');
+                Route::patch('items/{item}/increase', 'increase')->name('items.increase');
+                Route::patch('items/{item}/decrease', 'decrease')->name('items.decrease');
+                Route::patch('items/{item}', 'update')->name('items.update');
+                Route::delete('items/{item}', 'remove')->name('items.remove');
+                Route::delete('/', 'clear')->name('clear');
+                Route::post('coupon', 'applyCoupon')->name('coupon.apply');
+                Route::delete('coupon', 'removeCoupon')->name('coupon.remove');
+                Route::patch('weekly-delivery', 'weeklyDelivery')->name('weekly');
+                Route::patch('address', 'setAddress')->name('address.set');
+            });
+
+        // Address Routes
+        Route::prefix('addresses')
+            ->name('addresses.')
+            ->controller(App\Http\Controllers\Api\Ecommerce\AddressController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('manual', 'storeManual')->name('store.manual');
+                Route::post('location', 'storeLocation')->name('store.location');
+                Route::get('{address}', 'show')->name('show');
+                Route::patch('{address}', 'update')->name('update');
+                Route::delete('{address}', 'delete')->name('delete');
+                Route::patch('{address}/default', 'setDefault')->name('default');
+                Route::post('{address}/checkout', 'selectForCheckout')->name('checkout.select');
+            });
+
+        // Checkout Routes
+        Route::prefix('checkout')
+            ->name('checkout.')
+            ->controller(App\Http\Controllers\Api\Ecommerce\CheckoutController::class)
+            ->group(function () {
+                Route::get('summary', 'summary')->name('summary');
+                Route::post('place-order', 'placeOrder')->name('place');
+            });
+
+        // Orders Routes
+        Route::prefix('orders')
+            ->name('orders.')
+            ->controller(App\Http\Controllers\Api\Ecommerce\OrderController::class)
+            ->group(function () {
+                Route::get('active', 'active')->name('active');
+                Route::get('history', 'history')->name('history');
+                Route::get('{order}', 'show')->name('show');
+                Route::get('{order}/tracking', 'tracking')->name('tracking');
+            });
+
+        // Reviews Routes
+        Route::prefix('reviews')
+            ->name('reviews.')
+            ->controller(App\Http\Controllers\Api\Ecommerce\ReviewController::class)
+            ->group(function () {
+                Route::get('{order}', 'open')->name('open');
+                Route::post('{order}', 'submit')->name('submit');
+            });
+
         // Account / Profile Routes
         Route::prefix('account')
             ->name('account.')

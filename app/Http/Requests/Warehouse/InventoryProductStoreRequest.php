@@ -20,6 +20,7 @@ class InventoryProductStoreRequest extends BaseWarehouseRequest
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'unit' => ['required', 'string', 'max:50'],
+            'tax' => ['nullable', 'numeric', 'min:0'],
             'track_expiry' => ['nullable', 'boolean'],
             'low_stock_threshold' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
