@@ -25,7 +25,7 @@ class DemoDataSeeder extends Seeder
                 'password' => Hash::make('password123'),
             ]
         );
-        $superAdmin->assignRole('SuperAdmin');
+        $superAdmin->syncRoles(['SuperAdmin', 'Customer']);
 
         // Step:2 Customer
         $customer = User::updateOrCreate(
@@ -48,12 +48,14 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
-
         $this->command->info("The Tenant Id Is => $tenant->id");
 
-        // Step:3 Assign tenant_id to customer
+        // Step:3 Assign tenant_id to customer and superadmin
         $customer->tenant_id = $tenant->id;
         $customer->save();
+
+        $superAdmin->tenant_id = $tenant->id;
+        $superAdmin->save();
 
         // Step:4 Create Plans with Features JSON
         $featureKeys = [

@@ -33,6 +33,8 @@ use App\Repositories\LeaveRepository;
 use App\Repositories\AttendanceRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
+use Illuminate\Support\Facades\Gate;
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -42,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // ✅ SuperAdmin Bypass
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('SuperAdmin') ? true : null;
+        });
 
         View::composer('*', function ($view) {
             $lang = session('locale', 'en');

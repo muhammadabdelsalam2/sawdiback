@@ -1,6 +1,6 @@
 @extends('layouts.customer.dashboard')
 
-@section('title', 'Dashboard' . 'EL-Sawady')
+@section('title', __('dashboard.sidebar.dashboard') . ' - ' . config('app.name'))
 
 @section('content')
 @if (optional(auth()->user()->subscription)->is_valid)
@@ -24,7 +24,7 @@
 
             <!-- Stats Cards Row -->
             <div class="row g-4 mb-4">
-                <!-- Card 1 -->
+                <!-- Card 1: Total Livestock -->
                 <div class="col-lg-3 col-md-6">
                     <div class="stats-card">
                         <div class="stats-card-header d-flex align-items-center">
@@ -33,20 +33,20 @@
                         </div>
                         <div class="stats-card-body">
                             <div class="d-flex align-items-baseline gap-2">
-                                <h2 class="stats-value">1,250</h2>
+                                <h2 class="stats-value">{{ number_format($stats['total_livestock']) }}</h2>
                                 <span class="stats-unit">{{ __('dashboard.stats.heads') }}</span>
                             </div>
                             <div class="stats-footer mt-2">
                                 <span class="trend trend-up">
                                     <img src="{{ asset('assets/images/card-icon-5.svg') }}" alt="" class="trend-icon me-1">
-                                    +5%
+                                    +{{ $stats['new_born_this_month'] }}
                                 </span>
                                 <span class="trend-label ms-1">{{ __('dashboard.stats.new_born') }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Card 2 -->
+                <!-- Card 2: Daily Milk Yield -->
                 <div class="col-lg-3 col-md-6">
                     <div class="stats-card">
                         <div class="stats-card-header d-flex align-items-center">
@@ -55,20 +55,20 @@
                         </div>
                         <div class="stats-card-body">
                             <div class="d-flex align-items-baseline gap-2">
-                                <h2 class="stats-value">15,000</h2>
+                                <h2 class="stats-value">{{ number_format($stats['daily_milk_yield']) }}</h2>
                                 <span class="stats-unit">{{ __('dashboard.stats.liters') }}</span>
                             </div>
                             <div class="stats-footer mt-2">
-                                <span class="trend trend-down-small">
-                                    <img src="{{ asset('assets/images/card-icon-6.svg') }}" alt="" class="trend-icon me-1">
-                                    -2%
+                                <span class="trend {{ $stats['milk_yield_delta'] >= 0 ? 'trend-up' : 'trend-down-small' }}">
+                                    <img src="{{ asset('assets/images/card-icon-' . ($stats['milk_yield_delta'] >= 0 ? '5' : '6') . '.svg') }}" alt="" class="trend-icon me-1">
+                                    {{ $stats['milk_yield_delta'] >= 0 ? '+' : '' }}{{ $stats['milk_yield_delta'] }}%
                                 </span>
                                 <span class="trend-label ms-1">{{ __('dashboard.stats.vs_last_month') }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Card 3 -->
+                <!-- Card 3: Feed Inventory -->
                 <div class="col-lg-3 col-md-6">
                     <div class="stats-card">
                         <div class="stats-card-header d-flex align-items-center">
@@ -77,20 +77,20 @@
                         </div>
                         <div class="stats-card-body">
                             <div class="d-flex align-items-baseline gap-2">
-                                <h2 class="stats-value">12</h2>
+                                <h2 class="stats-value">{{ number_format($stats['feed_inventory']) }}</h2>
                                 <span class="stats-unit">{{ __('dashboard.stats.tons') }}</span>
                             </div>
                             <div class="stats-footer mt-2">
-                                <span class="trend trend-down-large">
-                                    <img src="{{ asset('assets/images/card-icon-7.svg') }}" alt="" class="trend-icon me-1">
-                                    -24%
+                                <span class="trend {{ $stats['feed_delta'] >= 0 ? 'trend-up' : 'trend-down-large' }}">
+                                    <img src="{{ asset('assets/images/card-icon-' . ($stats['feed_delta'] >= 0 ? '5' : '7') . '.svg') }}" alt="" class="trend-icon me-1">
+                                    {{ $stats['feed_delta'] >= 0 ? '+' : '' }}{{ $stats['feed_delta'] }}%
                                 </span>
                                 <span class="trend-label ms-1">{{ __('dashboard.stats.low_stock_alert') }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Card 4 -->
+                <!-- Card 4: Average Profit -->
                 <div class="col-lg-3 col-md-6">
                     <div class="stats-card">
                         <div class="stats-card-header d-flex align-items-center">
@@ -99,13 +99,13 @@
                         </div>
                         <div class="stats-card-body">
                             <div class="d-flex align-items-baseline gap-2">
-                                <h2 class="stats-value">45,200</h2>
+                                <h2 class="stats-value">{{ number_format($stats['average_profit']) }}</h2>
                                 <span class="stats-unit">{{ __('dashboard.stats.aed') }}</span>
                             </div>
                             <div class="stats-footer mt-2">
                                 <span class="trend trend-up">
                                     <img src="{{ asset('assets/images/card-icon-5.svg') }}" alt="" class="trend-icon me-1">
-                                    +12%
+                                    +{{ $stats['profit_delta'] }}%
                                 </span>
                                 <span class="trend-label ms-1">{{ __('dashboard.stats.vs_last_month') }}</span>
                             </div>
@@ -197,46 +197,23 @@
                             </div>
                             <div class="return-info d-flex align-items-center">
                                 <i class="fa-solid fa-rotate-left me-1"></i>
-                                <span class="small">{{ __('dashboard.last_updated') }} 4:47</span>
+                                <span class="small">{{ __('dashboard.last_updated') }} {{ now()->format('H:i') }}</span>
                             </div>
                         </div>
                         <div class="alert-list">
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-8.svg') }}" alt="" class="alert-icon">
+                            @foreach($alerts['critical'] as $alert)
+                            <div class="alert-item {{ $loop->last ? 'border-0' : '' }}">
+                                <img src="{{ asset('assets/images/' . $alert['icon']) }}" alt="" class="alert-icon">
                                 <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.low_feed_stock') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.warehouse_c_only_2_tons') }}</p>
+                                    <h4 class="alert-title">{{ $alert['title'] }}</h4>
+                                    <p class="alert-desc">{{ $alert['desc'] }}</p>
                                 </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
+                                <span class="badge badge-{{ $alert['type'] }}">
+                                    <i class="fa-regular {{ $alert['type'] == 'urgent' ? 'fa-circle-xmark' : 'fa-triangle-exclamation' }} me-1"></i>
+                                    {{ __('dashboard.alerts.' . $alert['type']) }}
+                                </span>
                             </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-9.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.vaccination_overdue') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.group_b_3_days_late') }}</p>
-                                </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
-                            </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-10.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.machinery_maintenance') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tractor_oil_filter_change') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
-                            <div class="alert-item border-0">
-                                <img src="{{ asset('assets/images/card-icon-11.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.high_scc_detected') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tank2_quality_risk') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
+                            @endforeach
                         </div>
                         <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                             <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
@@ -255,51 +232,27 @@
                             </div>
                             <div class="return-info d-flex align-items-center">
                                 <i class="fa-solid fa-rotate-left me-1"></i>
-                                <span class="small">{{ __('dashboard.last_updated') }} 4:47</span>
+                                <span class="small">{{ __('dashboard.last_updated') }} {{ now()->format('H:i') }}</span>
                             </div>
                         </div>
                         <div class="alert-list">
-                            <!-- Reuse same alert items or dynamic content -->
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-8.svg') }}" alt="" class="alert-icon">
+                            @foreach($alerts['sales'] as $alert)
+                            <div class="alert-item {{ $loop->last ? 'border-0' : '' }}">
+                                <img src="{{ asset('assets/images/' . $alert['icon']) }}" alt="" class="alert-icon">
                                 <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.low_feed_stock') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.warehouse_c_only_2_tons') }}</p>
+                                    <h4 class="alert-title">{{ $alert['title'] }}</h4>
+                                    <p class="alert-desc">{{ $alert['desc'] }}</p>
                                 </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
+                                <span class="badge badge-warning">
+                                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                                    {{ __('dashboard.alerts.warning') }}
+                                </span>
                             </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-9.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.vaccination_overdue') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.group_b_3_days_late') }}</p>
-                                </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
-                            </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-10.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.machinery_maintenance') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tractor_oil_filter_change') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
-                            <div class="alert-item border-0">
-                                <img src="{{ asset('assets/images/card-icon-11.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.high_scc_detected') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tank2_quality_risk') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
+                            @endforeach
                         </div>
                         <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                             <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
-                            <span class="badge-count">72</span>
+                            <span class="badge-count">12</span>
                         </button>
                     </div>
                 </div>
@@ -314,50 +267,27 @@
                             </div>
                             <div class="return-info d-flex align-items-center">
                                 <i class="fa-solid fa-rotate-left me-1"></i>
-                                <span class="small">{{ __('dashboard.last_updated') }} 4:47</span>
+                                <span class="small">{{ __('dashboard.last_updated') }} {{ now()->format('H:i') }}</span>
                             </div>
                         </div>
                         <div class="alert-list">
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-8.svg') }}" alt="" class="alert-icon">
+                            @foreach($alerts['operations'] as $alert)
+                            <div class="alert-item {{ $loop->last ? 'border-0' : '' }}">
+                                <img src="{{ asset('assets/images/' . $alert['icon']) }}" alt="" class="alert-icon">
                                 <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.low_feed_stock') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.warehouse_c_only_2_tons') }}</p>
+                                    <h4 class="alert-title">{{ $alert['title'] }}</h4>
+                                    <p class="alert-desc">{{ $alert['desc'] }}</p>
                                 </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
+                                <span class="badge badge-info text-dark">
+                                    <i class="fa-solid fa-info-circle me-1"></i>
+                                    {{ __('dashboard.alerts.todays_operations') }}
+                                </span>
                             </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-9.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.vaccination_overdue') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.group_b_3_days_late') }}</p>
-                                </div>
-                                <span class="badge badge-urgent"><i
-                                        class="fa-regular fa-circle-xmark me-1"></i>{{ __('dashboard.alerts.urgent') }}</span>
-                            </div>
-                            <div class="alert-item">
-                                <img src="{{ asset('assets/images/card-icon-10.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.machinery_maintenance') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tractor_oil_filter_change') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
-                            <div class="alert-item border-0">
-                                <img src="{{ asset('assets/images/card-icon-11.svg') }}" alt="" class="alert-icon">
-                                <div class="alert-content">
-                                    <h4 class="alert-title">{{ __('dashboard.alerts.high_scc_detected') }}</h4>
-                                    <p class="alert-desc">{{ __('dashboard.alerts.tank2_quality_risk') }}</p>
-                                </div>
-                                <span class="badge badge-warning"><i
-                                        class="fa-solid fa-triangle-exclamation me-1"></i>{{ __('dashboard.alerts.warning') }}</span>
-                            </div>
+                            @endforeach
                         </div>
                         <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                             <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
-                            <span class="badge-count">72</span>
+                            <span class="badge-count">5</span>
                         </button>
                     </div>
                 </div>
@@ -371,11 +301,11 @@
             <h1 class="h2 mb-2">{{ __('dashboard.no_plan_title') }}</h1>
             <p class="text-muted mb-4">{{ __('dashboard.no_plan_desc') }}</p>
 
-<a href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}"
-   class="btn btn-primary btn-lg d-flex align-items-center gap-2">
-    <i class="fa-solid fa-arrow-right-to-bracket"></i>
-    {{ __('dashboard.go_to_subscription') }}
-</a>
+            <a href="{{ route('customer.subscription.index', ['locale' => request()->route('locale')]) }}"
+               class="btn btn-primary btn-lg d-flex align-items-center gap-2">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                {{ __('dashboard.go_to_subscription') }}
+            </a>
 
             <div class="mt-5 w-75 text-start">
                 <h4 class="mb-3">{{ __('dashboard.no_plan_features_title') }}</h4>
@@ -387,7 +317,20 @@
                 </ul>
             </div>
         </div>
-
     @endif
-
 @endsection
+
+@push('scripts')
+<script>
+    window.dashboardData = {
+        production: {
+            labels: {!! json_encode($productionData->pluck('date')) !!},
+            data: {!! json_encode($productionData->pluck('total_yield')) !!}
+        },
+        herd: {
+            labels: {!! json_encode($herdComposition->keys()) !!},
+            data: {!! json_encode($herdComposition->values()) !!}
+        }
+    };
+</script>
+@endpush

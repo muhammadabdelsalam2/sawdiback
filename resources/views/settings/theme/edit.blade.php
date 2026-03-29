@@ -1,6 +1,6 @@
 @extends('layouts.customer.dashboard')
 
-@section('title', 'Theme Settings | EL-Sawady')
+@section('title', __('dashboard.theme.title') . ' | EL-Sawady')
 
 @section('content')
     @php
@@ -10,8 +10,8 @@
     <div class="dashboard-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
-                <h1 class="dashboard-title mb-1">Theme Settings</h1>
-                <p class="dashboard-desc mb-0">Basic UI settings per tenant (MVP).</p>
+                <h1 class="dashboard-title mb-1">{{ __('dashboard.theme.title') }}</h1>
+                <p class="dashboard-desc mb-0">{{ __('dashboard.theme.desc') }}</p>
             </div>
         </div>
 
@@ -37,7 +37,7 @@
                                 value="1"
                                 class="custom-checkbox"
                                 {{ old('rtl_enabled', $settings->rtl_enabled ?? false) ? 'checked' : '' }}>
-                            <span class="checkbox-text">Enable RTL</span>
+                            <span class="checkbox-text">{{ __('dashboard.theme.enable_rtl') }}</span>
                         </label>
                         @error('rtl_enabled')
                             <div class="text-danger small mt-2">{{ $message }}</div>
@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="app_name" class="form-label fw-semibold">App Name</label>
+                        <label for="app_name" class="form-label fw-semibold">{{ __('dashboard.theme.app_name') }}</label>
                         <input
                             type="text"
                             id="app_name"
@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="primary_color" class="form-label fw-semibold">Primary Color</label>
+                        <label for="primary_color" class="form-label fw-semibold">{{ __('dashboard.theme.primary_color') }}</label>
                         <input
                             type="text"
                             id="primary_color"
@@ -67,7 +67,7 @@
                             value="{{ old('primary_color', $settings->primary_color ?? '') }}"
                             class="form-control @error('primary_color') is-invalid @enderror"
                             placeholder="#16a34a">
-                        <small class="text-muted">Example: #16a34a</small>
+                        <small class="text-muted">{{ __('dashboard.theme.example') }}: #16a34a</small>
                         @error('primary_color')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -76,8 +76,8 @@
             </div>
 
             <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="btn btn-primary-green">Save</button>
-                <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Back</a>
+                <button type="submit" class="btn btn-primary-green">{{ __('dashboard.theme.save') }}</button>
+                <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">{{ __('dashboard.theme.back') }}</a>
             </div>
         </form>
     </div>

@@ -5,7 +5,7 @@
 <div class="chart-card mb-4">
     <div class="row g-4">
         <div class="col-md-6">
-            <label for="name" class="form-label fw-semibold">Name</label>
+            <label for="name" class="form-label fw-semibold">{{ __('dashboard.users.name') }}</label>
             <input
                 type="text"
                 id="name"
@@ -19,7 +19,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="email" class="form-label fw-semibold">Email</label>
+            <label for="email" class="form-label fw-semibold">{{ __('dashboard.users.email') }}</label>
             <input
                 type="email"
                 id="email"
@@ -34,7 +34,7 @@
 
         <div class="col-md-6">
             <label for="password" class="form-label fw-semibold">
-                Password
+                {{ __('dashboard.users.password') }}
                 @if (!isset($userModel))
                     <span class="text-danger">*</span>
                 @endif
@@ -46,7 +46,7 @@
                 class="form-control @error('password') is-invalid @enderror"
                 @if (!isset($userModel)) required @endif>
             @if (isset($userModel))
-                <small class="text-muted">Leave blank to keep current password.</small>
+                <small class="text-muted">{{ __('dashboard.users.leave_blank_password') }}</small>
             @endif
             @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -54,7 +54,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="password_confirmation" class="form-label fw-semibold">Confirm Password</label>
+            <label for="password_confirmation" class="form-label fw-semibold">{{ __('dashboard.users.confirm_password') }}</label>
             <input
                 type="password"
                 id="password_confirmation"
@@ -66,7 +66,7 @@
 </div>
 
 <div class="chart-card mb-4">
-    <h3 class="chart-title mb-3">Roles</h3>
+    <h3 class="chart-title mb-3">{{ __('dashboard.users.roles') }}</h3>
     <div class="row g-2">
         @foreach ($roles as $role)
             @php
@@ -94,8 +94,8 @@
 </div>
 
 <div class="chart-card mb-4">
-    <h3 class="chart-title mb-3">Direct Permissions</h3>
-    <p class="chart-desc mb-3">Optional permissions assigned directly to this user.</p>
+    <h3 class="chart-title mb-3">{{ __('dashboard.users.direct_permissions') }}</h3>
+    <p class="chart-desc mb-3">{{ __('dashboard.users.create_desc') }}</p>
     <div class="row g-2">
         @foreach ($permissions as $permission)
             @php

@@ -691,6 +691,11 @@ html[dir="rtl"] #content.sidebar-collapsed {
     padding-left: 40px;
 }
 
+html[dir="rtl"] .dropdown-container {
+    padding-left: 0;
+    padding-right: 40px;
+}
+
 .nav-dropdown.open .dropdown-container {
     display: block;
 }
@@ -710,8 +715,20 @@ html[dir="rtl"] #content.sidebar-collapsed {
     background: var(--light-green);
 }
 
-.chevron.rotate {
-    transform: rotate(90deg);
+.nav-item .chevron {
+    transition: transform 0.2s ease;
+}
+
+html[dir="rtl"] .nav-item .chevron {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown.open .chevron {
+    transform: rotate(90deg) !important;
+}
+
+html[dir="rtl"] .nav-dropdown.open .chevron {
+    transform: rotate(270deg) !important;
 }
 
 /* Animal Details Styles */

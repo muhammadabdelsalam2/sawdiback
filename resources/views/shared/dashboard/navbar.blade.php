@@ -1,4 +1,8 @@
 <header class="navbar p-0 d-flex align-items-center justify-content-between">
+    @php
+        $activeLocale = $currentLocale ?? app()->getLocale();
+        $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
+    @endphp
     <div class="navbar-left d-flex align-items-center">
         <button id="sidebar-toggle" class="btn text-green me-2">
             <i class="fa-solid fa-bars"></i>
@@ -8,7 +12,7 @@
 
     <div class="navbar-right d-flex align-items-center">
         <div class="search-container me-3">
-            <input type="text" placeholder="Search" class="search-input">
+            <input type="text" placeholder="{{ __('dashboard.navbar.search') }}" class="search-input">
             <button class="search-btn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -25,13 +29,13 @@
                     <i class="fa-solid fa-gear"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
-                    @if(auth()?->user()->hasRole('SuperAdmin'))
+                    @if($isSuperAdmin)
 
                         <li><a class="dropdown-item"
-                                href="{{ route('superadmin.access-management', ['locale' => $currentLocale]) }}">{{__('superadmin.dashboard.user_management')}}</a>
+                                href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}">{{ __('dashboard.sidebar.settings.permissionsManagement') }}</a>
                         </li>
                     @else
-                        <li><a class="dropdown-item" href="#">Module 1</a></li>
+                        <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.module') }} 1</a></li>
                     @endif
                     <!-- add more modules here -->
                 </ul>
@@ -76,19 +80,19 @@
                 aria-expanded="false">
                 <img src="{{ asset('assets/images/user.png') }}" alt="User" class="user-avatar">
             </a>
-            <ul class="dropdown-menu @if(in_array($currentLocale, ['ar-SA', 'ar-EG'])) dropdown-menu-end @else dropdown-menu-start @endif"
+            <ul class="dropdown-menu @if(in_array($activeLocale, ['ar-SA', 'ar-EG'])) dropdown-menu-end @else dropdown-menu-start @endif"
                 aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.profile') }}</a></li>
+                <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.settings') }}</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <a class="dropdown-item" href="{{ route('logout', $currentLocale) }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        Logout
+                    <a class="dropdown-item" href="{{ route('logout', ['locale' => $activeLocale]) }}"
+                        onclick="event.preventDefault(); document.getElementById('navbar-logout-form').submit();">
+                        {{ __('dashboard.navbar.logout') }}
                     </a>
-                    <form id="logout-form" action="{{ route('logout', $currentLocale) }}" method="POST" class="d-none">
+                    <form id="navbar-logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
                         @csrf
                     </form>
                 </li>

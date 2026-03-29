@@ -57,7 +57,7 @@ class UserManagementController extends Controller
 
         return redirect()
             ->route('superadmin.users.index', ['locale' => $locale])
-            ->with('success', 'User created successfully.');
+            ->with('success', __('dashboard.messages.success.user_created'));
     }
 
     public function edit(string $locale, User $user): View
@@ -96,7 +96,7 @@ class UserManagementController extends Controller
 
         return redirect()
             ->route('superadmin.users.index', ['locale' => $locale])
-            ->with('success', 'User updated successfully.');
+            ->with('success', __('dashboard.messages.success.user_updated'));
     }
 
     public function destroy(string $locale, User $user): RedirectResponse
@@ -111,6 +111,6 @@ class UserManagementController extends Controller
 
         return redirect()
             ->route('superadmin.users.index', ['locale' => $locale])
-            ->with('success', 'User deleted successfully.');
+            ->with('success', __('dashboard.messages.success.user_deleted'));
     }
 }

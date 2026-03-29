@@ -3,14 +3,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const productionCanvas = document.getElementById('productionChart');
     if (productionCanvas) {
         const productionCtx = productionCanvas.getContext('2d');
+        const labels = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.labels.length > 0) 
+            ? window.dashboardData.production.labels 
+            : ['1', '2', '3', '4', '5', '6'];
+        const data = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.data.length > 0)
+            ? window.dashboardData.production.data
+            : [20, 15, 25, 40, 50, 20];
+
         new Chart(productionCtx, {
             type: 'line',
             data: {
-                labels: ['1', '2', '3', '4', '5', '6'],
+                labels: labels,
                 datasets: [
                     {
                         label: 'Milk Production',
-                        data: [20, 15, 25, 40, 50, 20],
+                        data: data,
                         borderColor: '#168EFF',
                         backgroundColor: 'rgba(22, 142, 255, 0.1)',
                         tension: 0.4,
@@ -20,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     {
                         label: 'Target',
-                        data: [-20, -10, -5, 10, 15, 25],
+                        data: data.map(v => v * 0.9), // Generate a target based on actual data
                         borderColor: '#DF1278',
                         backgroundColor: 'rgba(223, 18, 120, 0.1)',
                         tension: 0.4,
@@ -45,8 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 scales: {
                     y: {
-                        min: -60,
-                        max: 60,
+                        beginAtZero: true,
                         ticks: {
                             stepSize: 20
                         },
@@ -68,13 +74,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const herdCanvas = document.getElementById('herdChart');
     if (herdCanvas) {
         const herdCtx = herdCanvas.getContext('2d');
+        const labels = (window.dashboardData && window.dashboardData.herd && window.dashboardData.herd.labels.length > 0)
+            ? window.dashboardData.herd.labels
+            : ['Lactating', 'Dry', 'Pregnant'];
+        const data = (window.dashboardData && window.dashboardData.herd && window.dashboardData.herd.data.length > 0)
+            ? window.dashboardData.herd.data
+            : [50, 15, 35];
+
         new Chart(herdCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Lactating', 'Dry', 'Pregnant'],
+                labels: labels,
                 datasets: [{
-                    data: [50, 15, 35],
-                    backgroundColor: ['#168EFF', '#DF1278', '#8B47D7'],
+                    data: data,
+                    backgroundColor: ['#168EFF', '#DF1278', '#8B47D7', '#30914C', '#C87B00'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
@@ -271,15 +284,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Sidebar Dropdown Toggle
     const dropdowns = document.querySelectorAll('.nav-dropdown');
     dropdowns.forEach(dropdown => {
+        // Auto-open if child is active
+        if (dropdown.querySelector('.dropdown-item.active')) {
+            dropdown.classList.add('open');
+        }
+
         const trigger = dropdown.querySelector('.has-dropdown');
         if (trigger) {
             trigger.addEventListener('click', function (e) {
                 e.preventDefault();
                 dropdown.classList.toggle('open');
-                const chevron = this.querySelector('.chevron');
-                if (chevron) {
-                    chevron.classList.toggle('rotate');
-                }
             });
         }
     });

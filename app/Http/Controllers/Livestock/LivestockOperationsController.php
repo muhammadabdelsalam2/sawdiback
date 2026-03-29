@@ -45,63 +45,63 @@ class LivestockOperationsController extends Controller
     public function recordFeeding(AnimalFeedingStoreRequest $request, string $locale): RedirectResponse
     {
         $this->recordFeedingService->execute($request->validated());
-        return redirect()->back()->with('success', 'Feeding logs recorded successfully.');
+        return redirect()->back()->with('success', __('messages.success.feeding_recorded'));
     }
 
     public function recordMilkProduction(MilkProductionStoreRequest $request, string $locale): RedirectResponse
     {
         $this->recordMilkProductionService->execute($request->validated());
 
-        return redirect()->back()->with('success', 'Milk production recorded successfully.');
+        return redirect()->back()->with('success', __('messages.success.milk_production_recorded'));
     }
 
     public function recordHealth(HealthRecordStoreRequest $request, string $locale): RedirectResponse
     {
         $this->recordHealthService->execute($request->validated());
 
-        return redirect()->back()->with('success', 'Health record saved successfully.');
+        return redirect()->back()->with('success', __('messages.success.health_record_saved'));
     }
 
     public function recordVaccination(VaccinationStoreRequest $request, string $locale): RedirectResponse
     {
         $this->recordVaccinationService->execute($request->validated());
 
-        return redirect()->back()->with('success', 'Vaccination recorded successfully.');
+        return redirect()->back()->with('success', __('messages.success.vaccination_recorded'));
     }
 
     public function openReproductionCycle(ReproductionCycleStoreRequest $request, string $locale): RedirectResponse
     {
         $this->reproductionService->openCycle($request->validated());
 
-        return redirect()->back()->with('success', 'Reproduction cycle opened successfully.');
+        return redirect()->back()->with('success', __('messages.success.reproduction_cycle_opened'));
     }
 
     public function recordWeight(WeightLogStoreRequest $request, string $locale): RedirectResponse
     {
         $this->recordWeightService->execute($request->validated());
 
-        return redirect()->back()->with('success', 'Weight record saved successfully.');
+        return redirect()->back()->with('success', __('messages.success.weight_record_saved'));
     }
 
     public function inseminateCycle(ReproductionInseminationRequest $request, string $locale, ReproductionCycle $cycle): RedirectResponse
     {
         $this->reproductionService->recordInsemination($cycle, $request->validated());
 
-        return redirect()->back()->with('success', 'Insemination data saved successfully.');
+        return redirect()->back()->with('success', __('messages.success.insemination_saved'));
     }
 
     public function pregnancyCheckCycle(ReproductionPregnancyCheckRequest $request, string $locale, ReproductionCycle $cycle): RedirectResponse
     {
         $this->reproductionService->recordPregnancyCheck($cycle, $request->validated());
 
-        return redirect()->back()->with('success', 'Pregnancy check saved successfully.');
+        return redirect()->back()->with('success', __('messages.success.pregnancy_check_saved'));
     }
 
     public function recordBirth(ReproductionBirthRequest $request, string $locale, ReproductionCycle $cycle): RedirectResponse
     {
         $this->reproductionService->recordBirth($cycle, $request->validated());
 
-        return redirect()->back()->with('success', 'Birth recorded and offspring created successfully.');
+        return redirect()->back()->with('success', __('messages.success.birth_recorded'));
     }
 
     public function listCycles(string $locale): View

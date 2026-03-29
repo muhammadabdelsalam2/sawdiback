@@ -1,6 +1,6 @@
 @extends('layouts.customer.dashboard')
 
-@section('title', 'Countries | EL-Sawady')
+@section('title', __('dashboard.countries.title') . ' | EL-Sawady')
 
 @section('content')
     @php
@@ -10,11 +10,11 @@
     <div class="dashboard-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
-                <h1 class="dashboard-title mb-1">Countries</h1>
-                <p class="dashboard-desc mb-0">Manage countries used across the system.</p>
+                <h1 class="dashboard-title mb-1">{{ __('dashboard.countries.title') }}</h1>
+                <p class="dashboard-desc mb-0">{{ __('dashboard.countries.desc') }}</p>
             </div>
             <a href="{{ route('superadmin.setting.countries.create', ['locale' => $activeLocale]) }}" class="btn btn-primary-green">
-                <i class="fa-solid fa-plus me-2"></i>Create Country
+                <i class="fa-solid fa-plus me-2"></i>{{ __('dashboard.countries.create') }}
             </a>
         </div>
 
@@ -25,13 +25,13 @@
                 <table class="table registry-table mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>ISO2</th>
-                            <th>ISO3</th>
-                            <th>Phone Code</th>
-                            <th>Status</th>
-                            <th class="text-end">Actions</th>
+                            <th>{{ __('dashboard.countries.id') }}</th>
+                            <th>{{ __('dashboard.countries.name') }}</th>
+                            <th>{{ __('dashboard.countries.iso2') }}</th>
+                            <th>{{ __('dashboard.countries.iso3') }}</th>
+                            <th>{{ __('dashboard.countries.phone_code') }}</th>
+                            <th>{{ __('dashboard.countries.status') }}</th>
+                            <th class="text-end">{{ __('dashboard.countries.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,31 +44,31 @@
                                 <td>{{ $country->phone_code ?? '-' }}</td>
                                 <td>
                                     @if ($country->is_active)
-                                        <span class="badge badge-lactating">Active</span>
+                                        <span class="badge badge-lactating">{{ __('dashboard.countries.active') }}</span>
                                     @else
-                                        <span class="badge badge-dry">Inactive</span>
+                                        <span class="badge badge-dry">{{ __('dashboard.countries.inactive') }}</span>
                                     @endif
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ route('superadmin.setting.countries.edit', ['locale' => $activeLocale, 'country' => $country]) }}"
                                        class="btn btn-sm btn-outline-white me-1">
-                                        Edit
+                                        {{ __('dashboard.countries.edit') }}
                                     </a>
 
                                     <form
                                         action="{{ route('superadmin.setting.countries.destroy', ['locale' => $activeLocale, 'country' => $country]) }}"
                                         method="POST"
                                         class="d-inline"
-                                        onsubmit="return confirm('Delete this country?');">
+                                        onsubmit="return confirm('{{ __('dashboard.countries.delete_confirm') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">{{ __('dashboard.countries.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">No countries found.</td>
+                                <td colspan="7" class="text-center py-4 text-muted">{{ __('dashboard.countries.no_data') }}</td>
                             </tr>
                         @endforelse
                     </tbody>
