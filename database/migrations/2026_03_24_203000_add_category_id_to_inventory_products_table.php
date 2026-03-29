@@ -9,16 +9,26 @@ use Illuminate\Support\Str;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('inventory_products', function (Blueprint $table) {
-            $table->foreignId('category_id')
-                ->nullable()
-                ->after('category')
-                ->constrained('categories')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
+        if (! Schema::hasColumn('inventory_products', 'category_id')) {
+            Schema::table('inventory_products', function (Blueprint $table) {
+                $table->foreignId('category_id')
+                    ->nullable()
+                    ->after('category')
+                    ->constrained('categories')
+                    ->cascadeOnUpdate()
+                    ->restrictOnDelete();
+            });
+        }
 
-            $table->index(['tenant_id', 'category_id'], 'inv_prod_tenant_category_id_idx');
-        });
+        $hasIndex = collect(DB::select("SHOW INDEX FROM inventory_products"))
+            ->pluck('Key_name')
+            ->contains('inv_prod_tenant_category_id_idx');
+
+        if (! $hasIndex) {
+            Schema::table('inventory_products', function (Blueprint $table) {
+                $table->index(['tenant_id', 'category_id'], 'inv_prod_tenant_category_id_idx');
+            });
+        }
 
         $categorySeeds = [
             'feed' => ['en' => 'Feed', 'ar' => 'أعلاف'],
@@ -27,7 +37,10 @@ return new class extends Migration {
             'animal_product' => ['en' => 'Animal Product', 'ar' => 'منتج حيواني'],
         ];
 
-        $tenantIds = DB::table('inventory_products')->distinct()->pluck('tenant_id');
+        $tenantIds = DB::table('inventory_products')
+            ->whereNotNull('tenant_id')
+            ->distinct()
+            ->pluck('tenant_id');
 
         foreach ($tenantIds as $tenantId) {
             foreach ($categorySeeds as $code => $labels) {
@@ -97,9 +110,20 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::table('inventory_products', function (Blueprint $table) {
-            $table->dropIndex('inv_prod_tenant_category_id_idx');
-            $table->dropConstrainedForeignId('category_id');
-        });
+        $hasIndex = collect(DB::select("SHOW INDEX FROM inventory_products"))
+            ->pluck('Key_name')
+            ->contains('inv_prod_tenant_category_id_idx');
+
+        if ($hasIndex) {
+            Schema::table('inventory_products', function (Blueprint $table) {
+                $table->dropIndex('inv_prod_tenant_category_id_idx');
+            });
+        }
+
+        if (Schema::hasColumn('inventory_products', 'category_id')) {
+            Schema::table('inventory_products', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('category_id');
+            });
+        }
     }
 };
