@@ -10,6 +10,8 @@ return [
         'production' => 'الإنتاج',
         'crops_feed' => 'المحاصيل والأعلاف',
         'inventory' => 'المخزون',
+        'ecommerce' => 'التجارة الإلكترونية',
+        'ecommerce_orders' => 'طلبات التجارة الإلكترونية',
         'sales_distribution' => 'المبيعات والتوزيع',
         'procurement' => 'المشتريات',
         'finance' => 'المالية',

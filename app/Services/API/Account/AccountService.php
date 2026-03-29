@@ -416,6 +416,7 @@ class AccountService
 
                 $address = $user->addresses()->create([
                     'label' => $data['label'] ?? null,
+                    'type' => $data['type'] ?? null,
                     'recipient_name' => $data['recipient_name'] ?? null,
                     'phone' => $data['phone'] ?? null,
                     'address_line_1' => $data['address_line_1'],
@@ -423,10 +424,13 @@ class AccountService
                     'building' => $data['building'] ?? null,
                     'floor' => $data['floor'] ?? null,
                     'apartment' => $data['apartment'] ?? null,
+                    'landmark' => $data['landmark'] ?? null,
                     'city' => $data['city'] ?? null,
                     'country' => $data['country'] ?? null,
                     'postal_code' => $data['postal_code'] ?? null,
                     'notes' => $data['notes'] ?? null,
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
                     'is_default' => $shouldBeDefault,
                 ]);
 
@@ -474,6 +478,7 @@ class AccountService
             DB::transaction(function () use ($user, $address, $data) {
                 $address->fill([
                     'label' => $data['label'] ?? $address->label,
+                    'type' => array_key_exists('type', $data) ? $data['type'] : $address->type,
                     'recipient_name' => array_key_exists('recipient_name', $data) ? $data['recipient_name'] : $address->recipient_name,
                     'phone' => array_key_exists('phone', $data) ? $data['phone'] : $address->phone,
                     'address_line_1' => $data['address_line_1'] ?? $address->address_line_1,
@@ -481,10 +486,13 @@ class AccountService
                     'building' => array_key_exists('building', $data) ? $data['building'] : $address->building,
                     'floor' => array_key_exists('floor', $data) ? $data['floor'] : $address->floor,
                     'apartment' => array_key_exists('apartment', $data) ? $data['apartment'] : $address->apartment,
+                    'landmark' => array_key_exists('landmark', $data) ? $data['landmark'] : $address->landmark,
                     'city' => array_key_exists('city', $data) ? $data['city'] : $address->city,
                     'country' => array_key_exists('country', $data) ? $data['country'] : $address->country,
                     'postal_code' => array_key_exists('postal_code', $data) ? $data['postal_code'] : $address->postal_code,
                     'notes' => array_key_exists('notes', $data) ? $data['notes'] : $address->notes,
+                    'latitude' => array_key_exists('latitude', $data) ? $data['latitude'] : $address->latitude,
+                    'longitude' => array_key_exists('longitude', $data) ? $data['longitude'] : $address->longitude,
                     'is_default' => array_key_exists('is_default', $data) ? (bool) $data['is_default'] : $address->is_default,
                 ]);
 

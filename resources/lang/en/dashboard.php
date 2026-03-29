@@ -10,6 +10,8 @@ return [
         'production' => 'Production',
         'crops_feed' => 'Crops & Feed',
         'inventory' => 'Inventory',
+        'ecommerce' => 'E-Commerce',
+        'ecommerce_orders' => 'E-Commerce Orders',
         'sales_distribution' => 'Sales & Distribution',
         'procurement' => 'Procurement',
         'finance' => 'Finance',

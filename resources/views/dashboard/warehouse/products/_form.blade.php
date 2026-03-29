@@ -22,6 +22,10 @@
         <input type="text" name="unit" class="form-control" required value="{{ old('unit', $product->unit ?? '') }}">
     </div>
     <div class="col-md-3">
+        <label class="form-label">{{ __('warehouse.fields.tax') }}</label>
+        <input type="number" step="0.01" min="0" name="tax" class="form-control" value="{{ old('tax', $product->tax ?? 0) }}">
+    </div>
+    <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.low_stock_threshold') }}</label>
         <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control" value="{{ old('low_stock_threshold', $product->low_stock_threshold ?? 0) }}">
     </div>

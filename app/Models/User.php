@@ -15,6 +15,8 @@ class User extends Authenticatable
 {
     use HasFactory, HasApiTokens, Notifiable, HasRoles;
 
+    protected string $guard_name = 'api';
+
     protected $fillable = [
         'tenant_id',
         'name',
@@ -81,6 +83,26 @@ class User extends Authenticatable
         return $this->hasOne(Wallet::class);
     }
 
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function orderReviews(): HasMany
+    {
+        return $this->hasMany(OrderReview::class);
+    }
+
+    public function otps(): HasMany
+    {
+        return $this->hasMany(Otp::class);
+    }
+
     public function planFeatures(): array
     {
         $this->loadMissing([
@@ -106,7 +128,6 @@ class User extends Authenticatable
     public function hasPlanFeature(string $key): bool
     {
         $features = $this->planFeatures();
-
         $feature = $features[$key] ?? null;
 
         if (is_array($feature)) {
@@ -119,7 +140,6 @@ class User extends Authenticatable
     public function planFeatureValue(string $key, $default = null)
     {
         $features = $this->planFeatures();
-
         $feature = $features[$key] ?? null;
 
         if (is_array($feature)) {
@@ -127,10 +147,5 @@ class User extends Authenticatable
         }
 
         return $default;
-    }
-
-    public function otps(): HasMany
-    {
-        return $this->hasMany(Otp::class);
     }
 }

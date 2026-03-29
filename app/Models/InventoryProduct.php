@@ -21,6 +21,7 @@ class InventoryProduct extends Model
         'category',
         'category_id',
         'unit',
+        'tax',
         'track_expiry',
         'low_stock_threshold',
         'is_active',
@@ -31,6 +32,7 @@ class InventoryProduct extends Model
         'track_expiry' => 'boolean',
         'is_active' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
+        'tax' => 'decimal:2',
     ];
 
     protected $append = ['image_url'];

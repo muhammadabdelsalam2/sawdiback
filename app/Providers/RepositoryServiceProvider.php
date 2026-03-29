@@ -51,6 +51,10 @@ class RepositoryServiceProvider extends ServiceProvider
         // API / Ecommerce
         \App\Repositories\Contracts\Api\WalletRepositoryInterface::class => \App\Repositories\WalletRepository::class,
         PlusRepositoryInterface::class => PlusRepository::class,
+        \App\Repositories\Contracts\Api\CartRepositoryInterface::class => \App\Repositories\Api\Ecommerce\CartRepository::class,
+        \App\Repositories\Contracts\Api\OrderRepositoryInterface::class => \App\Repositories\Api\Ecommerce\OrderRepository::class,
+        \App\Repositories\Contracts\Api\CouponRepositoryInterface::class => \App\Repositories\Api\Ecommerce\CouponRepository::class,
+        \App\Repositories\Contracts\Api\ReviewRepositoryInterface::class => \App\Repositories\Api\Ecommerce\ReviewRepository::class,
 
         UserRepositoryInterface::class => UserRepository::class,
         OtpRepositoryInterface::class => OtpRepository::class,

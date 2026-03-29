@@ -37,6 +37,7 @@ return [
         'name' => 'Name',
         'category' => 'Category',
         'unit' => 'Unit',
+        'tax' => 'Tax',
         'track_expiry' => 'Track Expiry',
         'low_stock_threshold' => 'Low Stock Threshold',
         'active' => 'Active',
@@ -88,3 +89,4 @@ return [
         'no_delivery_items' => 'No delivery records found.',
     ],
 ];
+

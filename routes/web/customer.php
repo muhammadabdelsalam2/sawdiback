@@ -14,6 +14,7 @@ use App\Http\Controllers\CropsFeed\FeedManagementController;
 use App\Http\Controllers\Warehouse\InventoryCategoryController;
 use App\Http\Controllers\Warehouse\InventoryProductController;
 use App\Http\Controllers\Warehouse\WarehouseController;
+use App\Http\Controllers\Customer\Ecommerce\EcommerceOrderController;
 
 use App\Http\Controllers\Customer\HR\DepartmentController;
 use App\Http\Controllers\Customer\HR\JobTitleController;
@@ -123,6 +124,17 @@ Route::prefix('{locale}')
             Route::put('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'update'])->name('invoices.payments.update');
             Route::delete('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'destroy'])->name('invoices.payments.destroy');
         });
+
+        // =========================
+        // E-Commerce Orders (Dashboard)
+        // =========================
+        Route::prefix('ecommerce')
+            ->name('ecommerce.')
+            ->group(function () {
+                Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
+                Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
+                Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
+            });
 
         // =========================
         // HR Management (Feature Gated)
