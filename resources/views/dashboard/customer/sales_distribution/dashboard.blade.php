@@ -14,6 +14,7 @@
         <div class="col-md-4"><div class="card"><div class="card-body"><h6>{{ __('sales_dist.dashboard.cards.shipments') }}</h6><h3>{{ $summary['shipments_count'] }}</h3></div></div></div>
         <div class="col-md-4"><div class="card"><div class="card-body"><h6>{{ __('sales_dist.dashboard.cards.invoices') }}</h6><h3>{{ $summary['invoices_count'] }}</h3></div></div></div>
         <div class="col-md-4"><div class="card"><div class="card-body"><h6>{{ __('sales_dist.dashboard.cards.open_invoices_total') }}</h6><h3>{{ number_format($summary['open_invoices_total'], 2) }}</h3></div></div></div>
+        <div class="col-md-4"><div class="card"><div class="card-body"><h6>{{ __('sales_dist.dashboard.cards.open_invoices_tax') }}</h6><h3>{{ number_format($summary['open_invoices_tax'], 2) }}</h3></div></div></div>
     </div>
 
     <div class="card mt-3"><div class="card-body">
@@ -33,6 +34,7 @@
                 <tr><td>{{ __('sales_dist.dashboard.cards.shipments') }}</td><td>{{ $summary['shipments_count'] }}</td></tr>
                 <tr><td>{{ __('sales_dist.dashboard.cards.invoices') }}</td><td>{{ $summary['invoices_count'] }}</td></tr>
                 <tr><td>{{ __('sales_dist.dashboard.cards.open_invoices_total') }}</td><td>{{ number_format($summary['open_invoices_total'], 2) }}</td></tr>
+                <tr><td>{{ __('sales_dist.dashboard.cards.open_invoices_tax') }}</td><td>{{ number_format($summary['open_invoices_tax'], 2) }}</td></tr>
             </tbody>
         </table>
     </div></div>

@@ -42,6 +42,7 @@ return [
             'shipments' => 'Shipments',
             'invoices' => 'Invoices',
             'open_invoices_total' => 'Open Invoices Total',
+            'open_invoices_tax' => 'Open Invoices Tax',
         ],
     ],
 
@@ -332,3 +333,4 @@ return [
         ],
     ],
 ];
+

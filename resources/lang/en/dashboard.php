@@ -124,7 +124,16 @@ return [
     'no_plan_feature_3' => 'Get critical alerts and notifications',
     'no_plan_feature_4' => 'Generate reports and insights',
 
+    'financial' => [
+        'subtotal' => 'Subtotal',
+        'shipping' => 'Shipping',
+        'taxes' => 'Taxes',
+        'discount' => 'Discount',
+        'total' => 'Total',
+    ],
+
     // Dashboard stats (example reuse)
+
 
 
     'users' => [
@@ -257,3 +266,4 @@ return [
         ],
     ],
 ];
+

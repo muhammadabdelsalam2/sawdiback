@@ -42,6 +42,7 @@ return [
             'shipments' => 'الشحنات',
             'invoices' => 'الفواتير',
             'open_invoices_total' => 'إجمالي الفواتير المفتوحة',
+            'open_invoices_tax' => 'ضريبة الفواتير المفتوحة',
         ],
     ],
 
@@ -332,3 +333,4 @@ return [
         ],
     ],
 ];
+

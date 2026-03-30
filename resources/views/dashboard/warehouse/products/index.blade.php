@@ -30,6 +30,7 @@
                         <th>{{ __('warehouse.fields.name') }}</th>
                         <th>{{ __('warehouse.fields.category') }}</th>
                         <th>{{ __('warehouse.fields.unit') }}</th>
+                        <th>{{ __('warehouse.fields.tax') }}</th>
                         <th>{{ __('warehouse.fields.low_stock_threshold') }}</th>
                         <th class="no-sort">{{ __('warehouse.fields.actions') }}</th>
                     </tr>
@@ -44,6 +45,7 @@
                                 {{ $row->category?->name ?? ($row->getAttribute('category') ? __('warehouse.options.' . $row->getAttribute('category')) : '-') }}
                             </td>
                             <td>{{ $row->unit }}</td>
+                            <td>{{ number_format($row->tax ?? 0, 2) }}</td>
                             <td>{{ $row->low_stock_threshold }}</td>
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-white" href="{{ route('customer.inventory.products.edit', ['locale' => $currentLocale, 'product' => $row->id]) }}">{{ __('warehouse.actions.edit') }}</a>
@@ -55,7 +57,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7">{{ __('warehouse.empty.no_products') }}</td></tr>
+                        <tr><td colspan="8">{{ __('warehouse.empty.no_products') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -27,7 +27,7 @@
 
     <div class="card"><div class="card-body">
         <table class="table align-middle">
-            <thead><tr><th>#</th><th>Order No</th><th>Customer</th><th>Status</th><th>Total</th><th>Placed At</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>#</th><th>Order No</th><th>Customer</th><th>Status</th><th>Totals</th><th>Placed At</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
             @forelse($orders as $order)
                 <tr>
@@ -35,7 +35,11 @@
                     <td>{{ $order->order_no }}</td>
                     <td>{{ $order->user?->name ?? 'N/A' }}</td>
                     <td>{{ ucfirst(str_replace('_', ' ', $order->status)) }}</td>
-                    <td>{{ number_format($order->total, 2) }}</td>
+                    <td>
+                        <div>{{ __('dashboard.financial.total') }}: {{ number_format($order->total, 2) }}</div>
+                        <div class="text-muted small">{{ __('dashboard.financial.subtotal') }}: {{ number_format($order->subtotal, 2) }}</div>
+                        <div class="text-muted small">{{ __('dashboard.financial.taxes') }}: {{ number_format($order->taxes, 2) }}</div>
+                    </td>
                     <td>{{ optional($order->placed_at)->format('Y-m-d H:i') }}</td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-info" href="{{ route('customer.ecommerce.orders.show', ['locale' => request()->route('locale'), 'order' => $order->id]) }}">View</a>

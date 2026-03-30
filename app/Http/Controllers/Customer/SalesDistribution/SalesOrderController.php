@@ -53,7 +53,7 @@ class SalesOrderController extends Controller
     public function show(string $locale, SalesOrder $order): View
     {
         $this->authorizeTenant($order->tenant_id);
-        $order->load(['customer', 'contract', 'items']);
+        $order->load(['customer', 'contract', 'items', 'invoices']);
         $orderItemsExportTitle = __('sales_dist.export.titles.order_items_show', ['order_no' => $order->order_no]);
 
         return view('dashboard.customer.sales_distribution.orders.show', compact('order', 'orderItemsExportTitle'));

@@ -22,6 +22,10 @@ class SalesDistributionDashboardService
                 ->where('tenant_id', $tenantId)
                 ->whereIn('status', ['unpaid', 'partially_paid'])
                 ->sum('total'),
+            'open_invoices_tax' => (float) SalesInvoice::query()
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['unpaid', 'partially_paid'])
+                ->sum('tax'),
         ];
     }
 }

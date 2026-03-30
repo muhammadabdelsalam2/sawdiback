@@ -13,6 +13,7 @@ class SalesOrderRepository implements SalesOrderRepositoryInterface
     {
         return SalesOrder::query()
             ->with(['customer', 'contract'])
+            ->withSum('invoices as invoices_tax', 'tax')
             ->where('tenant_id', $tenantId)
             ->when($filters['customer_id'] ?? null, fn ($q, $v) => $q->where('customer_id', $v))
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
