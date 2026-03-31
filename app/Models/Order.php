@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 
 class Order extends Model
 {
@@ -96,5 +97,33 @@ class Order extends Model
     public function review(): HasOne
     {
         return $this->hasOne(OrderReview::class);
+    }
+
+
+    public function getTrackingData(): array
+    {
+        $this->loadMissing(['statusHistories', 'items']);
+
+        $timeline = $this->statusHistories
+            ->sortBy('changed_at')
+            ->values()
+            ->map(function ($history) {
+                return [
+                    'from' => $history->from_status,
+                    'to' => $history->to_status,
+                    'changed_at' => $history->changed_at?->toISOString(),
+                    'notes' => $history->notes,
+                ];
+            });
+
+        return [
+            'order_id' => $this->id,
+            'order_no' => $this->order_no,
+            'status' => $this->status,
+            'estimated_delivery_at' => $this->estimated_delivery_at?->toISOString(),
+            'timeline' => $timeline,
+            'items_count' => $this->items->count(),
+            'support' => config('ecommerce.support'),
+        ];
     }
 }
