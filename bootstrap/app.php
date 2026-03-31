@@ -59,6 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // ✅ REQUIRED FOR FEATURE GATING
             'feature' => EnsureFeatureEnabled::class,
             'authorized' => CheckAuthorized::class,
+            'api.error' => ApiErrorMiddleware::class,
         ]);
 
         // Append API error middleware

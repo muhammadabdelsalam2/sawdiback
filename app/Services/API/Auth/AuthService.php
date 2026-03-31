@@ -319,13 +319,13 @@ class AuthService
 
                 $this->userRepository->update($user, $updateData);
                 $token = $this->createTokenResponse($user);
-                $user->setAttribute('token', $token['token']);
+
                 $message = __('auth.account_verified');
 
                 break;
             case 'verify_email':
                 $token = $this->createTokenResponse($user);
-                $user->setAttribute('token', $token['token']);
+
                 $this->userRepository->update($user, [
                     'email_verified_at' => now(),
                 ]);
@@ -333,7 +333,7 @@ class AuthService
                 break;
             case 'verify_phone':
                 $token = $this->createTokenResponse($user);
-                $user->setAttribute('token', $token['token']);
+
                 $this->userRepository->update($user, [
                     'phone_verified_at' => now(),
                 ]);
@@ -353,7 +353,7 @@ class AuthService
             case 'login':
                 // Maybe generate token
                 $token = $this->createTokenResponse($user);
-                $user->setAttribute('token', $token['token']);
+
                 $message = __('auth.login_success');
                 break;
             default:
@@ -362,7 +362,8 @@ class AuthService
 
         return ServiceResult::success(
             data: [
-                'user' => $user ?? null,
+                'user' => $user->toArray() ?? null,
+                'token' => $token['token'] ?? null
             ],
             message: $message,
             nextEndpoint: route('api.account.verifyOtp', ['locale' => app()->getLocale()]),
