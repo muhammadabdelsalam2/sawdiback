@@ -44,11 +44,10 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function listHistoryForUser(User $user, int $perPage = 10): LengthAwarePaginator
     {
-        $tenantId = $this->resolveTenantId($user, false);
+        // $tenantId = $this->resolveTenantId($user, false);
 
         return Order::query()
             ->where('user_id', $user->id)
-            
             ->whereIn('status', Order::HISTORY_STATUSES)
             ->latest('id')
             ->paginate($perPage);
@@ -56,7 +55,7 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function findForUser(User $user, int $orderId): ?Order
     {
-        $tenantId = $this->resolveTenantId($user, false);
+        // $tenantId = $this->resolveTenantId($user, false);
 
         return Order::query()
             ->whereKey($orderId)
