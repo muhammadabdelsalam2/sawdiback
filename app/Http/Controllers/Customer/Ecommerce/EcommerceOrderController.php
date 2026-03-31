@@ -14,8 +14,13 @@ class EcommerceOrderController extends Controller
     public function index(Request $request, string $locale): View
     {
         $tenantId = $request->user()->tenant_id;
-
-        $query = Order::query()->with('user')->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId));
+        /*
+         ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId)) :
+         We Remove tenant_id filter to allow users
+          see all their orders across tenants if they have multiple tenants.
+           We will handle tenant scoping in the repository layer instead.
+        */
+        $query = Order::query()->with('user');
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));

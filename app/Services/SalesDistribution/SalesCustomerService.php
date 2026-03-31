@@ -4,13 +4,14 @@ namespace App\Services\SalesDistribution;
 
 use App\Models\SalesDistribution\SalesCustomer;
 use App\Repositories\Contracts\SalesDistribution\SalesCustomerRepositoryInterface;
+use App\Repositories\SalesDistribution\SalesCustomerRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class SalesCustomerService
 {
     public function __construct(
-        private readonly SalesCustomerRepositoryInterface $repo
+        private readonly SalesCustomerRepository $repo
     ) {}
 
     public function paginate(string $tenantId, array $filters): LengthAwarePaginator

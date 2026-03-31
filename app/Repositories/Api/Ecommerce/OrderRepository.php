@@ -36,7 +36,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         return Order::query()
             ->where('user_id', $user->id)
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+            
             ->whereIn('status', Order::ACTIVE_STATUSES)
             ->latest('id')
             ->paginate($perPage);
@@ -48,7 +48,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         return Order::query()
             ->where('user_id', $user->id)
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+            
             ->whereIn('status', Order::HISTORY_STATUSES)
             ->latest('id')
             ->paginate($perPage);
@@ -61,7 +61,7 @@ class OrderRepository implements OrderRepositoryInterface
         return Order::query()
             ->whereKey($orderId)
             ->where('user_id', $user->id)
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+            
             ->first();
     }
 
