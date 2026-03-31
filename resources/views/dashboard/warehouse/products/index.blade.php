@@ -9,7 +9,8 @@
     <div class="container py-4 livestock-page">
         <div class="page-head mb-3">
             <h2 class="page-title">{{ __('warehouse.titles.products') }}</h2>
-            <a class="btn btn-primary-green" href="{{ route('customer.inventory.products.create', ['locale' => $currentLocale]) }}">
+            <a class="btn btn-primary-green"
+                href="{{ route('customer.inventory.products.create', ['locale' => $currentLocale]) }}">
                 {{ __('warehouse.actions.add_product') }}
             </a>
         </div>
@@ -38,7 +39,7 @@
                 <tbody>
                     @forelse($rows as $row)
                         <tr>
-                            <td>{{ $row->id }}</td>
+                            <td>{{ $loop?->iteration }}</td>
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
@@ -48,19 +49,29 @@
                             <td>{{ number_format($row->tax ?? 0, 2) }}</td>
                             <td>{{ $row->low_stock_threshold }}</td>
                             <td class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-white" href="{{ route('customer.inventory.products.edit', ['locale' => $currentLocale, 'product' => $row->id]) }}">{{ __('warehouse.actions.edit') }}</a>
-                                <form method="POST" action="{{ route('customer.inventory.products.destroy', ['locale' => $currentLocale, 'product' => $row->id]) }}">
+                                <a class="btn btn-sm btn-outline-white"
+                                    href="{{ route('customer.inventory.products.edit', ['locale' => $currentLocale, 'product' => $row->id]) }}">{{ __('warehouse.actions.edit') }}</a>
+                                <form method="POST"
+                                    action="{{ route('customer.inventory.products.destroy', ['locale' => $currentLocale, 'product' => $row->id]) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">{{ __('warehouse.actions.delete') }}</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        type="submit">{{ __('warehouse.actions.delete') }}</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8">{{ __('warehouse.empty.no_products') }}</td></tr>
+                        <tr>
+                            <td colspan="8">{{ __('warehouse.empty.no_products') }}</td>
+                        </tr>
                     @endforelse
+
+                    <!-- Placeholder rows for consistent table height -->
+
                 </tbody>
+
             </table>
         </div>
+        <div class="mt-3">{{ $rows->links('pagination::bootstrap-5') }}</div>
     </div>
 @endsection

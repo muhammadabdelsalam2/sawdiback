@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
             'price' => (float) $this->price,
             'last_price' => (float) $this->last_price,
             'unit_tax' => (float) ($this->tax ?? 0),
-
+            'description' => $this->notes,
             'available_quantity' => (int) $this->available_quantity,
 
             'is_active' => (bool) $this->is_active,
@@ -36,7 +36,6 @@ class ProductResource extends JsonResource
 
             'low_stock_threshold' => (float) $this->low_stock_threshold,
 
-            'notes' => $this->notes,
 
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
