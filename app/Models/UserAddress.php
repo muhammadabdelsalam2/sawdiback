@@ -14,6 +14,7 @@ class UserAddress extends Model
         'user_id',
         'label',
         'type',
+        'title',
         'recipient_name',
         'phone',
         'address_line_1',

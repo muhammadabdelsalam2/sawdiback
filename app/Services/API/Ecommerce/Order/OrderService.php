@@ -5,6 +5,7 @@ namespace App\Services\API\Ecommerce\Order;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
+use App\Repositories\Api\Ecommerce\OrderRepository;
 use App\Repositories\Contracts\Api\OrderRepositoryInterface;
 use App\Support\ServiceResult;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -12,7 +13,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class OrderService
 {
     public function __construct(
-        protected OrderRepositoryInterface $orderRepository
+        protected OrderRepository $orderRepository
     ) {
     }
 
