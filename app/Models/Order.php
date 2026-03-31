@@ -100,11 +100,65 @@ class Order extends Model
     }
 
 
-    public function getTrackingData(): array
+    /*
+   |--------------------------------------------------------------------------
+   | Tracking Steps (Workflow)
+   |--------------------------------------------------------------------------
+   */
+    public static function trackingSteps(): array
     {
-        $this->loadMissing(['statusHistories', 'items']);
+        return [
+            'pending' => 'Order placed',
+            'confirmed' => 'Order confirmed',
+            'processing' => 'Preparing order',
+            'shipped' => 'Shipped',
+            'out_for_delivery' => 'Out for delivery',
+            'delivered' => 'Order delivered',
+            'cancelled' => 'Order cancelled',
+        ];
+    }
 
-        $timeline = $this->statusHistories
+    /*
+    |--------------------------------------------------------------------------
+    | UI Timeline (Structured)
+    |--------------------------------------------------------------------------
+    */
+    public function getTrackingTimeline(): array
+    {
+        $this->loadMissing(['statusHistories']);
+
+        $histories = $this->statusHistories
+            ->sortBy('changed_at')
+            ->keyBy('to_status');
+
+        $currentStatus = $this->status;
+
+        $steps = [];
+
+        foreach (self::trackingSteps() as $key => $label) {
+
+            $history = $histories->get($key);
+
+            $steps[] = [
+                'key' => $key,
+                'label' => __($label), // ready for translation
+                'date' => $history?->changed_at?->format('Y-m-d H:i') ?? null,
+                'completed' => (bool) $history,
+                'is_current' => $currentStatus === $key,
+            ];
+        }
+
+        return $steps;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Raw Timeline (Optional - Debug / Logs)
+    |--------------------------------------------------------------------------
+    */
+    public function getRawTimeline(): Collection
+    {
+        return $this->statusHistories
             ->sortBy('changed_at')
             ->values()
             ->map(function ($history) {
@@ -115,13 +169,29 @@ class Order extends Model
                     'notes' => $history->notes,
                 ];
             });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Full Tracking Data
+    |--------------------------------------------------------------------------
+    */
+    public function getTrackingData(): array
+    {
+        $this->loadMissing(['statusHistories', 'items']);
 
         return [
             'order_id' => $this->id,
             'order_no' => $this->order_no,
             'status' => $this->status,
-            'estimated_delivery_at' => $this->estimated_delivery_at?->toISOString(),
-            'timeline' => $timeline,
+            'estimated_delivery_at' => $this->estimated_delivery_at->format('Y-m-d H:i') ?? null,
+
+            // ✅ UI Ready Timeline
+            'timeline' => $this->getTrackingTimeline(),
+
+            // ✅ Optional (for debugging / admin)
+            'raw_timeline' => $this->getRawTimeline(),
+
             'items_count' => $this->items->count(),
             'support' => config('ecommerce.support'),
         ];
