@@ -37,7 +37,7 @@ class AuthController extends Controller
     | Register
     |--------------------------------------------------------------------------
     */
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request,$locale): JsonResponse
     {
         $dto = RegisterDTO::fromRequest($request);
         $result = $this->authService->register($dto);
