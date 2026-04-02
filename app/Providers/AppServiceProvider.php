@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Services\PlanFeatureService;
 use App\Services\SalesDistribution\Accounting\AccountingGateway;
-use App\Services\SalesDistribution\Accounting\NullAccountingGateway;
+use App\Services\Finance\Accounting\FinanceAccountingGateway;
 
 // Plan Repo
 use App\Repositories\Contracts\PlanRepositoryInterface;
@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(AccountingGateway::class, NullAccountingGateway::class);
+        $this->app->bind(AccountingGateway::class, FinanceAccountingGateway::class);
     }
 
     public function boot(): void

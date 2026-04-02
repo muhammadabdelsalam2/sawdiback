@@ -28,6 +28,19 @@ use App\Http\Controllers\Customer\SalesDistribution\SalesInvoiceController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesOrderController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesPaymentController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesShipmentController;
+use App\Http\Controllers\Customer\Finance\FinanceDashboardController;
+use App\Http\Controllers\Customer\Finance\ChartOfAccountsController;
+use App\Http\Controllers\Customer\Finance\JournalEntryController;
+use App\Http\Controllers\Customer\Finance\GeneralLedgerController;
+use App\Http\Controllers\Customer\Finance\ExpenseController;
+use App\Http\Controllers\Customer\Finance\ProfitLossController;
+use App\Http\Controllers\Customer\Procurement\SupplierController;
+use App\Http\Controllers\Customer\Procurement\PurchaseRequisitionController;
+use App\Http\Controllers\Customer\Procurement\RfqController;
+use App\Http\Controllers\Customer\Procurement\QuotationController;
+use App\Http\Controllers\Customer\Procurement\PurchaseOrderController;
+use App\Http\Controllers\Customer\Procurement\GoodsReceiptController;
+use App\Http\Controllers\Customer\Procurement\PurchaseInvoiceController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
@@ -123,6 +136,34 @@ Route::prefix('{locale}')
             Route::post('invoices/{invoice}/payments', [SalesPaymentController::class, 'store'])->name('invoices.payments.store');
             Route::put('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'update'])->name('invoices.payments.update');
             Route::delete('invoices/{invoice}/payments/{payment}', [SalesPaymentController::class, 'destroy'])->name('invoices.payments.destroy');
+        });
+
+        // =========================
+        // Procurement
+        // =========================
+        Route::prefix('procurement')->name('procurement.')->group(function () {
+            Route::resource('suppliers', SupplierController::class)->except(['show']);
+            Route::resource('requisitions', PurchaseRequisitionController::class);
+            Route::resource('rfqs', RfqController::class);
+            Route::resource('quotations', QuotationController::class);
+            Route::resource('purchase-orders', PurchaseOrderController::class)
+                ->parameters(['purchase-orders' => 'order']);
+            Route::resource('goods-receipts', GoodsReceiptController::class)
+                ->parameters(['goods-receipts' => 'receipt']);
+            Route::resource('invoices', PurchaseInvoiceController::class);
+        });
+
+        // =========================
+        // Finance
+        // =========================
+        Route::prefix('finance')->name('finance.')->group(function () {
+            Route::get('/', [FinanceDashboardController::class, 'index'])->name('dashboard');
+
+            Route::resource('accounts', ChartOfAccountsController::class)->except(['show']);
+            Route::resource('journal-entries', JournalEntryController::class)->only(['index', 'create', 'store', 'show']);
+            Route::get('ledger', [GeneralLedgerController::class, 'index'])->name('ledger.index');
+            Route::resource('expenses', ExpenseController::class)->except(['show']);
+            Route::get('profit-loss', [ProfitLossController::class, 'index'])->name('profit-loss.index');
         });
 
         // =========================

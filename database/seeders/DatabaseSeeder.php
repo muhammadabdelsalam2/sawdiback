@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             DemoDataSeeder::class,
+            FinanceAccountsSeeder::class,
+            ProcurementFlowSeeder::class,
             LivestockManagementSeeder::class,
         ]);
     }

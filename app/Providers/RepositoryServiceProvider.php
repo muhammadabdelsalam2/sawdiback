@@ -48,6 +48,20 @@ class RepositoryServiceProvider extends ServiceProvider
         \App\Repositories\Contracts\SalesDistribution\SalesInvoiceRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesInvoiceRepository::class,
         \App\Repositories\Contracts\SalesDistribution\SalesPaymentRepositoryInterface::class => \App\Repositories\SalesDistribution\SalesPaymentRepository::class,
 
+        // Finance Module
+        \App\Repositories\Contracts\Finance\AccountRepositoryInterface::class => \App\Repositories\Finance\AccountRepository::class,
+        \App\Repositories\Contracts\Finance\JournalEntryRepositoryInterface::class => \App\Repositories\Finance\JournalEntryRepository::class,
+        \App\Repositories\Contracts\Finance\ExpenseRepositoryInterface::class => \App\Repositories\Finance\ExpenseRepository::class,
+
+        // Procurement Module
+        \App\Repositories\Contracts\Procurement\SupplierRepositoryInterface::class => \App\Repositories\Procurement\SupplierRepository::class,
+        \App\Repositories\Contracts\Procurement\PurchaseRequisitionRepositoryInterface::class => \App\Repositories\Procurement\PurchaseRequisitionRepository::class,
+        \App\Repositories\Contracts\Procurement\RfqRepositoryInterface::class => \App\Repositories\Procurement\RfqRepository::class,
+        \App\Repositories\Contracts\Procurement\QuotationRepositoryInterface::class => \App\Repositories\Procurement\QuotationRepository::class,
+        \App\Repositories\Contracts\Procurement\PurchaseOrderRepositoryInterface::class => \App\Repositories\Procurement\PurchaseOrderRepository::class,
+        \App\Repositories\Contracts\Procurement\GoodsReceiptRepositoryInterface::class => \App\Repositories\Procurement\GoodsReceiptRepository::class,
+        \App\Repositories\Contracts\Procurement\InvoiceRepositoryInterface::class => \App\Repositories\Procurement\InvoiceRepository::class,
+
         // API / Ecommerce
         \App\Repositories\Contracts\Api\WalletRepositoryInterface::class => \App\Repositories\WalletRepository::class,
         PlusRepositoryInterface::class => PlusRepository::class,
