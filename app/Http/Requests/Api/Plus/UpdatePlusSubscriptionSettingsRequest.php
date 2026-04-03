@@ -21,9 +21,12 @@ class UpdatePlusSubscriptionSettingsRequest extends FormRequest
             'payment_method_id' => [
                 'sometimes',
                 'integer',
-                Rule::exists('user_payment_methods', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
+                Rule::exists('user_payment_methods', 'id')->where(
+                    fn ($query) => $query->where('user_id', $userId)
+                ),
             ],
             'vacation_mode' => ['sometimes', 'boolean'],
+            'resume_at' => ['sometimes', 'nullable', 'date', 'after:today'],
             'cancel_subscription' => ['sometimes', 'boolean'],
         ];
     }
@@ -31,13 +34,31 @@ class UpdatePlusSubscriptionSettingsRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if (
-                !$this->has('auto_renew') &&
-                !$this->has('payment_method_id') &&
-                !$this->has('vacation_mode') &&
-                !$this->has('cancel_subscription')
-            ) {
-                $validator->errors()->add('settings', 'At least one setting must be provided for update.');
+            $hasUpdatableSetting =
+                $this->has('auto_renew') ||
+                $this->has('payment_method_id') ||
+                $this->has('vacation_mode') ||
+                $this->has('cancel_subscription');
+
+            if (!$hasUpdatableSetting) {
+                $validator->errors()->add(
+                    'settings',
+                    'At least one setting must be provided for update.'
+                );
+            }
+
+            if ($this->boolean('vacation_mode') && !$this->filled('resume_at')) {
+                $validator->errors()->add(
+                    'resume_at',
+                    'The resume_at field is required when vacation_mode is true.'
+                );
+            }
+
+            if ($this->filled('resume_at') && !$this->boolean('vacation_mode')) {
+                $validator->errors()->add(
+                    'resume_at',
+                    'The resume_at field may only be sent when vacation_mode is true.'
+                );
             }
         });
     }

@@ -211,25 +211,7 @@ class PlusService
             ]);
         }
 
-        return [
-            'membership_billing' => [
-                'plan_status' => config('plus.manage_subscription.status_labels.' . $subscription->status, ucfirst($subscription->status)),
-                'renews_at' => $subscription->next_billing_at?->toDateString(),
-                'renews_at_label' => $subscription->next_billing_at?->format('d M Y'),
-                'auto_renewal' => (bool) $subscription->auto_renew,
-                'payment_method' => $subscription->paymentMethod
-                    ? $this->transformPaymentMethod($subscription->paymentMethod)
-                    : null,
-            ],
-            'vacation_mode' => [
-                'enabled' => (bool) $subscription->vacation_mode,
-                'paused_until' => $subscription->paused_until?->toDateString(),
-                'paused_until_label' => $subscription->paused_until?->format('d M Y'),
-            ],
-            'actions' => [
-                'can_cancel' => !$subscription->is_canceled,
-            ],
-        ];
+        return $this->buildManageSubscriptionPayload($subscription);
     }
 
     public function updateManageSubscription(User $user, array $payload): array
@@ -248,60 +230,65 @@ class PlusService
             ]);
         }
 
-        $data = [];
+        $subscription = DB::transaction(function () use ($subscription, $payload) {
+            $data = [];
 
-        if (array_key_exists('auto_renew', $payload)) {
-            $data['auto_renew'] = (bool) $payload['auto_renew'];
-        }
+            if (array_key_exists('auto_renew', $payload)) {
+                $data['auto_renew'] = (bool) $payload['auto_renew'];
+            }
 
-        if (!empty($payload['payment_method_id'])) {
-            $data['user_payment_method_id'] = $payload['payment_method_id'];
-        }
+            if (!empty($payload['payment_method_id'])) {
+                $data['user_payment_method_id'] = $payload['payment_method_id'];
+            }
 
-        if (array_key_exists('vacation_mode', $payload)) {
-            $vacationMode = (bool) $payload['vacation_mode'];
+            $shouldCancel = !empty($payload['cancel_subscription']);
 
-            if ($vacationMode) {
-                $data['vacation_mode'] = true;
-                $data['status'] = PlusSubscription::STATUS_PAUSED;
+            if (!$shouldCancel && array_key_exists('vacation_mode', $payload)) {
+                $vacationMode = (bool) $payload['vacation_mode'];
+
+                if ($vacationMode) {
+                    $resumeAt = Carbon::parse($payload['resume_at'])->startOfDay();
+
+                    $this->plusRepository->createSkip($subscription, [
+                        'action' => PlusSubscriptionSkip::ACTION_PAUSE,
+                        'scheduled_for' => null,
+                        'resume_at' => $resumeAt->toDateString(),
+                        'reason' => 'Pause from manage subscription',
+                        'metadata' => [
+                            'source' => 'mobile_api',
+                            'entry_point' => 'manage_subscription_update',
+                        ],
+                    ]);
+
+                    $data['vacation_mode'] = true;
+                    $data['status'] = PlusSubscription::STATUS_PAUSED;
+                    $data['paused_until'] = $resumeAt->toDateString();
+                    $data['next_delivery_at'] = $this->calculateNextEligibleDeliveryFromDate($subscription, $resumeAt);
+                } else {
+                    $data['vacation_mode'] = false;
+                    $data['status'] = PlusSubscription::STATUS_ACTIVE;
+                    $data['paused_until'] = null;
+                    $data['next_delivery_at'] = $this->calculateNextEligibleDeliveryFromNow($subscription);
+                }
+            }
+
+            if ($shouldCancel) {
+                $data['status'] = PlusSubscription::STATUS_CANCELED;
+                $data['canceled_at'] = now();
+                $data['auto_renew'] = false;
+                $data['vacation_mode'] = false;
                 $data['paused_until'] = null;
                 $data['next_delivery_at'] = null;
-            } else {
-                $data['vacation_mode'] = false;
-                $data['status'] = PlusSubscription::STATUS_ACTIVE;
-                $data['paused_until'] = null;
-                $data['next_delivery_at'] = $this->calculateNextEligibleDeliveryFromNow($subscription);
             }
-        }
 
-        if (!empty($payload['cancel_subscription'])) {
-            $data['status'] = PlusSubscription::STATUS_CANCELED;
-            $data['canceled_at'] = now();
-            $data['auto_renew'] = false;
-            $data['next_delivery_at'] = null;
-        }
+            $updatedSubscription = $this->plusRepository->update($subscription, $data);
 
-        $subscription = $this->plusRepository->update($subscription, $data);
-        $subscription = $this->plusRepository->loadFull($subscription);
+            return $this->plusRepository->loadFull($updatedSubscription);
+        });
 
         return [
             'subscription' => $this->transformDetailedSubscription($subscription),
-            'manage_subscription' => [
-                'membership_billing' => [
-                    'plan_status' => config('plus.manage_subscription.status_labels.' . $subscription->status, ucfirst($subscription->status)),
-                    'renews_at' => $subscription->next_billing_at?->toDateString(),
-                    'renews_at_label' => $subscription->next_billing_at?->format('d M Y'),
-                    'auto_renewal' => (bool) $subscription->auto_renew,
-                    'payment_method' => $subscription->paymentMethod
-                        ? $this->transformPaymentMethod($subscription->paymentMethod)
-                        : null,
-                ],
-                'vacation_mode' => [
-                    'enabled' => (bool) $subscription->vacation_mode,
-                    'paused_until' => $subscription->paused_until?->toDateString(),
-                    'paused_until_label' => $subscription->paused_until?->format('d M Y'),
-                ],
-            ],
+            'manage_subscription' => $this->buildManageSubscriptionPayload($subscription),
         ];
     }
 
@@ -329,7 +316,7 @@ class PlusService
                     ]);
                 }
 
-                $nextDelivery = $this->resolveNextEligibleDeliveryDate($subscription);
+                $nextDelivery = $this->resolveRequestedDeliveryDate($subscription, $payload);
 
                 if (!$nextDelivery) {
                     throw ValidationException::withMessages([
@@ -344,7 +331,7 @@ class PlusService
 
                 if ($existingSkip) {
                     throw ValidationException::withMessages([
-                        'delivery' => ['The next delivery has already been skipped.'],
+                        'delivery' => ['The selected delivery has already been skipped.'],
                     ]);
                 }
 
@@ -352,13 +339,19 @@ class PlusService
                     'action' => PlusSubscriptionSkip::ACTION_SKIP_ONCE,
                     'scheduled_for' => $nextDelivery->toDateString(),
                     'resume_at' => null,
-                    'reason' => $payload['reason'] ?? 'Skip next order only',
+                    'reason' => $payload['reason'] ?? 'Skip selected delivery',
                     'metadata' => [
                         'source' => 'mobile_api',
+                        'delivery_id' => $payload['delivery_id'] ?? null,
+                        'order_id' => $payload['order_id'] ?? null,
                     ],
                 ]);
 
-                $newNext = $this->calculateNextEligibleDeliveryFromDate($subscription, $nextDelivery->copy()->addDay());
+                $newNext = $this->calculateNextEligibleDeliveryFromDate(
+                    $subscription,
+                    $nextDelivery->copy()->addDay()
+                );
+
                 $subscription = $this->plusRepository->update($subscription, [
                     'next_delivery_at' => $newNext,
                 ]);
@@ -420,6 +413,29 @@ class PlusService
         }
 
         return $subscription;
+    }
+
+    protected function buildManageSubscriptionPayload(PlusSubscription $subscription): array
+    {
+        return [
+            'membership_billing' => [
+                'plan_status' => config('plus.manage_subscription.status_labels.' . $subscription->status, ucfirst($subscription->status)),
+                'renews_at' => $subscription->next_billing_at?->toDateString(),
+                'renews_at_label' => $subscription->next_billing_at?->format('d M Y'),
+                'auto_renewal' => (bool) $subscription->auto_renew,
+                'payment_method' => $subscription->paymentMethod
+                    ? $this->transformPaymentMethod($subscription->paymentMethod)
+                    : null,
+            ],
+            'vacation_mode' => [
+                'enabled' => (bool) $subscription->vacation_mode,
+                'paused_until' => $subscription->paused_until?->toDateString(),
+                'paused_until_label' => $subscription->paused_until?->format('d M Y'),
+            ],
+            'actions' => [
+                'can_cancel' => !$subscription->is_canceled,
+            ],
+        ];
     }
 
     protected function buildBannerPayload(?PlusSubscription $subscription): array
@@ -584,8 +600,13 @@ class PlusService
             ->values()
             ->all();
 
+        $deliveryIdentifier = $this->makeDeliveryIdentifier($subscription, $scheduledFor);
+
         return [
-            'key' => 'plus-delivery-' . $subscription->id . '-' . $scheduledFor->format('YmdHis'),
+            'id' => $deliveryIdentifier,
+            'delivery_id' => $deliveryIdentifier,
+            'order_id' => $deliveryIdentifier,
+            'key' => $deliveryIdentifier,
             'title' => $this->buildOccurrenceTitle($subscription),
             'subtitle' => 'Recurring delivery bundle',
             'schedule_label' => $this->makeFrequencyLabel($subscription->frequency, $subscription->delivery_days ?? []),
@@ -665,7 +686,6 @@ class PlusService
         }
 
         $deliveryDays = $subscription->delivery_days ?? [];
-
         $cursor = $startCursor->copy();
 
         for ($i = 0; $i < 366; $i++) {
@@ -689,6 +709,57 @@ class PlusService
         }
 
         return $this->calculateNextEligibleDeliveryFromNow($subscription);
+    }
+
+    protected function resolveRequestedDeliveryDate(PlusSubscription $subscription, array $payload): ?Carbon
+    {
+        $field = array_key_exists('delivery_id', $payload)
+            ? 'delivery_id'
+            : (array_key_exists('order_id', $payload) ? 'order_id' : 'delivery_id');
+
+        $requestedIdentifier = $payload['delivery_id'] ?? $payload['order_id'] ?? null;
+
+        if (blank($requestedIdentifier)) {
+            return $this->resolveNextEligibleDeliveryDate($subscription);
+        }
+
+        if (
+            !preg_match('/^plus-delivery-(\d+)-(\d{14})$/', $requestedIdentifier, $matches)
+        ) {
+            throw ValidationException::withMessages([
+                $field => ['The selected ' . $field . ' is invalid.'],
+            ]);
+        }
+
+        if ((int) $matches[1] !== (int) $subscription->id) {
+            throw ValidationException::withMessages([
+                $field => ['The selected ' . $field . ' does not belong to this subscription.'],
+            ]);
+        }
+
+        $allowedDeliveries = collect(
+            $this->getUpcomingEligibleDeliveries(
+                $subscription,
+                max((int) config('plus.defaults.preview_occurrences', 3), 12)
+            )
+        );
+
+        $matchedDelivery = $allowedDeliveries->first(
+            fn (Carbon $delivery) => $this->makeDeliveryIdentifier($subscription, $delivery) === $requestedIdentifier
+        );
+
+        if (!$matchedDelivery) {
+            throw ValidationException::withMessages([
+                $field => ['The selected ' . $field . ' is invalid or no longer available.'],
+            ]);
+        }
+
+        return $matchedDelivery->copy();
+    }
+
+    protected function makeDeliveryIdentifier(PlusSubscription $subscription, Carbon $scheduledFor): string
+    {
+        return 'plus-delivery-' . $subscription->id . '-' . $scheduledFor->format('YmdHis');
     }
 
     protected function getUpcomingEligibleDeliveries(PlusSubscription $subscription, int $count = 3): array
