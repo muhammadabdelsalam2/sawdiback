@@ -50,7 +50,8 @@
         </div>
 
         {{-- Production Dropdown (Contains Subscriptions/Plans) --}}
-        <div class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-3.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.production') }}</span>
@@ -98,7 +99,8 @@
 
         {{-- Inventory --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
-            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.inventory') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -119,7 +121,8 @@
 
         {{-- E-Commerce --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'open' : '' }}">
-            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.ecommerce') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -131,8 +134,7 @@
         </div>
 
         {{-- Sales & Distribution --}}
-        <div
-            class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
+        <div class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
             <a href="javascript:void(0)"
                 class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
@@ -266,6 +268,7 @@
 
         @can('roles.manage')
 
+        @if ($isSuperAdmin)
             {{-- System Settings (Dropdown) --}}
             <div class="nav-dropdown {{ request()->routeIs('settings.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)"
@@ -276,7 +279,7 @@
                 </a>
 
                 <div class="dropdown-container">
-                    <a href="{{ route('settings.countries.index', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.countries.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.countries') }}
                     </a>
@@ -292,10 +295,10 @@
                     </a>
 
                     @if ($isSuperAdmin)
-                         <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
+                        <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
                             class="dropdown-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                             {{ __('dashboard.sidebar.settings.permissionsManagement') }}
-                         </a>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -307,7 +310,8 @@
                 <span class="nav-label">{{ __('dashboard.sidebar.user_management') }}</span>
             </a>
 
-        @endcan
+            @endcan
+        @endif
 
         {{-- Logout --}}
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -317,8 +321,7 @@
         </a>
 
         <!-- Hidden logout form -->
-        <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}"
-            method="POST" class="d-none">
+        <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
             @csrf
         </form>
 
