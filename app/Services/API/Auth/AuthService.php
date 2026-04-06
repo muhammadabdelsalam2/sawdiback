@@ -187,44 +187,90 @@ class AuthService
     public function socialLogin(SocialLoginDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
+            // Map provider to database column
+            $providerColumn = match ($dto->provider) {
+                'google' => 'google_id',
+                'facebook' => 'facebook_id',
+                'instagram' => 'instagram_id',
+                default => throw new \Exception(__('auth.provider_not_supported')),
+            };
 
-            $user = $this->userRepository
-                ->findByProvider(
-                    $dto->provider,
-                    $dto->providerId
-                );
+            // 1. Try to find user by social ID
+            $user = User::where($providerColumn, $dto->providerId)->first();
 
             if (!$user) {
-
-                // check email exists
+                // 2. Try to find user by email
                 if ($dto->email) {
-                    $user = $this->userRepository
-                        ->findByEmail($dto->email);
+                    $user = User::where('email', $dto->email)->first();
                 }
 
                 if (!$user) {
-
-                    $user = $this->userRepository->create([
+                    // 3. Create new user
+                    $user = User::create([
+                        'name' => $dto->name ?? 'User',
                         'email' => $dto->email,
-                        'provider' => $dto->provider,
-                        'provider_id' => $dto->providerId,
+                        $providerColumn => $dto->providerId,
+                        'social_avatar' => $dto->avatar,
+                        'email_verified_at' => now(),
+                        'is_completed' => true,
+                        // Generate a random password since it's social login
+                        'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(24)),
                     ]);
 
-                    $user->assignRole('Client');
-
+                    $user->assignRole('customer'); // Default role
                 } else {
-
+                    // 4. Update existing user with social info
                     $user->update([
-                        'provider' => $dto->provider,
-                        'provider_id' => $dto->providerId,
-                        'avatar' => $dto->avatar,
+                        $providerColumn => $dto->providerId,
+                        'social_avatar' => $dto->avatar,
                     ]);
-
                 }
             }
 
             return $this->createTokenResponse($user);
         });
+    }
+
+    /**
+     * Link a social account to an existing user.
+     */
+    public function socialLink(User $user, SocialLoginDTO $dto): bool
+    {
+        $providerColumn = match ($dto->provider) {
+            'google' => 'google_id',
+            'facebook' => 'facebook_id',
+            'instagram' => 'instagram_id',
+            default => throw new \Exception(__('auth.provider_not_supported')),
+        };
+
+        // Check if this social ID is already linked to another user
+        if (User::where($providerColumn, $dto->providerId)->where('id', '!=', $user->id)->exists()) {
+            throw ValidationException::withMessages([
+                'provider' => __('auth.social_account_already_linked'),
+            ]);
+        }
+
+        return $user->update([
+            $providerColumn => $dto->providerId,
+            'social_avatar' => $dto->avatar,
+        ]);
+    }
+
+    /**
+     * Unlink a social account from a user.
+     */
+    public function socialUnlink(User $user, string $provider): bool
+    {
+        $providerColumn = match ($provider) {
+            'google' => 'google_id',
+            'facebook' => 'facebook_id',
+            'instagram' => 'instagram_id',
+            default => throw new \Exception(__('auth.provider_not_supported')),
+        };
+
+        return $user->update([
+            $providerColumn => null,
+        ]);
     }
 
     /*

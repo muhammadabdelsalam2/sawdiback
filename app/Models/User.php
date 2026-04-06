@@ -31,6 +31,10 @@ class User extends Authenticatable
         'phone_verified_at',
         'password_reset_token',
         'password_reset_at',
+        'google_id',
+        'facebook_id',
+        'instagram_id',
+        'social_avatar',
     ];
 
     protected $hidden = [

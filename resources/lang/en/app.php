@@ -110,6 +110,11 @@ return [
 'product_4_name' => 'Fresh Mint',
 'product_4_desc' => 'Aromatic green mint perfect for cooking and tea.',
 
-'product_5_name' => 'Bell Peppers',
-'product_5_desc' => 'Colorful and healthy peppers rich in vitamins.',
+    'product_5_name' => 'Bell Peppers',
+    'product_5_desc' => 'Colorful and healthy peppers rich in vitamins.',
+
+    'best_selling_title' => 'Best Selling',
+    'best_selling_subtitle' => 'Discover our most popular products and customer favorites',
+    'hot_deal' => 'Best Selling',
+    'no_best_selling_products' => 'No featured products available at the moment',
     ];

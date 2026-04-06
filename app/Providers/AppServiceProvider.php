@@ -74,5 +74,10 @@ class AppServiceProvider extends ServiceProvider
         Tenant::observe(TenantObserver::class);
        User::observe(UserObserver::class);
 
+        // ✅ Register Socialite Providers
+        \Illuminate\Support\Facades\Event::listen(
+            \SocialiteProviders\Manager\SocialiteWasCalled::class,
+            [\SocialiteProviders\Instagram\InstagramExtendSocialite::class, 'handle']
+        );
     }
 }

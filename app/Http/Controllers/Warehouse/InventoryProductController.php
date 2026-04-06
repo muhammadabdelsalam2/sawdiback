@@ -33,8 +33,18 @@ class InventoryProductController extends Controller
     public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
     {
         $data = $request->validated();
+
         $category = $this->findCategoryForTenant($data['category_id']);
         $data['category'] = $category->code;
+        $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
+
+        $data['is_active'] = $request->boolean('is_active');
+        $data['track_expiry'] = $request->boolean('track_expiry');
+        $data['is_best_selling'] = $request->boolean('is_best_selling');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('inventory/products', 'public');
+        }
 
         InventoryProduct::query()->create($data);
 
@@ -53,8 +63,18 @@ class InventoryProductController extends Controller
     public function update(InventoryProductUpdateRequest $request, string $locale, InventoryProduct $product): RedirectResponse
     {
         $data = $request->validated();
+
         $category = $this->findCategoryForTenant($data['category_id']);
         $data['category'] = $category->code;
+        $data['tenant_id'] = $product->tenant_id ?: ($category->tenant_id ?? $this->tenantId());
+
+        $data['is_active'] = $request->boolean('is_active');
+        $data['track_expiry'] = $request->boolean('track_expiry');
+        $data['is_best_selling'] = $request->boolean('is_best_selling');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('inventory/products', 'public');
+        }
 
         $product->update($data);
 

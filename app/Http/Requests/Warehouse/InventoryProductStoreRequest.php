@@ -24,6 +24,7 @@ class InventoryProductStoreRequest extends BaseWarehouseRequest
             'track_expiry' => ['nullable', 'boolean'],
             'low_stock_threshold' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
+            'is_best_selling' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string'],
         ];
     }
