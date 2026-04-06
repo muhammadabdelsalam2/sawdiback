@@ -24,12 +24,14 @@ class InventoryProduct extends Model
         'track_expiry',
         'low_stock_threshold',
         'is_active',
+        'is_best_selling',
         'notes',
     ];
 
     protected $casts = [
         'track_expiry' => 'boolean',
         'is_active' => 'boolean',
+        'is_best_selling' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
     ];
 

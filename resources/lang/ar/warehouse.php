@@ -40,6 +40,7 @@ return [
         'track_expiry' => 'متابعة الصلاحية',
         'low_stock_threshold' => 'حد التنبيه',
         'active' => 'نشط',
+        'best_selling' => 'الأكثر مبيعاً',
         'notes' => 'ملاحظات',
         'sort_order' => 'ترتيب العرض',
         'product' => 'المنتج',

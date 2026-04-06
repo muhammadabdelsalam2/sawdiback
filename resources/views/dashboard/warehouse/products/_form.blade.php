@@ -39,6 +39,13 @@
             <label class="form-check-label" for="is_active">{{ __('warehouse.fields.active') }}</label>
         </div>
     </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="is_best_selling" value="1" id="is_best_selling"
+                @checked((bool) old('is_best_selling', $product->is_best_selling ?? false))>
+            <label class="form-check-label text-warning fw-bold" for="is_best_selling">{{ __('warehouse.fields.best_selling') ?? 'Best Selling' }}</label>
+        </div>
+    </div>
     <div class="col-12">
         <label class="form-label">{{ __('warehouse.fields.notes') }}</label>
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $product->notes ?? '') }}</textarea>

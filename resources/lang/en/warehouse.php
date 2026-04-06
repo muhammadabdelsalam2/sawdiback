@@ -40,6 +40,7 @@ return [
         'track_expiry' => 'Track Expiry',
         'low_stock_threshold' => 'Low Stock Threshold',
         'active' => 'Active',
+        'best_selling' => 'Best Selling',
         'notes' => 'Notes',
         'sort_order' => 'Sort Order',
         'product' => 'Product',

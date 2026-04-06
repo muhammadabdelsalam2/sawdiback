@@ -58,6 +58,10 @@
                         {{ __('app.explore_products') }}
                     </a>
 
+                    <a href="#best-selling" class="btn btn-outline-warning btn-lg px-5 rounded-pill fw-bold">
+                        <i class="bi bi-fire me-2"></i> {{ __('app.best_selling_title') ?? 'الأكثر مبيعًا' }}
+                    </a>
+
                     <a href="#contact" class="btn btn-outline-light btn-lg px-5 rounded-pill">
                         {{ __('app.contact_us') }}
                     </a>

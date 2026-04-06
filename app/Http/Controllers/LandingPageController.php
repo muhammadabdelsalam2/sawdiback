@@ -28,9 +28,10 @@ class LandingPageController extends Controller
 
         // Get all active plans with currency
        $products = InventoryProduct::where('is_active', true)->get();
+       $bestSellingProducts = InventoryProduct::where('is_active', true)->where('is_best_selling', true)->get();
 
         // Pass plans & currency to the view
-        return view('landing.index', compact('products', 'currencyId'));
+        return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts'));
     }
 
 }

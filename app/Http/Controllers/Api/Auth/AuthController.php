@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\VerifyOtpRequest;
-use App\Http\Requests\Api\Auth\Password\ForgotPasswordRequest;
-
+use App\Http\Requests\Api\Password\ForgotPasswordRequest;
 use App\Services\API\Auth\AuthService;
 
 use App\DTOs\Auth\LoginDTO;
@@ -19,8 +18,11 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use App\Support\ApiResponse;
 use Illuminate\Support\Facades\Request;
+use App\Http\Requests\Api\Auth\SocialLoginRequest;
+use App\DTOs\Auth\SocialLoginDTO;
 use App\DTOs\Auth\VerifyOtpDTO;
 use App\DTOs\Auth\SendOtpDTO;
+use App\Enums\OtpType;
 use App\Services\API\Auth\OtpService;
 use App\Repositories\UserRepository;
 class AuthController extends Controller
@@ -70,6 +72,51 @@ class AuthController extends Controller
             data: $result['data'],
             message: $result['message'],
             code: $result['code']
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Social Login (Mobile)
+    |--------------------------------------------------------------------------
+    */
+    public function socialLogin(SocialLoginRequest $request): JsonResponse
+    {
+        $dto = new SocialLoginDTO(
+            provider: $request->provider,
+            providerId: $request->providerId,
+            name: $request->name,
+            email: $request->email,
+            avatar: $request->avatar
+        );
+
+        $result = $this->authService->socialLogin($dto);
+
+        return ApiResponse::success(
+            data: $result,
+            message: __('auth.login_success')
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Social Link (Link account from profile)
+    |--------------------------------------------------------------------------
+    */
+    public function socialLink(SocialLoginRequest $request): JsonResponse
+    {
+        $dto = new SocialLoginDTO(
+            provider: $request->provider,
+            providerId: $request->providerId,
+            name: $request->name,
+            email: $request->email,
+            avatar: $request->avatar
+        );
+
+        $this->authService->socialLink(auth()->user(), $dto);
+
+        return ApiResponse::success(
+            message: __('auth.social_account_linked')
         );
     }
 
@@ -163,7 +210,6 @@ public function verifyOtp(VerifyOtpRequest $request): JsonResponse
     return ApiResponse::success(
         data: $result['data'],
         message: $result['message'],
-        message: $result['nextEndpoint'],
         code: $result['code']
     );
 }
@@ -190,7 +236,7 @@ public function resendOtp(ResendOtpRequest $request): JsonResponse
     );
 
     // Resend OTP
-    $this->otpService->resend($dto);
+    $this->otpService->resend($dto, $user);
 
     return response()->json([
         'status' => true,
