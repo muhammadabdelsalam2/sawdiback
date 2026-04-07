@@ -14,8 +14,9 @@ class StoreLocationAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:100'],
-            'type' => ['required', 'string', 'max:50'],
+             'label' => ['sometimes', 'nullable', 'string', 'max:100'], // ✅ أضفها
+        'title' => ['required', 'string', 'max:100'],
+        'type'  => ['required', 'string', 'max:50'],
             'street_address' => ['required', 'string', 'max:255'],
             'address_line_1' => ['sometimes', 'string', 'max:255'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
