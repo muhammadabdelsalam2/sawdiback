@@ -36,27 +36,45 @@ class StoreLocationAddressRequest extends FormRequest
 
    protected function prepareForValidation(): void
 {
-    $this->merge([
-        'title' => $this->input('title', ''),
-        'label' => $this->input('label', $this->input('title', '')),
-        'address_line_1' => $this->input('street_address', ''),
+    $merge = [];
 
-        'recipient_name' => $this->input('recipient_name', ''),
-        'phone' => $this->input('phone', ''),
-        'address_line_2' => $this->input('address_line_2', ''),
-        'building' => $this->input('building', ''),
-        'floor' => $this->input('floor', ''),
-        'apartment' => $this->input('apartment', ''),
-        'landmark' => $this->input('landmark', ''),
-        'city' => $this->input('city', ''),
-        'country' => $this->input('country', ''),
-        'postal_code' => $this->input('postal_code', ''),
-        'notes' => $this->input('notes', ''),
+    // فقط لو مش موجود أصلاً
+    if (!$this->has('label')) {
+        $merge['label'] = $this->input('title', '');
+    }
 
-        'latitude' => $this->input('latitude', 0),
-        'longitude' => $this->input('longitude', 0),
+    if (!$this->has('address_line_1')) {
+        $merge['address_line_1'] = $this->input('street_address', '');
+    }
 
-        'is_default' => $this->boolean('is_default'),
-    ]);
+    // باقي القيم الافتراضية بس لو مش موجودة
+    $defaults = [
+        'recipient_name' => '',
+        'phone'          => '',
+        'address_line_2' => '',
+        'building'       => '',
+        'floor'          => '',
+        'apartment'      => '',
+        'landmark'       => '',
+        'city'           => '',
+        'country'        => '',
+        'postal_code'    => '',
+        'notes'          => '',
+        'latitude'       => 0,
+        'longitude'      => 0,
+        'is_default'     => false,
+    ];
+
+    foreach ($defaults as $key => $default) {
+        if (!$this->has($key)) {
+            $merge[$key] = $key === 'is_default'
+                ? $this->boolean($key)
+                : $this->input($key, $default);
+        }
+    }
+
+    if (!empty($merge)) {
+        $this->merge($merge);
+    }
 }
 }
