@@ -217,7 +217,7 @@ class AuthService
                         'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(24)),
                     ]);
 
-                    $user->assignRole('customer'); // Default role
+                    $user->assignRole('Client'); // Use 'Client' for social login to keep everything consistent
                 } else {
                     // 4. Update existing user with social info
                     $user->update([
