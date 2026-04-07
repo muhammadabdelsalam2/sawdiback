@@ -402,61 +402,72 @@ class AccountService
         ];
     }
 
-    public function storeAddress(array $data): array
-    {
-        $user = $this->authenticatedUser();
+   public function storeAddress(array $data): array
+{
+    $user = $this->authenticatedUser();
 
-        if (!$user) {
-            return $this->userNotFoundResponse();
-        }
-
-        try {
-            DB::transaction(function () use ($user, $data) {
-                $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
-
-                $address = $user->addresses()->create([
-    'label' => $data['label'] ?? '',
-    'title' => $data['title'] ?? '',
-    'type' => $data['type'] ?? '',
-    'recipient_name' => $data['recipient_name'] ?? '',
-    'phone' => $data['phone'] ?? '',
-    'address_line_1' => $data['address_line_1'] ?? '',
-    'address_line_2' => $data['address_line_2'] ?? '',
-    'building' => $data['building'] ?? '',
-    'floor' => $data['floor'] ?? '',
-    'apartment' => $data['apartment'] ?? '',
-    'landmark' => $data['landmark'] ?? '',
-    'city' => $data['city'] ?? '',
-    'country' => $data['country'] ?? '',
-    'postal_code' => $data['postal_code'] ?? '',
-    'notes' => $data['notes'] ?? '',
-    'latitude' => $data['latitude'] ?? null,
-    'longitude' => $data['longitude'] ?? null,
-    'is_default' => $shouldBeDefault,
-]);
-
-                if ($shouldBeDefault) {
-                    $this->normalizeUserAddressDefaults($user, $address->id);
-                } else {
-                    $this->normalizeUserAddressDefaults($user);
-                }
-            });
-
-            return [
-                'success' => true,
-                'message' => 'Address added successfully.',
-                'data' => $this->addressBookPayload($user->fresh()),
-                'code' => 201,
-            ];
-        } catch (Throwable $e) {
-            return [
-                'success' => false,
-                'message' => 'Unable to save address right now.',
-                'data' => null,
-                'code' => 422,
-            ];
-        }
+    if (!$user) {
+        return $this->userNotFoundResponse();
     }
+
+    try {
+        DB::beginTransaction();
+
+        $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
+
+        $address = $user->addresses()->create([
+            'label' => $data['label'] ?? '',
+            'title' => $data['title'] ?? '',
+            'type' => $data['type'] ?? '',
+            'recipient_name' => $data['recipient_name'] ?? '',
+            'phone' => $data['phone'] ?? '',
+            'address_line_1' => $data['address_line_1'] ?? '',
+            'address_line_2' => $data['address_line_2'] ?? '',
+            'building' => $data['building'] ?? '',
+            'floor' => $data['floor'] ?? '',
+            'apartment' => $data['apartment'] ?? '',
+            'landmark' => $data['landmark'] ?? '',
+            'city' => $data['city'] ?? '',
+            'country' => $data['country'] ?? '',
+            'postal_code' => $data['postal_code'] ?? '',
+            'notes' => $data['notes'] ?? '',
+            'latitude' => $data['latitude'] ?? null,
+            'longitude' => $data['longitude'] ?? null,
+            'is_default' => $shouldBeDefault,
+        ]);
+
+        if (!$address) {
+            throw new \Exception('Address not created');
+        }
+
+        if ($shouldBeDefault) {
+            $this->normalizeUserAddressDefaults($user, $address->id);
+        } else {
+            $this->normalizeUserAddressDefaults($user);
+        }
+
+        DB::commit();
+
+        return [
+            'success' => true,
+            'message' => 'Address added successfully.',
+            'data' => $this->addressBookPayload($user->fresh()),
+            'code' => 201,
+        ];
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+
+        // 👇 أهم سطرين
+        return [
+            'success' => false,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(), // optional
+            'code' => 500,
+        ];
+    }
+}
 
     public function updateAddress(UserAddress $address, array $data): array
     {
