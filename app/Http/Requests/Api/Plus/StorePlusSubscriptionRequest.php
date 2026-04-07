@@ -24,23 +24,26 @@ class StorePlusSubscriptionRequest extends FormRequest
 
         return [
             'address_id' => [
-                'required',
+                'sometimes',
+                'nullable',
                 'integer',
                 Rule::exists('user_addresses', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
             ],
             'payment_method_id' => [
-                'required',
+                'sometimes',
+                'nullable',
                 'integer',
                 Rule::exists('user_payment_methods', 'id')->where(fn ($query) => $query->where('user_id', $userId)),
             ],
             'frequency' => [
-                'required',
+                'sometimes',
+                'nullable',
                 'string',
                 Rule::in($frequencyValues),
             ],
             'delivery_days' => ['sometimes', 'nullable', 'array'],
             'delivery_days.*' => ['integer', 'between:0,6'],
-            'start_date' => ['required', 'date', 'after_or_equal:today'],
+            'start_date' => ['sometimes', 'nullable', 'date', 'after_or_equal:today'],
             'category_ids' => ['sometimes', 'nullable', 'array'],
             'category_ids.*' => [
                 'integer',

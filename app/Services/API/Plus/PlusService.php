@@ -101,14 +101,41 @@ class PlusService
             ]);
         }
 
-        $startsAt = Carbon::parse($payload['start_date'])->startOfDay();
-        $deliveryDays = array_values(array_unique(array_map('intval', $payload['delivery_days'] ?? [])));
-        sort($deliveryDays);
+        // Extract values from payload with fallbacks to defaults
+        $frequency = $payload['frequency'] ?? config('plus.defaults.frequency', 'weekly');
+        $deliveryDays = $payload['delivery_days'] ?? config('plus.defaults.delivery_days', [6, 2]);
+        $startDateStr = $payload['start_date'] ?? now()->toDateString();
+        $autoRenew = $payload['auto_renew'] ?? (bool) config('plus.defaults.auto_renew', true);
+        $categoryIds = $payload['category_ids'] ?? [];
+        $notes = $payload['notes'] ?? null;
+
+        // Automatically select default address and payment method if not provided
+        $addressId = $payload['address_id'] ?? null;
+        if (!$addressId) {
+            $addressId = $user->addresses()->where('is_default', true)->first()?->id ?? $user->addresses()->first()?->id;
+        }
+
+        $paymentMethodId = $payload['payment_method_id'] ?? null;
+        if (!$paymentMethodId) {
+            $paymentMethodId = $user->paymentMethods()->where('is_default', true)->first()?->id ?? $user->paymentMethods()->first()?->id;
+        }
+
+        // Final check for essential data
+        if (!$addressId) {
+            throw ValidationException::withMessages(['address_id' => ['Please add a delivery address to your account first.']]);
+        }
+        if (!$paymentMethodId) {
+            throw ValidationException::withMessages(['payment_method_id' => ['Please add a payment method to your account first.']]);
+        }
+
+        $startsAt = Carbon::parse($startDateStr)->startOfDay();
+        $deliveryDaysArr = array_values(array_unique(array_map('intval', (array) $deliveryDays)));
+        sort($deliveryDaysArr);
 
         $nextDeliveryAt = $this->calculateNextDeliveryAt(
-            frequency: $payload['frequency'],
+            frequency: $frequency,
             startsAt: $startsAt,
-            deliveryDays: $deliveryDays
+            deliveryDays: $deliveryDaysArr
         );
 
         $nextBillingAt = $startsAt->copy()->addMonth()->setTime(
@@ -116,32 +143,32 @@ class PlusService
             (int) config('plus.defaults.delivery_minute', 0)
         );
 
-        $subscription = DB::transaction(function () use ($user, $payload, $startsAt, $nextDeliveryAt, $nextBillingAt, $deliveryDays) {
+        $subscription = DB::transaction(function () use ($user, $frequency, $deliveryDaysArr, $startsAt, $nextDeliveryAt, $nextBillingAt, $addressId, $paymentMethodId, $autoRenew, $notes, $categoryIds) {
             $subscription = $this->plusRepository->createForUser($user, [
                 'status' => PlusSubscription::STATUS_ACTIVE,
                 'monthly_price' => (float) config('plus.pricing.monthly_price', 50),
                 'currency' => config('plus.pricing.currency', 'AED'),
-                'frequency' => $payload['frequency'],
-                'delivery_days' => $deliveryDays,
+                'frequency' => $frequency,
+                'delivery_days' => $deliveryDaysArr,
                 'starts_at' => $startsAt->toDateString(),
                 'next_delivery_at' => $nextDeliveryAt,
                 'next_billing_at' => $nextBillingAt,
                 'paused_until' => null,
                 'vacation_mode' => false,
                 'canceled_at' => null,
-                'user_address_id' => $payload['address_id'],
-                'user_payment_method_id' => $payload['payment_method_id'],
-                'auto_renew' => (bool) ($payload['auto_renew'] ?? config('plus.defaults.auto_renew', true)),
-                'notes' => $payload['notes'] ?? null,
+                'user_address_id' => $addressId,
+                'user_payment_method_id' => $paymentMethodId,
+                'auto_renew' => (bool) $autoRenew,
+                'notes' => $notes,
                 'metadata' => [
                     'source' => 'mobile_api',
-                    'category_count' => count($payload['category_ids'] ?? []),
+                    'category_count' => count($categoryIds),
                 ],
             ]);
 
             return $this->plusRepository->syncCategories(
                 $subscription,
-                $payload['category_ids'] ?? []
+                $categoryIds
             );
         });
 
