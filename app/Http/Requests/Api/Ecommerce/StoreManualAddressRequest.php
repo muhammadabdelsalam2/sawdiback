@@ -35,18 +35,29 @@ class StoreManualAddressRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        $payload = [];
+  protected function prepareForValidation(): void
+{
+    $this->merge([
+        'title' => $this->input('title', ''),
+        'label' => $this->input('label', $this->input('title', '')),
+        'address_line_1' => $this->input('street_address', ''),
 
-        if ($this->filled('title')) {
-            $payload['label'] = $this->input('title');
-        }
+        'recipient_name' => $this->input('recipient_name', ''),
+        'phone' => $this->input('phone', ''),
+        'address_line_2' => $this->input('address_line_2', ''),
+        'building' => $this->input('building', ''),
+        'floor' => $this->input('floor', ''),
+        'apartment' => $this->input('apartment', ''),
+        'landmark' => $this->input('landmark', ''),
+        'city' => $this->input('city', ''),
+        'country' => $this->input('country', ''),
+        'postal_code' => $this->input('postal_code', ''),
+        'notes' => $this->input('notes', ''),
 
-        if ($this->filled('street_address')) {
-            $payload['address_line_1'] = $this->input('street_address');
-        }
+        'latitude' => $this->input('latitude', 0),
+        'longitude' => $this->input('longitude', 0),
 
-        $this->merge($payload);
-    }
+        'is_default' => $this->boolean('is_default'),
+    ]);
+}
 }
