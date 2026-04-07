@@ -415,25 +415,25 @@ class AccountService
                 $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
 
                 $address = $user->addresses()->create([
-                    'label' => $data['label'] ?? '',
-                    'title' => $data['title'] ?? '', // ✅ أهم سطر
-                    'type' => $data['type'] ?? '',
-                    'recipient_name' => $data['recipient_name'] ?? '',
-                    'phone' => $data['phone'] ?? '',
-                    'address_line_1' => $data['address_line_1'],
-                    'address_line_2' => $data['address_line_2'] ?? '',
-                    'building' => $data['building'] ?? '',
-                    'floor' => $data['floor'] ?? '',
-                    'apartment' => $data['apartment'] ?? '',
-                    'landmark' => $data['landmark'] ?? '',
-                    'city' => $data['city'] ?? '',
-                    'country' => $data['country'] ?? '',
-                    'postal_code' => $data['postal_code'] ?? '',
-                    'notes' => $data['notes'] ?? '',
-                    'latitude' => $data['latitude'] ?? 0,
-                    'longitude' => $data['longitude'] ?? 0,
-                    'is_default' => $shouldBeDefault,
-                ]);
+    'label' => $data['label'] ?? '',
+    'title' => $data['title'] ?? '',
+    'type' => $data['type'] ?? '',
+    'recipient_name' => $data['recipient_name'] ?? '',
+    'phone' => $data['phone'] ?? '',
+    'address_line_1' => $data['address_line_1'] ?? '',
+    'address_line_2' => $data['address_line_2'] ?? '',
+    'building' => $data['building'] ?? '',
+    'floor' => $data['floor'] ?? '',
+    'apartment' => $data['apartment'] ?? '',
+    'landmark' => $data['landmark'] ?? '',
+    'city' => $data['city'] ?? '',
+    'country' => $data['country'] ?? '',
+    'postal_code' => $data['postal_code'] ?? '',
+    'notes' => $data['notes'] ?? '',
+    'latitude' => $data['latitude'] ?? null,
+    'longitude' => $data['longitude'] ?? null,
+    'is_default' => $shouldBeDefault,
+]);
 
                 if ($shouldBeDefault) {
                     $this->normalizeUserAddressDefaults($user, $address->id);
