@@ -62,8 +62,8 @@ class StoreManualAddressRequest extends FormRequest
         'country'        => '',
         'postal_code'    => '',
         'notes'          => '',
-        'latitude'       => 0,
-        'longitude'      => 0,
+        'latitude'       => null,
+        'longitude'      => null,
         'is_default'     => false,
     ];
 
