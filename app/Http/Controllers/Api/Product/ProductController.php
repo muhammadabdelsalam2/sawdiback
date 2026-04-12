@@ -99,4 +99,43 @@ class ProductController extends Controller
             code: 200
         );
     }
+
+    // Feature: Add to favorites
+    public function addToFavorites($locale, Request $request, $product)
+    {
+        $user = $request->user();
+        $favorite = $this->productService->addToFavorites($user, $product);
+        if (!$favorite['success']) {
+            return ApiResponse::error(
+                message: __('ecommerce.product.favorite_failed'),
+                code: 500
+            );
+        }
+
+
+        return ApiResponse::success(
+            message: __('ecommerce.product.favorite_added'),
+            data: $favorite['data'],
+            code: 200
+        );
+    }
+
+    // Feature: Remove from favorites
+    public function removeFromFavorites($locale, Request $request, $product)
+    {
+        $user = $request->user();
+        $result = $this->productService->removeFromFavorites($user, $product);
+        if (!$result['success']) {
+            return ApiResponse::error(
+                message: __('ecommerce.product.not_found'),
+                code: 404
+            );
+        }
+
+        return ApiResponse::success(
+            message: 'Product removed from favorites successfully.',
+            code: 200
+        );
+    }
+
 }

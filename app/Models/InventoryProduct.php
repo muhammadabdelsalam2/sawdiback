@@ -81,4 +81,15 @@ class InventoryProduct extends Model
 
         return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
     }
+
+    public function favoritedBy()
+    {
+        return $this->hasMany(FavoriteProduct::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->hasMany(FavoriteProduct::class, 'inventory_product_id');
+    }
+
 }

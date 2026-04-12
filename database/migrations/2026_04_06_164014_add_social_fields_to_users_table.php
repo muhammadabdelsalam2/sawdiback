@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumn('users', 'instagram_id')) {
-                $table->string('instagram_id')->nullable()->after('google_id');
+                $table->string('instagram_id')->nullable();
             }
             if (!Schema::hasColumn('users', 'social_avatar')) {
                 $table->string('social_avatar')->nullable()->after('instagram_id');

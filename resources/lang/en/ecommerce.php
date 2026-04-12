@@ -10,7 +10,12 @@ return [
     'product' => [
         'success' => 'Products Returned Successfully',
         'message' => 'Product details fetched successfully',
-    ],
+        'favorite_added' => 'Product added to favorites successfully.',
+        'favorite_failed' => 'Failed to add product to favorites.',
+        'already_favorite' => 'Product already in favorites.',
+        'not_found' => 'Product not found.',
+        'favorite_removed' => 'Product removed from favorites successfully.',
+        ],
 
     'cart' => [
         'success' => 'Cart loaded successfully.',

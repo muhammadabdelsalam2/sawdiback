@@ -74,9 +74,9 @@ class ProductService
         return $this->productRepository->all($perPage);
     }
 
-    public function getProductDetails( $product): array
+    public function getProductDetails($product): array
     {
-     
+
         $product = $this->productRepository->findWithDetails($product->id);
 
         if (!$product) {
@@ -92,6 +92,64 @@ class ProductService
         return ServiceResult::success(
             data: new ProductResource($product),
             message: 'Success',
+            code: 200
+        );
+    }
+
+
+
+    // Feat: Service For Add Favorite Product
+    public function addToFavorites($user, $productId): array
+    {
+        // get Product By Id
+        $product = $this->productRepository->findWithDetails($productId);
+
+
+        if (!$product) {
+            return ServiceResult::error(
+                message: __('ecommerce.product.not_found'),
+                errors: [],
+                code: 404
+            );
+        }
+
+        // Check if already in favorites
+        $existingFavorite = $user->favoriteProducts()->where('inventory_product_id', $productId)->first();
+        if ($existingFavorite) {
+
+            return ServiceResult::error(
+                message: __('ecommerce.product.already_favorite'),
+                errors: [],
+                code: 400
+            );
+        } else {
+            // Add to favorites
+            $user->favoriteProducts()->attach($productId);
+            return ServiceResult::success(
+                data: new ProductResource($product),
+                message: __('ecommerce.product.favorite_added'),
+                code: 200
+            );
+        }
+
+    }
+
+    public function removeFromFavorites($user, $productId): array
+    {
+        $favorite = $user->favoriteProducts()->where('inventory_product_id', $productId)->first();
+
+        if (!$favorite) {
+            return ServiceResult::error(
+                message: __('ecommerce.product.not_found'),
+                errors: [],
+                code: 404
+            );
+        }
+
+        $user->favoriteProducts()->detach($productId);
+
+        return ServiceResult::success(
+            message: __('ecommerce.product.favorite_removed'),
             code: 200
         );
     }

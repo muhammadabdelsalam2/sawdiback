@@ -11,6 +11,11 @@ return [
         'created' => 'تم إنشاء :resource بنجاح.',
         'updated' => 'تم تحديث :resource بنجاح.',
         'deleted' => 'تم حذف :resource بنجاح.',
+        'favorite_failed' => 'فشل في إضافة المنتج إلى المفضلة.',
+        'favorite_added' => 'تم إضافة المنتج إلى المفضلة بنجاح.',
+        'already_favorite' => 'المنتج موجود بالفعل في المفضلة.',
+        'not_found' => 'المنتج غير موجود.',
+        
     ],
     'cart' => [
         'success' => 'تم جلب السلة بنجاح.',

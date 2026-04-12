@@ -16,6 +16,10 @@ class ProductRepository implements ProductRepositoryInterface
     public function all(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = InventoryProduct::query();
+        // Apply Filters By Favorite, Search, Category, Price Range
+
+        $this->applyFavoriteFilter($query, $filters);
+
 
         $this->applyStockCalculations($query);
 
@@ -34,6 +38,19 @@ class ProductRepository implements ProductRepositoryInterface
             });
     }
 
+    /**
+     * Apply "favorites" filter if requested
+     */
+
+    private function applyFavoriteFilter(Builder $query, array $filters): void
+    {
+        if (!empty($filters['favorites']) && auth()->check()) {
+            $userId = auth()->id();
+            $query->whereHas('favoriteProducts', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+    }
     /**
      * Base filters (tenant + active + search + category + price)
      */
@@ -165,5 +182,7 @@ class ProductRepository implements ProductRepositoryInterface
             ->where('is_active', true)
             ->first();
     }
+
+
 
 }

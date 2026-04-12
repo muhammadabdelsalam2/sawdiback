@@ -152,4 +152,15 @@ class User extends Authenticatable
 
         return $default;
     }
+
+    // Feature: Favorite Products
+    public function favorites()
+    {
+        return $this->hasMany(FavoriteProduct::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(InventoryProduct::class, 'favorite_products', 'user_id', 'inventory_product_id');
+    }
 }
