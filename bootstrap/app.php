@@ -64,8 +64,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Append API error middleware
         $middleware->appendToGroup('api', [
-            ApiErrorMiddleware::class,
             SetLocaleApi::class,
+            ApiErrorMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
