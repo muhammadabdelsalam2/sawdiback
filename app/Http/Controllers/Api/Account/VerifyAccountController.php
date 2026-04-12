@@ -27,7 +27,7 @@ class VerifyAccountController extends Controller
     ) {
     }
 
-    public function verifyOtp(VerifyOtpRequest $request): JsonResponse
+    public function verifyOtp($locale, VerifyOtpRequest $request): JsonResponse
     {
         $result = $this->authService->verifyOtp(
             VerifyOtpDTO::fromRequest($request)
