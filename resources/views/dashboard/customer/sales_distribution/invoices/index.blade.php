@@ -32,7 +32,7 @@
         <table class="table align-middle no-datatable sd-export-table"
             data-export-title="{{ __('sales_dist.export.titles.invoices_index') }}"
             data-pdf-orientation="landscape" data-pdf-page-size="A4">
-            <thead><tr><th>#</th><th>{{ __('sales_dist.invoices.fields.invoice_no') }}</th><th>{{ __('sales_dist.invoices.fields.customer') }}</th><th>{{ __('sales_dist.invoices.fields.invoice_date') }}</th><th>{{ __('sales_dist.invoices.fields.status') }}</th><th>{{ __('sales_dist.invoices.fields.total') }}</th><th class="text-end no-sort no-export">{{ __('sales_dist.common.actions') }}</th></tr></thead>
+            <thead><tr><th>#</th><th>{{ __('sales_dist.invoices.fields.invoice_no') }}</th><th>{{ __('sales_dist.invoices.fields.customer') }}</th><th>{{ __('sales_dist.invoices.fields.invoice_date') }}</th><th>{{ __('sales_dist.invoices.fields.status') }}</th><th>{{ __('sales_dist.invoices.fields.tax') }}</th><th>{{ __('sales_dist.invoices.fields.total') }}</th><th class="text-end no-sort no-export">{{ __('sales_dist.common.actions') }}</th></tr></thead>
             <tbody>
             @forelse($invoices as $invoice)
                 <tr>
@@ -41,6 +41,7 @@
                     <td>{{ $invoice->customer->name }}</td>
                     <td>{{ $invoice->invoice_date?->format('Y-m-d') }}</td>
                     <td>{{ __("sales_dist.status.invoice.$invoice->status") }}</td>
+                    <td>{{ number_format($invoice->tax, 2) }}</td>
                     <td>{{ number_format($invoice->total, 2) }}</td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-info" href="{{ route('customer.sales-distribution.invoices.show', ['locale' => request()->route('locale'), 'invoice' => $invoice->id]) }}">{{ __('sales_dist.common.view') }}</a>
@@ -52,7 +53,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7" class="text-center text-muted py-4">{{ __('sales_dist.invoices.empty') }}</td></tr>
+                <tr><td colspan="8" class="text-center text-muted py-4">{{ __('sales_dist.invoices.empty') }}</td></tr>
             @endforelse
             </tbody>
         </table>

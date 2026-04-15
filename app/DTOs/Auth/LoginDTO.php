@@ -12,10 +12,8 @@ class LoginDTO
 
     public function __construct(
         string $identifier,
-        string $password
     ) {
         $this->identifier = $identifier;
-        $this->password = $password;
         $this->type = $this->detectType($identifier);
     }
 
@@ -23,7 +21,6 @@ class LoginDTO
     {
         return new self(
             identifier: $request->identifier,
-            password: $request->password,
         );
     }
 

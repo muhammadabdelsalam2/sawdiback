@@ -37,7 +37,7 @@ class OtpService
             $code = random_int(100000, 999999);
 
             //  Store new OTP in database
-         $otp =    $this->otpRepository->create([
+            $otp = $this->otpRepository->create([
                 'identifier' => $dto->identifier,
                 'code' => $code,
                 'type' => $dto->type,
@@ -56,10 +56,10 @@ class OtpService
     /**
      * Resend OTP (same logic as send)
      */
-    public function resend(SendOtpDTO $dto,$user): void
+    public function resend(SendOtpDTO $dto, $user): void
     {
         // Just call send() - it will reuse unexpired OTP if available
-        $this->send($dto,$user);
+        $this->send($dto, $user);
     }
 
     /**
@@ -71,59 +71,59 @@ class OtpService
 
 
 
-public function verify(string $identifier, string $code): Otp
-{
-    // 1. Find OTP by identifier and code
-    $otp = $this->otpRepository->findByIdentifierAndCode($identifier, $code);
+    public function verify(string $identifier, string $code): Otp
+    {
+        // 1. Find OTP by identifier and code
+        $otp = $this->otpRepository->findByIdentifierAndCode($identifier, $code);
 
-    if (!$otp) {
-        throw ValidationException::withMessages([
-            'code' => __('auth.invalid_otp'),
-        ]);
-    }
-
-    // 2. Check if already used
-    if ($otp->used_at !== null) {
-        throw ValidationException::withMessages([
-            'code' => __('auth.otp_already_used'),
-        ]);
-    }
-
-    // 3. Check expiration
-    if ($otp->expires_at->isPast()) {
-        throw ValidationException::withMessages([
-            'code' => __('auth.otp_expired'),
-        ]);
-    }
-
-    DB::transaction(function () use ($otp) {
-
-        // 4. Mark OTP as used
-        $this->otpRepository->markAsUsed($otp);
-
-        // 5. Get related user
-        $user = $otp->user;
-
-        if (!$user) {
+        if (!$otp) {
             throw ValidationException::withMessages([
-                'identifier' => __('auth.user_not_found'),
+                'code' => __('auth.invalid_otp'),
             ]);
         }
 
-        // 6. Update verification field based on OTP type
-        if ($otp->type === OtpType::VERIFY_EMAIL) {
-            $user->update([
-                'email_verified_at' => now(),
+        // 2. Check if already used
+        if ($otp->used_at !== null) {
+            throw ValidationException::withMessages([
+                'code' => __('auth.otp_already_used'),
             ]);
         }
 
-        if ($otp->type === OtpType::VERIFY_PHONE) {
-            $user->update([
-                'phone_verified_at' => now(),
+        // 3. Check expiration
+        if ($otp->expires_at->isPast()) {
+            throw ValidationException::withMessages([
+                'code' => __('auth.otp_expired'),
             ]);
         }
+
+        DB::transaction(function () use ($otp) {
+
+            // 4. Mark OTP as used
+            $this->otpRepository->markAsUsed($otp);
+
+            // 5. Get related user
+            $user = $otp->user;
+
+            if (!$user) {
+                throw ValidationException::withMessages([
+                    'identifier' => __('auth.user_not_found'),
+                ]);
+            }
+
+            // 6. Update verification field based on OTP type
+            if ($otp->type === OtpType::VERIFY_EMAIL) {
+                $user->update([
+                    'email_verified_at' => now(),
+                ]);
+            }
+
+            if ($otp->type === OtpType::VERIFY_PHONE) {
+                $user->update([
+                    'phone_verified_at' => now(),
+                ]);
+            }
         });
 
-    return $otp;
-}
+        return $otp;
+    }
 }

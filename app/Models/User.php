@@ -2,30 +2,39 @@
 
 namespace App\Models;
 
-use App\Services\PlanService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasFactory, HasApiTokens, Notifiable, HasRoles;
-protected $guard_name = 'api';
+
+    protected string $guard_name = 'web';
+
     protected $fillable = [
         'tenant_id',
         'name',
         'phone',
         'email',
         'password',
+        'avatar',
+        'preferred_language',
+        'appearance_mode',
+        'is_completed',
         'email_verified_at',
         'phone_verified_at',
         'password_reset_token',
         'password_reset_at',
+        'google_id',
+        'facebook_id',
+        'instagram_id',
+        'social_avatar',
     ];
 
     protected $hidden = [
@@ -37,6 +46,7 @@ protected $guard_name = 'api';
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
             'password_reset_at' => 'datetime',
         ];
@@ -57,12 +67,46 @@ protected $guard_name = 'api';
         return $this->hasOne(Subscription::class, 'customer_id');
     }
 
-    /**
-     * Resolve current plan features for this user.
-     * Priority:
-     * 1) subscription.plan (if exists)
-     * 2) tenant.plan (if tenant has plan_id)
-     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(UserPaymentMethod::class);
+    }
+
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(UserNotificationSetting::class);
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function orderReviews(): HasMany
+    {
+        return $this->hasMany(OrderReview::class);
+    }
+
+    public function otps(): HasMany
+    {
+        return $this->hasMany(Otp::class);
+    }
+
     public function planFeatures(): array
     {
         $this->loadMissing([
@@ -76,7 +120,6 @@ protected $guard_name = 'api';
             return [];
         }
 
-        // $plan->features ممكن تكون array (cast) أو string JSON (legacy)
         $features = $plan->features ?? [];
 
         if (!is_array($features)) {
@@ -86,30 +129,21 @@ protected $guard_name = 'api';
         return $features;
     }
 
-    /**
-     * Quick check: is feature enabled?
-     */
     public function hasPlanFeature(string $key): bool
     {
         $features = $this->planFeatures();
-
         $feature = $features[$key] ?? null;
 
         if (is_array($feature)) {
             return (bool) ($feature['enabled'] ?? false);
         }
 
-        // support boolean-style flags: "feature_key" => true
         return (bool) $feature;
     }
 
-    /**
-     * Quick read: feature value
-     */
     public function planFeatureValue(string $key, $default = null)
     {
         $features = $this->planFeatures();
-
         $feature = $features[$key] ?? null;
 
         if (is_array($feature)) {
@@ -119,9 +153,19 @@ protected $guard_name = 'api';
         return $default;
     }
 
-    public function otps()
+    // Feature: Favorite Products
+    public function favorites()
     {
-        return $this->hasMany(Otp::class);
+        return $this->hasMany(FavoriteProduct::class);
     }
-    // Is Pas
+
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(InventoryProduct::class, 'favorite_products', 'user_id', 'inventory_product_id');
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_default', true);
+    }
 }

@@ -32,6 +32,10 @@ Route::prefix('{locale}')
         Route::get('register', [LoginController::class, 'showRegister'])->name('showRegister');
         Route::post('store', [LoginController::class, 'register'])->name('auth.register');
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+        // Social Login Routes
+        Route::get('auth/{provider}/redirect', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
+        Route::get('auth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
     });
 Route::prefix('{locale}')->group(function () {
     Route::get('/terms', [PageController::class, 'terms'])->name('terms.show');

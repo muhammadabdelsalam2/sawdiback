@@ -1,6 +1,6 @@
 @extends('layouts.customer.dashboard')
 
-@section('title', 'User Management | EL-Sawady')
+@section('title', __('dashboard.users.title') . ' | EL-Sawady')
 
 @section('content')
     @php
@@ -10,11 +10,11 @@
     <div class="dashboard-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
-                <h1 class="dashboard-title mb-1">Users, Roles & Permissions</h1>
-                <p class="dashboard-desc mb-0">Manage super admins and customers from one place.</p>
+                <h1 class="dashboard-title mb-1">{{ __('dashboard.users.title') }}</h1>
+                <p class="dashboard-desc mb-0">{{ __('dashboard.users.desc') }}</p>
             </div>
             <a href="{{ route('superadmin.users.create', ['locale' => $activeLocale]) }}" class="btn btn-primary-green">
-                <i class="fa-solid fa-plus me-2"></i>Create User
+                <i class="fa-solid fa-plus me-2"></i>{{ __('dashboard.users.create') }}
             </a>
         </div>
 
@@ -31,12 +31,12 @@
                 <table class="table registry-table mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Roles</th>
-                            <th>Direct Permissions</th>
-                            <th class="text-end">Actions</th>
+                            <th>{{ __('dashboard.users.id') }}</th>
+                            <th>{{ __('dashboard.users.name') }}</th>
+                            <th>{{ __('dashboard.users.email') }}</th>
+                            <th>{{ __('dashboard.users.roles') }}</th>
+                            <th>{{ __('dashboard.users.direct_permissions') }}</th>
+                            <th class="text-end">{{ __('dashboard.users.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,34 +49,34 @@
                                     @forelse ($user->roles as $role)
                                         <span class="badge badge-lactating me-1">{{ $role->name }}</span>
                                     @empty
-                                        <span class="text-muted">No role</span>
+                                        <span class="text-muted">{{ __('dashboard.users.no_role') }}</span>
                                     @endforelse
                                 </td>
                                 <td>
                                     @forelse ($user->permissions as $permission)
                                         <span class="badge badge-dry me-1">{{ $permission->name }}</span>
                                     @empty
-                                        <span class="text-muted">No direct permission</span>
+                                        <span class="text-muted">{{ __('dashboard.users.no_direct_permission') }}</span>
                                     @endforelse
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ route('superadmin.users.edit', ['locale' => $activeLocale, 'user' => $user]) }}" class="btn btn-sm btn-outline-white me-1">
-                                        Edit
+                                        {{ __('dashboard.users.edit') }}
                                     </a>
                                     <form
                                         action="{{ route('superadmin.users.destroy', ['locale' => $activeLocale, 'user' => $user]) }}"
                                         method="POST"
                                         class="d-inline"
-                                        onsubmit="return confirm('Delete this user?');">
+                                        onsubmit="return confirm('{{ __('dashboard.users.confirm_delete') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">{{ __('dashboard.users.delete') }}</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No users found.</td>
+                                <td colspan="6" class="text-center py-4 text-muted">{{ __('dashboard.users.no_users') }}</td>
                             </tr>
                         @endforelse
                     </tbody>

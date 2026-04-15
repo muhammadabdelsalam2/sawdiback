@@ -7,7 +7,22 @@ use App\Models\SalesDistribution\SalesPayment;
 
 class NullAccountingGateway implements AccountingGateway
 {
+    public function recordInvoice(SalesInvoice $invoice): void
+    {
+        // No-op until accounting integration is available.
+    }
+
+    public function deleteInvoice(SalesInvoice $invoice): void
+    {
+        // No-op until accounting integration is available.
+    }
+
     public function recordPayment(SalesInvoice $invoice, SalesPayment $payment): void
+    {
+        // No-op until accounting integration is available.
+    }
+
+    public function deletePayment(SalesPayment $payment): void
     {
         // No-op until accounting integration is available.
     }

@@ -162,6 +162,11 @@ return [
 
     'messages' => [
         'capture_birth_event' => 'تسجيل حدث ولادة للحيوان المولود',
+        'success' => [
+            'animal_registered' => 'تم تسجيل الحيوان بنجاح.',
+            'animal_updated' => 'تم تحديث بيانات الحيوان بنجاح.',
+            'animal_status_updated' => 'تم تحديث حالة الحيوان بنجاح.',
+        ],
     ],
 
     'empty' => [

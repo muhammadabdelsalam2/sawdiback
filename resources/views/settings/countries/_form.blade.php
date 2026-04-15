@@ -1,7 +1,7 @@
 <div class="chart-card mb-4">
     <div class="row g-4">
         <div class="col-md-6">
-            <label for="name" class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+            <label for="name" class="form-label fw-semibold">{{ __('dashboard.countries.fields.name') }} <span class="text-danger">*</span></label>
             <input
                 type="text"
                 id="name"
@@ -15,7 +15,7 @@
         </div>
 
         <div class="col-md-3">
-            <label for="iso2" class="form-label fw-semibold">ISO2</label>
+            <label for="iso2" class="form-label fw-semibold">{{ __('dashboard.countries.fields.iso2') }}</label>
             <input
                 type="text"
                 id="iso2"
@@ -29,7 +29,7 @@
         </div>
 
         <div class="col-md-3">
-            <label for="iso3" class="form-label fw-semibold">ISO3</label>
+            <label for="iso3" class="form-label fw-semibold">{{ __('dashboard.countries.fields.iso3') }}</label>
             <input
                 type="text"
                 id="iso3"
@@ -43,7 +43,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="phone_code" class="form-label fw-semibold">Phone Code</label>
+            <label for="phone_code" class="form-label fw-semibold">{{ __('dashboard.countries.fields.phone_code') }}</label>
             <input
                 type="text"
                 id="phone_code"
@@ -64,7 +64,7 @@
                     value="1"
                     class="custom-checkbox"
                     {{ old('is_active', ($country->is_active ?? true)) ? 'checked' : '' }}>
-                <span class="checkbox-text">Active</span>
+                <span class="checkbox-text">{{ __('dashboard.countries.active') }}</span>
             </label>
             @error('is_active')
                 <div class="text-danger small ms-2">{{ $message }}</div>

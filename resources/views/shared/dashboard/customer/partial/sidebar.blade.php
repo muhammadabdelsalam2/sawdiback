@@ -22,15 +22,6 @@
             <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
         </a>
 
-        {{-- Subscription --}}
-        <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}"
-            class="nav-item {{ request()->routeIs('customer.subscription.*') ? 'active' : '' }}">
-            <span class="nav-icon">
-                <i class="fa-solid fa-credit-card"></i>
-            </span>
-            <span class="nav-label">My Subscription</span>
-        </a>
-
         {{-- Livestock --}}
         <div
             class="nav-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
@@ -58,13 +49,31 @@
             </div>
         </div>
 
-        {{-- Production --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        {{-- Production Dropdown (Contains Subscriptions/Plans) --}}
+        <div
+            class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-3.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.production') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.subscription.*') ? 'active' : '' }}">
+                    <i class="bi bi-credit-card me-2"></i> {{ __('dashboard.sidebar.my_subscription') }}
+                </a>
+
+                @if ($isSuperAdmin)
+                    <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
+                        <i class="bi bi-gem me-2"></i> {{ __('dashboard.sidebar.plans') }}
+                    </a>
+                    <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
+                        <i class="bi bi-arrow-repeat me-2"></i> {{ __('dashboard.sidebar.subscriptions') }}
+                    </a>
+                @endif
+            </div>
         </div>
 
         {{-- Crops & Feed --}}
@@ -90,7 +99,8 @@
 
         {{-- Inventory --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
-            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.inventory') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
@@ -100,6 +110,8 @@
                     class="dropdown-item {{ request()->routeIs('customer.inventory.index') ? 'active' : '' }}">{{ __('warehouse.titles.warehouse') }}</a>
                 <a href="{{ route('customer.inventory.products.index', ['locale' => $activeLocale]) }}"
                     class="dropdown-item {{ request()->routeIs('customer.inventory.products.*') ? 'active' : '' }}">{{ __('warehouse.titles.products') }}</a>
+                <a href="{{ route('customer.inventory.categories.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.inventory.categories.*') ? 'active' : '' }}">{{ __('warehouse.titles.categories') }}</a>
                 <a href="{{ route('customer.inventory.alerts.index', ['locale' => $activeLocale]) }}"
                     class="dropdown-item {{ request()->routeIs('customer.inventory.alerts.*') ? 'active' : '' }}">{{ __('warehouse.titles.alerts') }}</a>
                 <a href="{{ route('customer.inventory.traceability.index', ['locale' => $activeLocale]) }}"
@@ -107,9 +119,22 @@
             </div>
         </div>
 
+        {{-- E-Commerce --}}
+        <div class="nav-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
+                <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
+                <span class="nav-label">{{ __('dashboard.sidebar.ecommerce') }}</span>
+                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+            </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.ecommerce.orders.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.ecommerce.orders.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.ecommerce_orders') }}</a>
+            </div>
+        </div>
+
         {{-- Sales & Distribution --}}
-        <div
-            class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
+        <div class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
             <a href="javascript:void(0)"
                 class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
@@ -133,21 +158,53 @@
         </div>
 
         {{-- Procurement --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        <div class="nav-dropdown {{ request()->routeIs('customer.procurement.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.procurement.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-7.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.procurement') }}</span>
+                <span class="nav-label">{{ __('procurement.sidebar.title') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.procurement.suppliers.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.suppliers.*') ? 'active' : '' }}">{{ __('procurement.sidebar.suppliers') }}</a>
+                <a href="{{ route('customer.procurement.requisitions.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.requisitions.*') ? 'active' : '' }}">{{ __('procurement.sidebar.requisitions') }}</a>
+                <a href="{{ route('customer.procurement.rfqs.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.rfqs.*') ? 'active' : '' }}">{{ __('procurement.sidebar.rfqs') }}</a>
+                <a href="{{ route('customer.procurement.quotations.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.quotations.*') ? 'active' : '' }}">{{ __('procurement.sidebar.quotations') }}</a>
+                <a href="{{ route('customer.procurement.purchase-orders.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.purchase-orders.*') ? 'active' : '' }}">{{ __('procurement.sidebar.purchase_orders') }}</a>
+                <a href="{{ route('customer.procurement.goods-receipts.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.goods-receipts.*') ? 'active' : '' }}">{{ __('procurement.sidebar.goods_receipts') }}</a>
+                <a href="{{ route('customer.procurement.invoices.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.procurement.invoices.*') ? 'active' : '' }}">{{ __('procurement.sidebar.invoices') }}</a>
+            </div>
         </div>
 
         {{-- Finance --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        <div class="nav-dropdown {{ request()->routeIs('customer.finance.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.finance.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-8.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.finance') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.finance.dashboard', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.dashboard') ? 'active' : '' }}">{{ __('finance.sidebar.dashboard') }}</a>
+                <a href="{{ route('customer.finance.accounts.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.accounts.*') ? 'active' : '' }}">{{ __('finance.sidebar.accounts') }}</a>
+                <a href="{{ route('customer.finance.journal-entries.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.journal-entries.*') ? 'active' : '' }}">{{ __('finance.sidebar.journal_entries') }}</a>
+                <a href="{{ route('customer.finance.ledger.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.ledger.*') ? 'active' : '' }}">{{ __('finance.sidebar.ledger') }}</a>
+                <a href="{{ route('customer.finance.expenses.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.expenses.*') ? 'active' : '' }}">{{ __('finance.sidebar.expenses') }}</a>
+                <a href="{{ route('customer.finance.profit-loss.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.finance.profit-loss.*') ? 'active' : '' }}">{{ __('finance.sidebar.profit_loss') }}</a>
+            </div>
         </div>
 
         {{-- HR Management (Only if enabled in plan features) --}}
@@ -164,32 +221,32 @@
                 <div class="dropdown-container">
                     <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">
-                        HR Dashboard
+                        {{ __('dashboard.sidebar.hr_dashboard') }}
                     </a>
 
                     <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">
-                        Departments
+                        {{ __('dashboard.sidebar.departments') }}
                     </a>
 
                     <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">
-                        Job Titles
+                        {{ __('dashboard.sidebar.job_titles') }}
                     </a>
 
                     <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">
-                        Employees
+                        {{ __('dashboard.sidebar.employees') }}
                     </a>
 
                     <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">
-                        Attendance
+                        {{ __('dashboard.sidebar.attendance') }}
                     </a>
 
                     <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">
-                        Leave Requests
+                        {{ __('dashboard.sidebar.leave_requests') }}
                     </a>
                 </div>
             </div>
@@ -211,8 +268,9 @@
 
         @can('roles.manage')
 
+        @if ($isSuperAdmin)
             {{-- System Settings (Dropdown) --}}
-            <div class="nav-dropdown">
+            <div class="nav-dropdown {{ request()->routeIs('settings.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)"
                     class="nav-item has-dropdown {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
@@ -221,7 +279,7 @@
                 </a>
 
                 <div class="dropdown-container">
-                    <a href="{{ route('settings.countries.index', ['locale' => $activeLocale]) }}"
+                    <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}"
                         class="dropdown-item {{ request()->routeIs('settings.countries.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.countries') }}
                     </a>
@@ -235,6 +293,13 @@
                         class="dropdown-item {{ request()->routeIs('settings.theme.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.theme') }}
                     </a>
+
+                    @if ($isSuperAdmin)
+                        <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                            {{ __('dashboard.sidebar.settings.permissionsManagement') }}
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -242,10 +307,11 @@
             <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}"
                 class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">User Management</span>
+                <span class="nav-label">{{ __('dashboard.sidebar.user_management') }}</span>
             </a>
 
-        @endcan
+            @endcan
+        @endif
 
         {{-- Logout --}}
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -255,8 +321,7 @@
         </a>
 
         <!-- Hidden logout form -->
-        <form id="logout-form" action="{{ route('logout', ['locale' => $currentLocale ?? app()->getLocale()]) }}"
-            method="POST" class="d-none">
+        <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
             @csrf
         </form>
 

@@ -9,15 +9,21 @@
     </div>
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.category') }}</label>
-        <select name="category" class="form-select" required>
-            @foreach (['feed', 'vet_medicine', 'equipment', 'animal_product'] as $cat)
-                <option value="{{ $cat }}" @selected(old('category', $product->category ?? '') === $cat)>{{ __('warehouse.options.' . $cat) }}</option>
+        <select name="category_id" class="form-select" required>
+            @foreach ($categories as $category)
+                <option value="{{ $category->id }}" @selected((int) old('category_id', $product->category_id ?? 0) === $category->id)>
+                    {{ $category->name ?? $category->code }}
+                </option>
             @endforeach
         </select>
     </div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.unit') }}</label>
         <input type="text" name="unit" class="form-control" required value="{{ old('unit', $product->unit ?? '') }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ __('warehouse.fields.tax') }}</label>
+        <input type="number" step="0.01" min="0" name="tax" class="form-control" value="{{ old('tax', $product->tax ?? 0) }}">
     </div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.low_stock_threshold') }}</label>
@@ -37,9 +43,15 @@
             <label class="form-check-label" for="is_active">{{ __('warehouse.fields.active') }}</label>
         </div>
     </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="is_best_selling" value="1" id="is_best_selling"
+                @checked((bool) old('is_best_selling', $product->is_best_selling ?? false))>
+            <label class="form-check-label text-warning fw-bold" for="is_best_selling">{{ __('warehouse.fields.best_selling') ?? 'Best Selling' }}</label>
+        </div>
+    </div>
     <div class="col-12">
         <label class="form-label">{{ __('warehouse.fields.notes') }}</label>
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $product->notes ?? '') }}</textarea>
     </div>
 </div>
-

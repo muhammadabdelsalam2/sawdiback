@@ -14,12 +14,12 @@
             <div class="col-md-3">
                 <select name="customer_id" class="form-select">
                     <option value="">{{ __('sales_dist.orders.all_customers') }}</option>
-                    @foreach($customerOptions as $option)
-                        <option value="{{ $option->id }}" @selected((int) request('customer_id') === $option->id)>{{ $option->name }}</option>
+                    @foreach($customerOptions as $customer)
+                        <option value="{{ $customer->id }}" @selected((int) request('customer_id') === $customer->id)>{{ $customer->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <select name="status" class="form-select">
                     <option value="">{{ __('sales_dist.common.all_status') }}</option>
                     @foreach(['draft', 'confirmed', 'fulfilled', 'cancelled'] as $value)
@@ -29,7 +29,7 @@
             </div>
             <div class="col-md-2"><input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}" title="{{ __('sales_dist.common.date_from') }}"></div>
             <div class="col-md-2"><input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}" title="{{ __('sales_dist.common.date_to') }}"></div>
-            <div class="col-md-3 d-flex gap-2">
+            <div class="col-md-2 d-flex gap-2">
                 <button class="btn btn-outline-primary w-100">{{ __('sales_dist.common.filter') }}</button>
                 <a class="btn btn-light w-100" href="{{ route('customer.sales-distribution.orders.index', ['locale' => request()->route('locale')]) }}">{{ __('sales_dist.common.reset') }}</a>
             </div>
@@ -49,7 +49,10 @@
                     <td>{{ $order->customer->name }}</td>
                     <td>{{ $order->order_date?->format('Y-m-d') }}</td>
                     <td>{{ __("sales_dist.status.order.$order->status") }}</td>
-                    <td>{{ number_format($order->total, 2) }}</td>
+                    <td>
+                        <div>{{ __('sales_dist.orders.fields.total') }}: {{ number_format($order->total, 2) }}</div>
+                        <div class="text-muted small">{{ __('sales_dist.invoices.fields.tax') }}: {{ number_format($order->invoices_tax ?? 0, 2) }}</div>
+                    </td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-info" href="{{ route('customer.sales-distribution.orders.show', ['locale' => request()->route('locale'), 'order' => $order->id]) }}">{{ __('sales_dist.common.view') }}</a>
                         <a class="btn btn-sm btn-outline-secondary" href="{{ route('customer.sales-distribution.orders.edit', ['locale' => request()->route('locale'), 'order' => $order->id]) }}">{{ __('sales_dist.common.edit') }}</a>

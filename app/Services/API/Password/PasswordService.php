@@ -39,7 +39,7 @@ class PasswordService
         if (!$user) {
             return ServiceResult::error(
                 message: __('auth.user_not_found'),
-                nextEndpoint: route('api.auth.register'),
+                nextEndpoint: route('api.auth.register', ['locale' => Route::current()->parameter('locale')]),
                 errors: ['identifier' => __('auth.user_not_found')],
                 code: 404
             );

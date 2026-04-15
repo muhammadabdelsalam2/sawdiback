@@ -11,8 +11,10 @@ use App\Http\Controllers\Livestock\LivestockOperationsController;
 use App\Http\Controllers\Livestock\VaccineController;
 use App\Http\Controllers\CropsFeed\CropController;
 use App\Http\Controllers\CropsFeed\FeedManagementController;
+use App\Http\Controllers\Warehouse\InventoryCategoryController;
 use App\Http\Controllers\Warehouse\InventoryProductController;
 use App\Http\Controllers\Warehouse\WarehouseController;
+use App\Http\Controllers\Customer\Ecommerce\EcommerceOrderController;
 
 use App\Http\Controllers\Customer\HR\DepartmentController;
 use App\Http\Controllers\Customer\HR\JobTitleController;
@@ -26,13 +28,25 @@ use App\Http\Controllers\Customer\SalesDistribution\SalesInvoiceController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesOrderController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesPaymentController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesShipmentController;
+use App\Http\Controllers\Customer\Finance\FinanceDashboardController;
+use App\Http\Controllers\Customer\Finance\ChartOfAccountsController;
+use App\Http\Controllers\Customer\Finance\JournalEntryController;
+use App\Http\Controllers\Customer\Finance\GeneralLedgerController;
+use App\Http\Controllers\Customer\Finance\ExpenseController;
+use App\Http\Controllers\Customer\Finance\ProfitLossController;
+use App\Http\Controllers\Customer\Procurement\SupplierController;
+use App\Http\Controllers\Customer\Procurement\PurchaseRequisitionController;
+use App\Http\Controllers\Customer\Procurement\RfqController;
+use App\Http\Controllers\Customer\Procurement\QuotationController;
+use App\Http\Controllers\Customer\Procurement\PurchaseOrderController;
+use App\Http\Controllers\Customer\Procurement\GoodsReceiptController;
+use App\Http\Controllers\Customer\Procurement\PurchaseInvoiceController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
-    ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
+    ->middleware(['set.locale', 'auth', 'role:Customer'])
     ->name('customer.')
     ->group(function () {
-
         // =========================
         // Subscription (Always Allowed)
         // =========================
@@ -84,6 +98,7 @@ Route::prefix('{locale}')
         });
 
         Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::resource('categories', InventoryCategoryController::class)->except(['show']);
             Route::resource('products', InventoryProductController::class)->except(['show']);
 
             Route::get('/', [WarehouseController::class, 'index'])->name('index');
@@ -124,6 +139,45 @@ Route::prefix('{locale}')
         });
 
         // =========================
+        // Procurement
+        // =========================
+        Route::prefix('procurement')->name('procurement.')->group(function () {
+            Route::resource('suppliers', SupplierController::class)->except(['show']);
+            Route::resource('requisitions', PurchaseRequisitionController::class);
+            Route::resource('rfqs', RfqController::class);
+            Route::resource('quotations', QuotationController::class);
+            Route::resource('purchase-orders', PurchaseOrderController::class)
+                ->parameters(['purchase-orders' => 'order']);
+            Route::resource('goods-receipts', GoodsReceiptController::class)
+                ->parameters(['goods-receipts' => 'receipt']);
+            Route::resource('invoices', PurchaseInvoiceController::class);
+        });
+
+        // =========================
+        // Finance
+        // =========================
+        Route::prefix('finance')->name('finance.')->group(function () {
+            Route::get('/', [FinanceDashboardController::class, 'index'])->name('dashboard');
+
+            Route::resource('accounts', ChartOfAccountsController::class)->except(['show']);
+            Route::resource('journal-entries', JournalEntryController::class)->only(['index', 'create', 'store', 'show']);
+            Route::get('ledger', [GeneralLedgerController::class, 'index'])->name('ledger.index');
+            Route::resource('expenses', ExpenseController::class)->except(['show']);
+            Route::get('profit-loss', [ProfitLossController::class, 'index'])->name('profit-loss.index');
+        });
+
+        // =========================
+        // E-Commerce Orders (Dashboard)
+        // =========================
+        Route::prefix('ecommerce')
+            ->name('ecommerce.')
+            ->group(function () {
+                Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
+                Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
+                Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
+            });
+
+        // =========================
         // HR Management (Feature Gated)
         // =========================
         Route::prefix('hr')
@@ -131,23 +185,23 @@ Route::prefix('{locale}')
             ->middleware(['feature:hr_management'])
             ->group(function () {
 
-                Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
-                    ->name('index');
+            Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
+                ->name('index');
 
-                Route::resource('departments', DepartmentController::class)->except(['show']);
-                Route::resource('job-titles', JobTitleController::class)->except(['show']);
-                Route::resource('employees', EmployeeController::class)->except(['show']);
+            Route::resource('departments', DepartmentController::class)->except(['show']);
+            Route::resource('job-titles', JobTitleController::class)->except(['show']);
+            Route::resource('employees', EmployeeController::class)->except(['show']);
 
-                // Attendance
-                Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-                Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
-                Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
+            // Attendance
+            Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+            Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
+            Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
 
-                // Leaves
-                Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
-                Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
-                Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
-                Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
-                Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
-            });
+            // Leaves
+            Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
+            Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
+            Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
+            Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
+            Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
+        });
     });

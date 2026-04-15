@@ -43,11 +43,11 @@ class CountryController extends Controller
 
             return redirect()
                 ->route('settings.countries.index', ['locale' => $locale])
-                ->with('success', 'Country created successfully.');
+                ->with('success', __('dashboard.messages.success.country_created'));
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Failed to create country.');
+                ->with('error', __('dashboard.messages.error.failed_to_create'));
         }
     }
 
@@ -80,7 +80,7 @@ class CountryController extends Controller
 
             return redirect()
                 ->route('settings.countries.index', ['locale' => $locale])
-                ->with('success', 'Country updated successfully.');
+                ->with('success', __('dashboard.messages.success.country_updated'));
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
@@ -99,7 +99,7 @@ class CountryController extends Controller
 
             return redirect()
                 ->route('settings.countries.index', ['locale' => $locale])
-                ->with('success', 'Country deleted successfully.');
+                ->with('success', __('dashboard.messages.success.country_deleted'));
         } catch (\Throwable $e) {
             return back()->with('error', 'Failed to delete country.');
         }

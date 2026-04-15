@@ -34,7 +34,7 @@ class AccessManagementController extends Controller
 
         return redirect()
             ->route('superadmin.access-management', ['locale' => $locale])
-            ->with('success', 'Role created successfully.');
+            ->with('success', __('dashboard.messages.success.role_created'));
     }
 
     public function storePermission(Request $request, string $locale): RedirectResponse
@@ -52,7 +52,7 @@ class AccessManagementController extends Controller
 
         return redirect()
             ->route('superadmin.access-management', ['locale' => $locale])
-            ->with('success', 'Permission created successfully.');
+            ->with('success', __('dashboard.messages.success.permission_created'));
     }
 
     public function updateRolePermissions(Request $request, string $locale, Role $role): RedirectResponse
@@ -68,6 +68,6 @@ class AccessManagementController extends Controller
 
         return redirect()
             ->route('superadmin.access-management', ['locale' => $locale])
-            ->with('success', "Permissions updated for role {$role->name}.");
+            ->with('success', __('dashboard.messages.success.permissions_updated'));
     }
 }

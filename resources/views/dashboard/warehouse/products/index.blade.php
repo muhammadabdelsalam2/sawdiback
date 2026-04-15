@@ -9,7 +9,8 @@
     <div class="container py-4 livestock-page">
         <div class="page-head mb-3">
             <h2 class="page-title">{{ __('warehouse.titles.products') }}</h2>
-            <a class="btn btn-primary-green" href="{{ route('customer.inventory.products.create', ['locale' => $currentLocale]) }}">
+            <a class="btn btn-primary-green"
+                href="{{ route('customer.inventory.products.create', ['locale' => $currentLocale]) }}">
                 {{ __('warehouse.actions.add_product') }}
             </a>
         </div>
@@ -30,6 +31,7 @@
                         <th>{{ __('warehouse.fields.name') }}</th>
                         <th>{{ __('warehouse.fields.category') }}</th>
                         <th>{{ __('warehouse.fields.unit') }}</th>
+                        <th>{{ __('warehouse.fields.tax') }}</th>
                         <th>{{ __('warehouse.fields.low_stock_threshold') }}</th>
                         <th class="no-sort">{{ __('warehouse.fields.actions') }}</th>
                     </tr>
@@ -37,27 +39,39 @@
                 <tbody>
                     @forelse($rows as $row)
                         <tr>
-                            <td>{{ $row->id }}</td>
+                            <td>{{ $loop?->iteration }}</td>
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
-                            <td>{{ __('warehouse.options.' . $row->category) }}</td>
+                            <td>
+                                {{ $row->category?->name ?? ($row->getAttribute('category') ? __('warehouse.options.' . $row->getAttribute('category')) : '-') }}
+                            </td>
                             <td>{{ $row->unit }}</td>
+                            <td>{{ number_format($row->tax ?? 0, 2) }}</td>
                             <td>{{ $row->low_stock_threshold }}</td>
                             <td class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-white" href="{{ route('customer.inventory.products.edit', ['locale' => $currentLocale, 'product' => $row->id]) }}">{{ __('warehouse.actions.edit') }}</a>
-                                <form method="POST" action="{{ route('customer.inventory.products.destroy', ['locale' => $currentLocale, 'product' => $row->id]) }}">
+                                <a class="btn btn-sm btn-outline-white"
+                                    href="{{ route('customer.inventory.products.edit', ['locale' => $currentLocale, 'product' => $row->id]) }}">{{ __('warehouse.actions.edit') }}</a>
+                                <form method="POST"
+                                    action="{{ route('customer.inventory.products.destroy', ['locale' => $currentLocale, 'product' => $row->id]) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">{{ __('warehouse.actions.delete') }}</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        type="submit">{{ __('warehouse.actions.delete') }}</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7">{{ __('warehouse.empty.no_products') }}</td></tr>
+                        <tr>
+                            <td colspan="8">{{ __('warehouse.empty.no_products') }}</td>
+                        </tr>
                     @endforelse
+
+                    <!-- Placeholder rows for consistent table height -->
+
                 </tbody>
+
             </table>
         </div>
+        <div class="mt-3">{{ $rows->links('pagination::bootstrap-5') }}</div>
     </div>
 @endsection
-

@@ -74,6 +74,7 @@ class LoginController extends Controller
     */
     public function register(Request $request, string $locale)
     {
+            
         $data = $request->validate([
             'name' => ['required'],
             'email' => ['required', 'email', 'unique:users'],
@@ -84,10 +85,7 @@ class LoginController extends Controller
         $user = $this->authService->registerCustomer($data);
 
         Auth::login($user);
-
-        return redirect()->route('dashboard', [
-            'locale' => $locale
-        ]);
+        return redirect()->route('dashboard', ['locale' => $locale]);
     }
 
     public function store()

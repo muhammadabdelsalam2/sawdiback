@@ -83,7 +83,7 @@ class CityController extends Controller
 
             return redirect()
                 ->route('superadmin.setting.cities.index', ['locale' => $request->route('locale')])
-                ->with('success', 'City created successfully.');
+                ->with('success', __('dashboard.messages.success.city_created'));
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
@@ -119,7 +119,7 @@ class CityController extends Controller
 
             return redirect()
                 ->route('superadmin.setting.cities.index', ['locale' => $request->route('locale')])
-                ->with('success', 'City updated successfully.');
+                ->with('success', __('dashboard.messages.success.city_updated'));
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
@@ -137,7 +137,7 @@ class CityController extends Controller
 
             return redirect()
                 ->route('superadmin.setting.cities.index', ['locale' => $locale])
-                ->with('success', 'City deleted successfully.');
+                ->with('success', __('dashboard.messages.success.city_deleted'));
         } catch (\Throwable $e) {
             return back()->with('error', 'Failed to delete city.');
         }

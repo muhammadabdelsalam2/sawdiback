@@ -7,13 +7,16 @@
     @endphp
 
     <nav class="sidebar-nav mt-4">
+
+        {{-- Dashboard --}}
         <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}"
             class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
             <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
             <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
         </a>
 
-        <div class="nav-dropdown">
+        {{-- Livestock --}}
+        <div class="nav-dropdown {{ request()->routeIs('customer.livestock.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-2.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.livestock') }}</span>
@@ -37,81 +40,71 @@
             </div>
         </div>
 
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
+        {{-- Production Dropdown (Contains Subscriptions/Plans) --}}
+        <div
+            class="nav-dropdown {{ request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-3.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.production') }}</span>
                 <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
             </a>
+            <div class="dropdown-container">
+                <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
+                    <i class="bi bi-gem me-2"></i> {{ __('dashboard.sidebar.plans') }}
+                </a>
+                <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
+                    <i class="bi bi-arrow-repeat me-2"></i> {{ __('dashboard.sidebar.subscriptions') }}
+                </a>
+            </div>
         </div>
-
-        @role('SuperAdmin')
-        <div class="nav-dropdown">
-            <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}"
-                class="nav-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">
-                <i class="bi bi-gem nav-icon"></i>
-                <span class="nav-label">{{ __('dashboard.sidebar.plans') }}</span>
-            </a>
-        </div>
-
-        <div class="nav-dropdown">
-            <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}"
-                class="nav-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
-                <i class="bi bi-arrow-repeat nav-icon"></i>
-                <span class="nav-label">{{ __('dashboard.sidebar.subscriptions') }}</span>
-            </a>
-        </div>
-        @endrole
 
         <div class="sidebar-bottom">
 
-
             @can('roles.manage')
 
-
+                {{-- System Settings (Dropdown) --}}
                 <div
-                    class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
-
+                    class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
                     <a href="javascript:void(0)"
-                        class="nav-item has-dropdown {{request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                        class="nav-item has-dropdown {{request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                         <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
                         <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
                         <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
                     </a>
 
-                    <div
-                        class="dropdown-container {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('setting.*') || request()->routeIs('superadmin.access-management') ? 'show' : '' }}">
-
-                        <a href="{{ route('superadmin.setting.countries.index', ['locale' => $currentLocale]) }}"
+                    <div class="dropdown-container">
+                        <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}"
                             class="dropdown-item {{ request()->routeIs('superadmin.setting.countries.*') ? 'active' : '' }}">
                             {{ __('dashboard.sidebar.countries') }}
                         </a>
 
-                        <a href="{{ route('superadmin.setting.cities.index', ['locale' => $currentLocale]) }}"
+                        <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}"
                             class="dropdown-item {{ request()->routeIs('superadmin.setting.cities.*') ? 'active' : '' }}">
                             {{ __('dashboard.sidebar.cities') }}
                         </a>
-
-                        <a href="{{ route('superadmin.setting.theme.index', ['locale' => $currentLocale]) }}"
-                            class="dropdown-item {{ request()->routeIs('superadmin.setting.theme.*') ? 'active' : '' }}">
-                            {{ __('dashboard.sidebar.theme') }}
-                        </a>
-
                         @can('roles.manage')
-                            <a href="{{ route('superadmin.access-management', ['locale' => $currentLocale]) }}"
-                                class="nav-item w-100 {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
-                                {{ __('dashboard.sidebar.settings.permissionsManagement') }}
+                            <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}"
+                                class="dropdown-item {{ request()->routeIs('superadmin.setting.theme.*') ? 'active' : '' }}">
+                                {{ __('dashboard.sidebar.theme') }}
                             </a>
                         @endcan
 
+                        @can('roles.manage')
+                            <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"
+                                class="dropdown-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                                {{ __('dashboard.sidebar.settings.permissionsManagement') }}
+                            </a>
+                        @endcan
                     </div>
                 </div>
 
                 {{-- User Management --}}
-                <a href="{{ route('superadmin.users.index', ['locale' => $currentLocale]) }}"
+                <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}"
                     class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">User Management</span>
+                    <span class="nav-label">{{ __('dashboard.sidebar.user_management') }}</span>
                 </a>
 
             @endcan

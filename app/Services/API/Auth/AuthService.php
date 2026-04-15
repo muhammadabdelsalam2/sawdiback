@@ -67,17 +67,14 @@ class AuthService
         //     );
         // }
 
-        //  Check password
-        if (!Hash::check($dto->password, $user->password)) {
-            return ServiceResult::error(
-                message: __('auth.invalid_password'),
-                nextEndpoint: null,
-                errors: ['password' => __('auth.invalid_password')],
-                code: 422
-            );
-        }
+        // Send OTP for login verification
+        $otpDto = new SendOtpDTO(
+            $dto->identifier, // identifier
+            OtpType::LOGIN   // type
+        );
+        $otp = $this->otpService->send($otpDto, $user);
 
-        // 🔎 Determine login type (email or phone)
+        // Determine login type (email or phone)
         $identifier = $dto->identifier;
 
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
@@ -106,8 +103,13 @@ class AuthService
         // ✅ Everything is valid → Create token
         $tokenResponse = $this->createTokenResponse($user);
 
+        $otpData = $otp->only([
+            'identifier',
+            'code',
+            'type'
+        ]);
         return ServiceResult::success(
-            data: $tokenResponse ?? null,
+            data: $otpData,
             message: __('auth.login_success'),
             code: 200
         );
@@ -129,10 +131,8 @@ class AuthService
 
         // Create user but do NOT activate yet (optional)
         $user = $this->userRepository->create([
-            'name' => $dto->name,
             'email' => $dto->email,
             'phone' => $dto->phone,
-            'password' => Hash::make($dto->password),
             // optionally add 'is_active' => false
         ]);
 
@@ -147,13 +147,13 @@ class AuthService
         );
 
         // Send OTP via OtpService
-        $otp = $this->otpService->send($otpDto,$user);
+        $otp = $this->otpService->send($otpDto, $user);
 
 
         return ServiceResult::success(
             data: $otp,
             message: __('auth.otp_sent'),
-            nextEndpoint: route('api.account.verifyOtp'),
+            nextEndpoint: route('api.account.verifyOtp', ['locale' => app()->getLocale()]),
             code: 200
         );
 
@@ -169,10 +169,8 @@ class AuthService
         return DB::transaction(function () use ($dto) {
 
             $user = $this->userRepository->create([
-                'name' => $dto->name,
                 'email' => $dto->email,
                 'phone' => $dto->phone,
-                'password' => Hash::make($dto->password),
             ]);
 
             $user->assignRole('SuperAdmin');
@@ -189,46 +187,90 @@ class AuthService
     public function socialLogin(SocialLoginDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
+            // Map provider to database column
+            $providerColumn = match ($dto->provider) {
+                'google' => 'google_id',
+                'facebook' => 'facebook_id',
+                'instagram' => 'instagram_id',
+                default => throw new \Exception(__('auth.provider_not_supported')),
+            };
 
-            $user = $this->userRepository
-                ->findByProvider(
-                    $dto->provider,
-                    $dto->providerId
-                );
+            // 1. Try to find user by social ID
+            $user = User::where($providerColumn, $dto->providerId)->first();
 
             if (!$user) {
-
-                // check email exists
+                // 2. Try to find user by email
                 if ($dto->email) {
-                    $user = $this->userRepository
-                        ->findByEmail($dto->email);
+                    $user = User::where('email', $dto->email)->first();
                 }
 
                 if (!$user) {
-
-                    $user = $this->userRepository->create([
-                        'name' => $dto->name,
+                    // 3. Create new user
+                    $user = User::create([
+                        'name' => $dto->name ?? 'User',
                         'email' => $dto->email,
-                        'provider' => $dto->provider,
-                        'provider_id' => $dto->providerId,
-                        'avatar' => $dto->avatar,
+                        $providerColumn => $dto->providerId,
+                        'social_avatar' => $dto->avatar,
+                        'email_verified_at' => now(),
+                        'is_completed' => true,
+                        // Generate a random password since it's social login
+                        'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(24)),
                     ]);
 
-                    $user->assignRole('Client');
-
+                    $user->assignRole('Client'); // Use 'Client' for social login to keep everything consistent
                 } else {
-
+                    // 4. Update existing user with social info
                     $user->update([
-                        'provider' => $dto->provider,
-                        'provider_id' => $dto->providerId,
-                        'avatar' => $dto->avatar,
+                        $providerColumn => $dto->providerId,
+                        'social_avatar' => $dto->avatar,
                     ]);
-
                 }
             }
 
             return $this->createTokenResponse($user);
         });
+    }
+
+    /**
+     * Link a social account to an existing user.
+     */
+    public function socialLink(User $user, SocialLoginDTO $dto): bool
+    {
+        $providerColumn = match ($dto->provider) {
+            'google' => 'google_id',
+            'facebook' => 'facebook_id',
+            'instagram' => 'instagram_id',
+            default => throw new \Exception(__('auth.provider_not_supported')),
+        };
+
+        // Check if this social ID is already linked to another user
+        if (User::where($providerColumn, $dto->providerId)->where('id', '!=', $user->id)->exists()) {
+            throw ValidationException::withMessages([
+                'provider' => __('auth.social_account_already_linked'),
+            ]);
+        }
+
+        return $user->update([
+            $providerColumn => $dto->providerId,
+            'social_avatar' => $dto->avatar,
+        ]);
+    }
+
+    /**
+     * Unlink a social account from a user.
+     */
+    public function socialUnlink(User $user, string $provider): bool
+    {
+        $providerColumn = match ($provider) {
+            'google' => 'google_id',
+            'facebook' => 'facebook_id',
+            'instagram' => 'instagram_id',
+            default => throw new \Exception(__('auth.provider_not_supported')),
+        };
+
+        return $user->update([
+            $providerColumn => null,
+        ]);
     }
 
     /*
@@ -311,30 +353,66 @@ class AuthService
         // Use type directly from OTP
         switch ($otp->type) {
             case 'register':
-                $this->userRepository->update($user, [
-                    'email_verified_at' => now(),
+                $updateData = [
                     'is_active' => true,
-                ]);
+                ];
+                // Detect identifier type (email or phone)
+                if (filter_var($dto->identifier, FILTER_VALIDATE_EMAIL)) {
+                    $updateData['email_verified_at'] = now();
+                } else {
+                    $updateData['phone_verified_at'] = now();
+                }
+
+                $this->userRepository->update($user, $updateData);
+                $token = $this->createTokenResponse($user);
+
+                $message = __('auth.account_verified');
+
                 break;
             case 'verify_email':
+                $token = $this->createTokenResponse($user);
+
                 $this->userRepository->update($user, [
                     'email_verified_at' => now(),
                 ]);
+                $message = __('auth.email_verified');
+                break;
+            case 'verify_phone':
+                $token = $this->createTokenResponse($user);
+
+                $this->userRepository->update($user, [
+                    'phone_verified_at' => now(),
+                ]);
+                $message = __('auth.phone_verified');
+                break;
+                $this->userRepository->update($user, [
+                    'email_verified_at' => now(),
+                ]);
+                $message = __('auth.email_verified');
                 break;
 
             case 'forgot_password':
                 // Allow password reset
+                $message = __('auth.otp_verified');
                 break;
 
             case 'login':
                 // Maybe generate token
+                $token = $this->createTokenResponse($user);
+
+                $message = __('auth.login_success');
                 break;
+            default:
+                $message = __('auth.otp_verified');
         }
 
         return ServiceResult::success(
-            data: $user,
-            message: __('auth.account_verified'),
-            nextEndpoint: route('api.account.verifyOtp'),
+            data: [
+                'user' => $user->toArray() ?? null,
+                'token' => $token['token'] ?? null
+            ],
+            message: $message,
+            nextEndpoint: route('api.account.verifyOtp', ['locale' => app()->getLocale()]),
             code: 200
         );
     }

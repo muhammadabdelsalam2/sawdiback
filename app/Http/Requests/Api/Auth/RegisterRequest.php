@@ -22,12 +22,12 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:users,name',
-            ],
+            // 'name' => [
+            //     'required',
+            //     'string',
+            //     'max:255',
+            //     'unique:users,name',
+            // ],
             'email' => [
                 'sometimes',
                 'email',
@@ -42,19 +42,19 @@ class RegisterRequest extends FormRequest
                 'unique:users,phone',
             ],
 
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed', // important
-            ],
+            // 'password' => [
+            //     'required',
+            //     'string',
+            //     'min:8',
+            //     'confirmed', // important
+            // ],
 
-            'password_confirmation' => [
-                'required',
-                'string',
-                'min:8',
-            ],
-            // Terms And Conditions 
+            // 'password_confirmation' => [
+            //     'required',
+            //     'string',
+            //     'min:8',
+            // ],
+            // Terms And Conditions
              'terms_conditions' => 'accepted|boolean|in:1|required',
         ];
     }

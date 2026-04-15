@@ -51,6 +51,7 @@ class SalesPaymentService
             $invoice = $payment->invoice()->firstOrFail();
             $deleted = $this->payments->delete($payment);
             $this->syncInvoiceStatus($invoice);
+            $this->accountingGateway->deletePayment($payment);
 
             return $deleted;
         });

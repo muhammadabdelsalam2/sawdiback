@@ -127,7 +127,6 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'otp_sent' => 'OTP has been sent successfully.',
     // 'otp_verified' => 'OTP verified successfully.',
     'invalid_otp' => 'Invalid or expired OTP code.',
     'otp_expired' => 'OTP has expired.',
@@ -158,4 +157,8 @@ return [
     'password_reset_token_expired' => 'Password reset token has expired. Please request a new one.',
     'otp_not_verified' => 'OTP has not been verified. Please verify OTP before resetting password.',
     'invalid_password_reset_token' => 'Invalid password reset token.',
+    'unauthenticated' => 'You are not authenticated. Please login and try again.',
+    'social_login_divider' => 'OR LOGIN WITH',
+    'social_login_failed' => 'Social login failed. Please try again.',
+    'social_account_already_linked' => 'This social account is already linked to another user.',
 ];

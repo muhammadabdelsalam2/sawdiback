@@ -7,7 +7,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-
 class ApiErrorMiddleware
 {
     /**
@@ -15,7 +14,7 @@ class ApiErrorMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, Closure $next)
     {
         try {
             $request->headers->set('Accept', 'application/json');
@@ -28,6 +27,5 @@ class ApiErrorMiddleware
                 500
             );
         }
-        // return $next($request);
     }
 }

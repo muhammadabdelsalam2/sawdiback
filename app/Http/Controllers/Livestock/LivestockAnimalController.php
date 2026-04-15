@@ -49,7 +49,7 @@ class LivestockAnimalController extends Controller
 
         return redirect()
             ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
-            ->with('success', 'Animal registered successfully.');
+            ->with('success', __('livestock.messages.success.animal_registered'));
     }
 
     public function show(string $locale, LivestockAnimal $animal): View
@@ -89,7 +89,7 @@ class LivestockAnimalController extends Controller
 
         return redirect()
             ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
-            ->with('success', 'Animal updated successfully.');
+            ->with('success', __('livestock.messages.success.animal_updated'));
     }
 
     public function changeStatus(AnimalStatusChangeRequest $request, string $locale, LivestockAnimal $animal): RedirectResponse
@@ -98,6 +98,6 @@ class LivestockAnimalController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Animal status updated successfully.');
+            ->with('success', __('livestock.messages.success.animal_status_updated'));
     }
 }

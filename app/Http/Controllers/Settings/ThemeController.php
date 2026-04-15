@@ -51,7 +51,7 @@ class ThemeController extends Controller
 
             return redirect()
                 ->route('superadmin.setting.theme.edit', ['locale' => $request->route('locale')])
-                ->with('success', 'Theme settings updated successfully.');
+                ->with('success', __('dashboard.messages.success.theme_updated'));
         } catch (\Throwable $e) {
             return back()
                 ->withInput()

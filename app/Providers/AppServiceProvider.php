@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Services\PlanFeatureService;
 use App\Services\SalesDistribution\Accounting\AccountingGateway;
-use App\Services\SalesDistribution\Accounting\NullAccountingGateway;
+use App\Services\Finance\Accounting\FinanceAccountingGateway;
 
 // Plan Repo
 use App\Repositories\Contracts\PlanRepositoryInterface;
@@ -33,15 +33,21 @@ use App\Repositories\LeaveRepository;
 use App\Repositories\AttendanceRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
+use Illuminate\Support\Facades\Gate;
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(AccountingGateway::class, NullAccountingGateway::class);
+        $this->app->bind(AccountingGateway::class, FinanceAccountingGateway::class);
     }
 
     public function boot(): void
     {
+        // ✅ SuperAdmin Bypass
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('SuperAdmin') ? true : null;
+        });
 
         View::composer('*', function ($view) {
             $lang = session('locale', 'en');
@@ -68,5 +74,10 @@ class AppServiceProvider extends ServiceProvider
         Tenant::observe(TenantObserver::class);
        User::observe(UserObserver::class);
 
+        // ✅ Register Socialite Providers
+        \Illuminate\Support\Facades\Event::listen(
+            \SocialiteProviders\Manager\SocialiteWasCalled::class,
+            [\SocialiteProviders\Instagram\InstagramExtendSocialite::class, 'handle']
+        );
     }
 }

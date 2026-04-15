@@ -1,6 +1,6 @@
 @extends('layouts.customer.dashboard')
 
-@section('title', 'Create Country | EL-Sawady')
+@section('title', __('dashboard.countries.create') . ' | EL-Sawady')
 
 @section('content')
     @php
@@ -10,8 +10,8 @@
     <div class="dashboard-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
-                <h1 class="dashboard-title mb-1">Create Country</h1>
-                <p class="dashboard-desc mb-0">Add a new country.</p>
+                <h1 class="dashboard-title mb-1">{{ __('dashboard.countries.create') }}</h1>
+                <p class="dashboard-desc mb-0">{{ __('dashboard.countries.add_new_country') }}</p>
             </div>
         </div>
 
@@ -22,8 +22,8 @@
             @include('superadmin.setting.countries._form', ['country' => null])
 
             <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="btn btn-primary-green">Save</button>
-                <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">Cancel</a>
+                <button type="submit" class="btn btn-primary-green">{{ __('dashboard.countries.save') }}</button>
+                <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}" class="btn btn-outline-white">{{ __('dashboard.countries.cancel') }}</a>
             </div>
         </form>
     </div>

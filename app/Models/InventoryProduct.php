@@ -11,29 +11,42 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InventoryProduct extends Model
 {
     use HasFactory;
-    use ScopedByTenant;
+    // use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'code',
         'name',
+        'image',
         'category',
+        'category_id',
         'unit',
+        'tax',
         'track_expiry',
         'low_stock_threshold',
         'is_active',
+        'is_best_selling',
         'notes',
     ];
 
     protected $casts = [
         'track_expiry' => 'boolean',
         'is_active' => 'boolean',
+        'is_best_selling' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
+        'tax' => 'decimal:2',
     ];
+
+    protected $append = ['image_url'];
 
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function batches(): HasMany
@@ -55,5 +68,28 @@ class InventoryProduct extends Model
     {
         return $this->hasMany(InventoryDeliveryItem::class);
     }
-}
 
+    public function getImageUrlAttribute(): string
+    {
+        // لو فيه صورة مرفوعة
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+
+        // ✅ Dynamic image باسم المنتج (API جاهز)
+        $name = urlencode($this->name);
+
+        return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
+    }
+
+    public function favoritedBy()
+    {
+        return $this->hasMany(FavoriteProduct::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->hasMany(FavoriteProduct::class, 'inventory_product_id');
+    }
+
+}
