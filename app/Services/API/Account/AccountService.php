@@ -87,7 +87,7 @@ class AccountService
             ];
         }
 
-        $user->loadMissing(['addresses', 'paymentMethods', 'notificationSetting']);
+        $user->loadMissing(['addresses', 'paymentMethods', 'notificationSetting', 'defaultAddress']);
         $user->refresh();
 
         $user->setAttribute('current_locale', $locale);
@@ -402,78 +402,78 @@ class AccountService
         ];
     }
 
-   public function storeAddress(array $data): array
-{
-    $user = $this->authenticatedUser();
+    public function storeAddress(array $data): array
+    {
+        $user = $this->authenticatedUser();
 
-    if (!$user) {
-        return $this->userNotFoundResponse();
-    }
-
-    try {
-        DB::beginTransaction();
-
-        $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
-
-      // 🔥 أول حاجة ننضف الداتا
-$data = array_map(function ($value) {
-    return $value === "" ? null : $value;
-}, $data);
-
-// 👇 بعد كده نعمل create
-$address = $user->addresses()->create([
-    'label' => $data['label'] ?? $data['type'] ?? 'Home',
-    'title' => $data['title'] ?? $data['label'] ?? 'Home',
-    'type' => $data['type'] ?? 'home',
-    'recipient_name' => $data['recipient_name'] ?? 'Unknown',
-    'phone' => $data['phone'] ?? '0000000000',
-    'address_line_1' => $data['address_line_1'] ?? '',
-    'address_line_2' => $data['address_line_2'] ?? '',
-    'building' => $data['building'] ?? '',
-    'floor' => $data['floor'] ?? '',
-    'apartment' => $data['apartment'] ?? '',
-    'landmark' => $data['landmark'] ?? '',
-    'city' => $data['city'] ?? '',
-    'country' => $data['country'] ?? '',
-    'postal_code' => $data['postal_code'] ?? '',
-    'notes' => $data['notes'] ?? '',
-    'latitude' => $data['latitude'] ?? null,
-    'longitude' => $data['longitude'] ?? null,
-    'is_default' => $shouldBeDefault,
-]);
-
-        if (!$address) {
-            throw new \Exception('Address not created');
+        if (!$user) {
+            return $this->userNotFoundResponse();
         }
 
-        if ($shouldBeDefault) {
-            $this->normalizeUserAddressDefaults($user, $address->id);
-        } else {
-            $this->normalizeUserAddressDefaults($user);
+        try {
+            DB::beginTransaction();
+
+            $shouldBeDefault = !empty($data['is_default']) || !$user->addresses()->exists();
+
+            // 🔥 أول حاجة ننضف الداتا
+            $data = array_map(function ($value) {
+                return $value === "" ? null : $value;
+            }, $data);
+
+            // 👇 بعد كده نعمل create
+            $address = $user->addresses()->create([
+                'label' => $data['label'] ?? $data['type'] ?? 'Home',
+                'title' => $data['title'] ?? $data['label'] ?? 'Home',
+                'type' => $data['type'] ?? 'home',
+                'recipient_name' => $data['recipient_name'] ?? 'Unknown',
+                'phone' => $data['phone'] ?? '0000000000',
+                'address_line_1' => $data['address_line_1'] ?? '',
+                'address_line_2' => $data['address_line_2'] ?? '',
+                'building' => $data['building'] ?? '',
+                'floor' => $data['floor'] ?? '',
+                'apartment' => $data['apartment'] ?? '',
+                'landmark' => $data['landmark'] ?? '',
+                'city' => $data['city'] ?? '',
+                'country' => $data['country'] ?? '',
+                'postal_code' => $data['postal_code'] ?? '',
+                'notes' => $data['notes'] ?? '',
+                'latitude' => $data['latitude'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+                'is_default' => $shouldBeDefault,
+            ]);
+
+            if (!$address) {
+                throw new \Exception('Address not created');
+            }
+
+            if ($shouldBeDefault) {
+                $this->normalizeUserAddressDefaults($user, $address->id);
+            } else {
+                $this->normalizeUserAddressDefaults($user);
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'message' => 'Address added successfully.',
+                'data' => $this->addressBookPayload($user->fresh()),
+                'code' => 201,
+            ];
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            // 👇 أهم سطرين
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(), // optional
+                'code' => 500,
+            ];
         }
-
-        DB::commit();
-
-        return [
-            'success' => true,
-            'message' => 'Address added successfully.',
-            'data' => $this->addressBookPayload($user->fresh()),
-            'code' => 201,
-        ];
-
-    } catch (\Throwable $e) {
-
-        DB::rollBack();
-
-        // 👇 أهم سطرين
-        return [
-            'success' => false,
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(), // optional
-            'code' => 500,
-        ];
     }
-}
 
     public function updateAddress(UserAddress $address, array $data): array
     {

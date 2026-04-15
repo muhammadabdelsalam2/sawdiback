@@ -163,4 +163,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(InventoryProduct::class, 'favorite_products', 'user_id', 'inventory_product_id');
     }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_default', true);
+    }
 }

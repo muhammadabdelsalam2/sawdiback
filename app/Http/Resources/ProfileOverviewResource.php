@@ -51,6 +51,9 @@ class ProfileOverviewResource extends JsonResource
                 'is_completed' => (bool) $this->is_completed,
             ],
 
+            // Feature Add Location 
+            'location' => new AddressResource($this->defaultAddress),
+
             'personal_information' => [
                 'phone' => $this->phone,
                 'email' => $this->email,
