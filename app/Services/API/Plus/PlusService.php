@@ -362,6 +362,8 @@ class PlusService
                     ]);
                 }
 
+                $currentNextDelivery = $this->resolveNextEligibleDeliveryDate($subscription);
+
                 $this->plusRepository->createSkip($subscription, [
                     'action' => PlusSubscriptionSkip::ACTION_SKIP_ONCE,
                     'scheduled_for' => $nextDelivery->toDateString(),
@@ -374,14 +376,20 @@ class PlusService
                     ],
                 ]);
 
-                $newNext = $this->calculateNextEligibleDeliveryFromDate(
-                    $subscription,
-                    $nextDelivery->copy()->addDay()
-                );
+                $shouldAdvanceNextDelivery =
+                    $currentNextDelivery &&
+                    $currentNextDelivery->copy()->startOfDay()->equalTo($nextDelivery->copy()->startOfDay());
 
-                $subscription = $this->plusRepository->update($subscription, [
-                    'next_delivery_at' => $newNext,
-                ]);
+                if ($shouldAdvanceNextDelivery) {
+                    $newNext = $this->calculateNextEligibleDeliveryFromDate(
+                        $subscription,
+                        $nextDelivery->copy()->addDay()->startOfDay()
+                    );
+
+                    $subscription = $this->plusRepository->update($subscription, [
+                        'next_delivery_at' => $newNext,
+                    ]);
+                }
             }
 
             if ($payload['action'] === 'pause') {
