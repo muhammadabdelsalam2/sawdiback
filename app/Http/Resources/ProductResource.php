@@ -29,7 +29,8 @@ class ProductResource extends JsonResource
             'unit_tax' => (float) ($this->tax ?? 0),
             'description' => $this->notes,
             'available_quantity' => (int) ($this->available_quantity ?? 0),
-
+            'is_favorite' => $this->favoriteProducts->contains('inventory_product_id',$this->id) ? true : false,
+            'favorite_count' => $this->favoriteProducts->count(),
             'is_active' => (bool) $this->is_active,
             'track_expiry' => (bool) $this->track_expiry,
             'is_best_selling' => (bool) $this->is_best_selling,
