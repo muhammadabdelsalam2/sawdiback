@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
 use App\Http\Controllers\Api\Product\ProductController;
+use App\Http\Controllers\Api\Setting\SupportController;
 
 Route::prefix('v1/{locale}')
     ->middleware(['auth:sanctum', 'role:Client'])
@@ -152,4 +153,18 @@ Route::prefix('v1/{locale}')
 
             Route::post('/skip', 'skip')->name('skip');
         });
+
+        // Setting Support Routes
+        Route::prefix('support')
+            ->name('support.')
+            ->controller(SupportController::class)
+            ->group(function () {
+            Route::get('/', 'index')->name('index');
+
+            // Support Items Get Values 
+            Route::get('/{supportItem}/value', 'getValue')->name('value');
+            
+        });
+
+
     });
