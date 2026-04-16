@@ -40,7 +40,7 @@ class SupportItemResource extends JsonResource
             return $this->value;
         }
 
-        $params = json_decode($this->meta, true) ?? [];
+
 
         // inject locale dynamically
         $params['locale'] = request('locale');

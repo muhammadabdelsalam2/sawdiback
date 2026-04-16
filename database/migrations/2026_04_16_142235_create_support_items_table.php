@@ -15,10 +15,11 @@ return new class extends Migration {
             $table->string('title');
             $table->string('subtitle')->nullable();
             $table->string('icon')->nullable();
-            $table->string('type'); // link, route, action
             $table->string('value')->nullable(); // url or route name
             $table->integer('order')->default(0);
-            $table->enum('module', ['FAQS','CONTACT_US','TERMS_POLICIES', 'HELP_CENTER','GENERAL'])->default('GENERAL'); // for categorization
+            $table->json('screen_config')->nullable();
+            $table->json('meta')->nullable(); // for any additional data needed for dynamic behavior
+            $table->enum('module', ['FAQS', 'CONTACT_US', 'TERMS_POLICIES', 'HELP_CENTER', 'GENERAL'])->default('GENERAL'); // for categorization
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

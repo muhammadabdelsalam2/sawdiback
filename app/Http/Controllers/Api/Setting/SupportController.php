@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SupportItemResource;
+use App\Models\SupportItem;
 use App\Services\API\Setting\SupportService;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,7 @@ class SupportController extends Controller
 
     public function index()
     {
-        
+
         $items = $this->service->getSupportItems();
 
         return SupportItemResource::collection($items);
@@ -27,7 +28,7 @@ class SupportController extends Controller
     public function helpCenter()
     {
         $items = $this->service->getSupportItemtemsgetBymodule('HELP_CENTER');
-            
+
         return SupportItemResource::collection($items);
     }
 
@@ -51,6 +52,12 @@ class SupportController extends Controller
 
         return SupportItemResource::collection($items);
     }
+    public function getValue($locale ,SupportItem $supportItem)
+    {   
+        return response()->json(
+            $this->service->resolve($supportItem->id)
+        );
+    }
 
-    
+
 }

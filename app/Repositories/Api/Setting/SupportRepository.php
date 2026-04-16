@@ -21,4 +21,12 @@ class SupportRepository implements SupportRepositoryInterface
             ->where('module', $module)
             ->get();
     }
+
+    public function find(int $id): ?SupportItem
+    {
+        $item = SupportItem::active()
+            ->ordered()
+            ->find($id);
+        return $item;
+    }
 }
