@@ -26,7 +26,7 @@ Route::prefix('v1/{locale}')->group(function () {
     | Routes for authentication and account verification for guests.
     */
     Route::prefix('auth')
-        ->middleware(['guest:sanctum', 'throttle:10,1', 'api.error','SetLocaleApi'])
+        ->middleware(['guest:sanctum', 'throttle:10,1', 'api.error'])
         ->controller(AuthController::class)
         ->group(function () {
             Route::post('login', 'login')->name('api.auth.login');

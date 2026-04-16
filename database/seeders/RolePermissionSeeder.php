@@ -52,7 +52,7 @@ class RolePermissionSeeder extends Seeder
 
         $clientRole = Role::firstOrCreate([
             'name' => 'Client',
-            'guard_name' => 'api',
+            'guard_name' => 'web',
         ]);
 
         // Customer gets everything for now to make sure the demo works perfectly
