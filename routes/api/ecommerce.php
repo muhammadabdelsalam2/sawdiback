@@ -160,6 +160,11 @@ Route::prefix('v1/{locale}')
             ->controller(SupportController::class)
             ->group(function () {
             Route::get('/', 'index')->name('index');
+            // fqs, contact us, terms & policies can be filtered by type in the index method using query parameters, so no need for separate endpoints
+            Route::get('help-center', 'helpCenter')->name('help_center');
+            Route::get('fqs', 'fqs')->name('fqs');
+            Route::get('contact-us', 'contactUs')->name('contact_us');
+            Route::get('terms-policies', 'termsPolicies')->name('terms_policies');
 
             // Support Items Get Values 
             Route::get('/{supportItem}/value', 'getValue')->name('value');

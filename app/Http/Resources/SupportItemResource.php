@@ -22,15 +22,11 @@ class SupportItemResource extends JsonResource
             'title' => $this->title,
             'subtitle' => $this->subtitle,
             'icon' => $this->icon,
-
+            'module' => $this->module, // for categorization
             // Behavior config (important for frontend)
             'type' => $this->type,        // route | link | action
-            // 'route' => $this->value,       // route name or URL
-            // 'params' => $this->meta ?? [],  // dynamic parameters
-
             // Final resolved action (ready to use)
             'action' => $this->resolveAction(),
-
             // UI ترتيب
             'order' => $this->order,
         ];

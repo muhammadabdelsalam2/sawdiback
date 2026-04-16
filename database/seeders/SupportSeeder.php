@@ -23,6 +23,7 @@ class SupportSeeder extends Seeder
                 'type' => 'route',
                 'value' => 'support.value', // route name
                 'order' => 1,
+                'module' => 'HELP_CENTER',
                 'is_active' => true,
             ],
             [
@@ -32,6 +33,7 @@ class SupportSeeder extends Seeder
                 'type' => 'route',
                 'value' => 'support.value',
                 'order' => 2,
+                'module' => 'FAQS',
                 'is_active' => true,
             ],
             [
@@ -41,6 +43,7 @@ class SupportSeeder extends Seeder
                 'type' => 'route',
                 'value' => 'support.value',
                 'order' => 3,
+                'module' => 'CONTACT_US',
                 'is_active' => true,
             ],
             [
@@ -50,6 +53,7 @@ class SupportSeeder extends Seeder
                 'type' => 'route',
                 'value' => 'support.value',
                 'order' => 4,
+                'module' => 'TERMS_POLICIES',
                 'is_active' => true,
             ],
             [
@@ -59,6 +63,7 @@ class SupportSeeder extends Seeder
                 'type' => 'action',
                 'value' => 'support.value', // frontend action
                 'order' => 5,
+                'module' => 'GENERAL',
                 'is_active' => true,
             ],
         ]);

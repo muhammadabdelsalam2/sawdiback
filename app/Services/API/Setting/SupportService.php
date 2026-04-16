@@ -17,4 +17,10 @@ class SupportService
     {
         return $this->repository->getAll();
     }
+
+    public function getSupportItemtemsgetBymodule($module)
+    {   
+
+        return $this->repository->getBymodule($module);
+    }
 }

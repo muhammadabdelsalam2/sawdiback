@@ -13,4 +13,12 @@ class SupportRepository implements SupportRepositoryInterface
             ->ordered()
             ->get();
     }
+
+    public function getBymodule($module)
+    {
+        return SupportItem::active()
+            ->ordered()
+            ->where('module', $module)
+            ->get();
+    }
 }
