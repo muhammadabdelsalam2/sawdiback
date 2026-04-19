@@ -16,7 +16,7 @@
         @endif
 
         <div class="card-block">
-            <form method="POST" action="{{ route('customer.inventory.products.store', ['locale' => $currentLocale]) }}">
+            <form method="POST" action="{{ route('customer.inventory.products.store', ['locale' => $currentLocale]) }}" enctype="multipart/form-data">
                 @csrf
                 @include('dashboard.warehouse.products._form')
                 <div class="mt-3">

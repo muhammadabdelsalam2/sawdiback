@@ -13,15 +13,23 @@ use Throwable;
 
 class InventoryProductController extends Controller
 {
-    public function index(string $locale): View
-    {
-        $rows = InventoryProduct::query()
-            ->with(['category.translation'])
-            ->orderBy('name')
-            ->paginate(15);
+public function index(string $locale): View
+{
+    $rows = InventoryProduct::query()
+        ->with(['category.translation'])
+        ->orderBy('name')
+        ->paginate(15);
 
-        return view('dashboard.warehouse.products.index', compact('rows'));
-    }
+    // إحصائيات للداشبورد
+    $totalProducts = InventoryProduct::count();
+    $activeProducts = InventoryProduct::where('is_active', true)->count();
+    $lowStock = InventoryProduct::whereColumn('available_quantity', '<=', 'low_stock_threshold')->count();
+    $bestSelling = InventoryProduct::where('is_best_selling', true)->count();
+
+    return view('dashboard.warehouse.products.index', compact(
+        'rows', 'totalProducts', 'activeProducts', 'lowStock', 'bestSelling'
+    ));
+}
 
     public function create(string $locale): View
     {
@@ -35,7 +43,7 @@ public function store(InventoryProductStoreRequest $request, string $locale): Re
     $data = $request->validated();
 
     $category = $this->findCategoryForTenant($data['category_id']);
-    // $data['category'] = $category->code;  
+    // $data['category'] = $category->code;
     $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
 
     $data['is_active'] = $request->boolean('is_active');

@@ -17,6 +17,16 @@
             @endforeach
         </select>
     </div>
+    <div class="col-md-4">
+    <label class="form-label">Image</label>
+    @if (!empty($product->image))
+        <div class="mb-2">
+            <img src="{{ $product->image_url }}"
+                 style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
+        </div>
+    @endif
+    <input type="file" name="image" class="form-control" accept="image/*">
+</div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.unit') }}</label>
         <input type="text" name="unit" class="form-control" required value="{{ old('unit', $product->unit ?? '') }}">
