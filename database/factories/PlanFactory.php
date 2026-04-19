@@ -7,11 +7,13 @@ use App\Models\Plan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Plan>
  */
 class PlanFactory extends Factory
 {
+
     protected $model = Plan::class;
 
     public function definition(): array
@@ -40,13 +42,13 @@ class PlanFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name) . '-' . fake()->unique()->numberBetween(100, 999),
-            'price' => fake()->randomFloat(2, 10, 500),
+            'slug' => \Illuminate\Support\Str::slug($name) . '-' . $this->faker->unique()->numberBetween(100, 999),
+            'price' => $this->faker->randomFloat(2, 10, 500),
             'currency_id' => Currency::factory(),
-            'billing_cycle' => fake()->randomElement(['monthly', 'yearly']),
+            'billing_cycle' => $this->faker->randomElement(['monthly', 'yearly']),
             'is_active' => true,
-            'description' => fake()->sentence(),
-            'sort_order' => fake()->numberBetween(0, 10),
+            'description' => $this->faker->sentence(),
+            'sort_order' => $this->faker->numberBetween(0, 10),
             'features' => $featuresJson,
         ];
     }
