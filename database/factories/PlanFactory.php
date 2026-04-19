@@ -18,7 +18,7 @@ class PlanFactory extends Factory
 
     public function definition(): array
     {
-        $name = fake()->unique()->words(2, true);
+        $name = $this->fake->unique()->words(2, true);
 
         $featureKeys = [
             ['key' => 'max_users', 'type' => 'numeric'],
@@ -35,7 +35,7 @@ class PlanFactory extends Factory
             $featuresJson[$feature['key']] = [
                 'value' => $feature['type'] === 'boolean'
                     ? true
-                    : fake()->numberBetween(1, 100),
+                    : $this->fake->numberBetween(1, 100),
                 'enabled' => true
             ];
         }
