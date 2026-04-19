@@ -16,7 +16,6 @@ class PlanFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique(true)->word() . ' Plan';
 
         // Define possible feature keys and types
         $featureKeys = [
@@ -39,7 +38,7 @@ class PlanFactory extends Factory
         }
 
         return [
-            'name' => ucwords($name),
+            'name' => $this->faker->unique()->words(2, true),
             'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(100, 999),
             'price' => fake()->randomFloat(2, 10, 500),
             'currency_id' => Currency::factory(),
