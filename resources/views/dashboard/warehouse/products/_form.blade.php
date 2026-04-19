@@ -27,6 +27,18 @@
     @endif
     <input type="file" name="image" class="form-control" accept="image/*">
 </div>
+<div class="col-md-3">
+    <label class="form-label">Price</label>
+    <input type="number" step="0.01" min="0" name="price"
+           class="form-control"
+           value="{{ old('price', $product->price ?? 0) }}">
+</div>
+<div class="col-md-3">
+    <label class="form-label">Last Price</label>
+    <input type="number" step="0.01" min="0" name="last_price"
+           class="form-control"
+           value="{{ old('last_price', $product->last_price ?? 0) }}">
+</div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.unit') }}</label>
         <input type="text" name="unit" class="form-control" required value="{{ old('unit', $product->unit ?? '') }}">

@@ -27,6 +27,8 @@ class InventoryProduct extends Model
         'is_active',
         'is_best_selling',
         'notes',
+         'price',
+    'last_price',
     ];
 
     protected $casts = [
@@ -35,6 +37,8 @@ class InventoryProduct extends Model
         'is_best_selling' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
         'tax' => 'decimal:2',
+        'price' => 'decimal:2',
+'last_price' => 'decimal:2',
     ];
 
     protected $append = ['image_url'];

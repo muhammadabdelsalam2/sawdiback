@@ -44,7 +44,7 @@ use App\Http\Controllers\Customer\Procurement\PurchaseInvoiceController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
-    ->middleware(['set.locale', 'auth', 'role:Customer'])
+    ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
     ->name('customer.')
     ->group(function () {
         // =========================

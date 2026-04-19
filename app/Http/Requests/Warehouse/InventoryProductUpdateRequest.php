@@ -31,6 +31,8 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
             'is_active' => ['nullable', 'boolean'],
             'is_best_selling' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+'last_price' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }
