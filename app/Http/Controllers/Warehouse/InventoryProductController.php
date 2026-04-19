@@ -23,7 +23,7 @@ public function index(string $locale): View
     // إحصائيات للداشبورد
     $totalProducts = InventoryProduct::count();
     $activeProducts = InventoryProduct::where('is_active', true)->count();
-    $lowStock = InventoryProduct::whereColumn('available_quantity', '<=', 'low_stock_threshold')->count();
+    $lowStock = InventoryProduct::where('low_stock_threshold', '>', 0)->count();
     $bestSelling = InventoryProduct::where('is_best_selling', true)->count();
 
     return view('dashboard.warehouse.products.index', compact(
