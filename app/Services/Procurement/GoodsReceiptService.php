@@ -90,6 +90,7 @@ class GoodsReceiptService
         $items = collect($data['items'] ?? [])
             ->map(function (array $item) {
                 return [
+                    'id' => $item['id'] ?? (string) Str::uuid(),
                     'product_id' => (int) $item['product_id'],
                     'quantity' => (float) $item['quantity'],
                 ];
