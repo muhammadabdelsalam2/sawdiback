@@ -16,7 +16,7 @@ class PlanFactory extends Factory
 
     public function definition(): array
     {
-        $name = fake()->unique()->words(2, true);
+        $name = $this->faker->unique(true)->word() . ' Plan';
 
         // Define possible feature keys and types
         $featureKeys = [
