@@ -154,49 +154,53 @@ class FullLivestockSeeder extends Seeder
     // ─────────────────────────────────────────────
     // Animals
     // ─────────────────────────────────────────────
-    private function seedAnimals(string $tenantId, $species, $breeds): \Illuminate\Support\Collection
-    {
-        $byCode   = $species->keyBy('code');
-        $bySpecies = $breeds->groupBy('species_id');
+   private function seedAnimals(string $tenantId, $species, $breeds): \Illuminate\Support\Collection
+{
+    $byCode    = $species->keyBy('code');
+    $bySpecies = $breeds->groupBy('species_id');
 
-        $data = [
-            ['tag' => 'TAG-001', 'name' => 'Bella',   'species' => 'CATTLE', 'gender' => 'female', 'status' => 'active',    'dob' => '2020-03-15'],
-            ['tag' => 'TAG-002', 'name' => 'Max',     'species' => 'CATTLE', 'gender' => 'male',   'status' => 'active',    'dob' => '2019-07-20'],
-            ['tag' => 'TAG-003', 'name' => 'Luna',    'species' => 'GOAT',   'gender' => 'female', 'status' => 'active',    'dob' => '2021-01-10'],
-            ['tag' => 'TAG-004', 'name' => 'Rocky',   'species' => 'GOAT',   'gender' => 'male',   'status' => 'active',    'dob' => '2021-05-05'],
-            ['tag' => 'TAG-005', 'name' => 'Daisy',   'species' => 'SHEEP',  'gender' => 'female', 'status' => 'active',    'dob' => '2022-02-14'],
-            ['tag' => 'TAG-006', 'name' => 'Storm',   'species' => 'SHEEP',  'gender' => 'male',   'status' => 'active',    'dob' => '2021-11-30'],
-            ['tag' => 'TAG-007', 'name' => 'Nora',    'species' => 'CATTLE', 'gender' => 'female', 'status' => 'pregnant',  'dob' => '2020-08-22'],
-            ['tag' => 'TAG-008', 'name' => 'Sultan',  'species' => 'CAMEL',  'gender' => 'male',   'status' => 'active',    'dob' => '2018-04-01'],
-            ['tag' => 'TAG-009', 'name' => 'Layla',   'species' => 'CAMEL',  'gender' => 'female', 'status' => 'active',    'dob' => '2019-09-15'],
-            ['tag' => 'TAG-010', 'name' => 'Spirit',  'species' => 'HORSE',  'gender' => 'male',   'status' => 'active',    'dob' => '2017-06-10'],
-            ['tag' => 'TAG-011', 'name' => 'Rose',    'species' => 'CATTLE', 'gender' => 'female', 'status' => 'active',    'dob' => '2021-03-18'],
-            ['tag' => 'TAG-012', 'name' => 'Bruno',   'species' => 'CATTLE', 'gender' => 'male',   'status' => 'active',    'dob' => '2020-12-01'],
-        ];
+    $data = [
+        ['tag' => 'TAG-001', 'species' => 'CATTLE', 'gender' => 'female', 'status' => 'active',      'health' => 'healthy',         'dob' => '2020-03-15', 'source' => 'born',      'price' => 0],
+        ['tag' => 'TAG-002', 'species' => 'CATTLE', 'gender' => 'male',   'status' => 'active',      'health' => 'healthy',         'dob' => '2019-07-20', 'source' => 'purchased', 'price' => 3500],
+        ['tag' => 'TAG-003', 'species' => 'GOAT',   'gender' => 'female', 'status' => 'active',      'health' => 'healthy',         'dob' => '2021-01-10', 'source' => 'born',      'price' => 0],
+        ['tag' => 'TAG-004', 'species' => 'GOAT',   'gender' => 'male',   'status' => 'active',      'health' => 'healthy',         'dob' => '2021-05-05', 'source' => 'purchased', 'price' => 800],
+        ['tag' => 'TAG-005', 'species' => 'SHEEP',  'gender' => 'female', 'status' => 'active',      'health' => 'healthy',         'dob' => '2022-02-14', 'source' => 'born',      'price' => 0],
+        ['tag' => 'TAG-006', 'species' => 'SHEEP',  'gender' => 'male',   'status' => 'active',      'health' => 'healthy',         'dob' => '2021-11-30', 'source' => 'purchased', 'price' => 600],
+        ['tag' => 'TAG-007', 'species' => 'CATTLE', 'gender' => 'female', 'status' => 'active',      'health' => 'under_treatment', 'dob' => '2020-08-22', 'source' => 'born',      'price' => 0],
+        ['tag' => 'TAG-008', 'species' => 'CAMEL',  'gender' => 'male',   'status' => 'active',      'health' => 'healthy',         'dob' => '2018-04-01', 'source' => 'purchased', 'price' => 12000],
+        ['tag' => 'TAG-009', 'species' => 'CAMEL',  'gender' => 'female', 'status' => 'active',      'health' => 'healthy',         'dob' => '2019-09-15', 'source' => 'purchased', 'price' => 10000],
+        ['tag' => 'TAG-010', 'species' => 'HORSE',  'gender' => 'male',   'status' => 'active',      'health' => 'healthy',         'dob' => '2017-06-10', 'source' => 'purchased', 'price' => 25000],
+        ['tag' => 'TAG-011', 'species' => 'CATTLE', 'gender' => 'female', 'status' => 'active',      'health' => 'healthy',         'dob' => '2021-03-18', 'source' => 'born',      'price' => 0],
+        ['tag' => 'TAG-012', 'species' => 'CATTLE', 'gender' => 'male',   'status' => 'sold',        'health' => 'healthy',         'dob' => '2020-12-01', 'source' => 'born',      'price' => 0],
+    ];
 
-        foreach ($data as $row) {
-            $sp = $byCode->get($row['species']);
-            if (!$sp) continue;
+    foreach ($data as $row) {
+        $sp = $byCode->get($row['species']);
+        if (!$sp) continue;
 
-            $breed = $bySpecies->get($sp->id)?->first();
+        $breed = $bySpecies->get($sp->id)?->first();
 
-            LivestockAnimal::withoutGlobalScopes()->updateOrCreate(
-                ['tenant_id' => $tenantId, 'tag_number' => $row['tag']],
-                [
-                    'tenant_id'    => $tenantId,
-                    'tag_number'   => $row['tag'],
-                    'name'         => $row['name'],
-                    'species_id'   => $sp->id,
-                    'breed_id'     => $breed?->id,
-                    'gender'       => $row['gender'],
-                    'status'       => $row['status'],
-                    'date_of_birth'=> $row['dob'],
-                ]
-            );
-        }
-
-        return LivestockAnimal::withoutGlobalScopes()->where('tenant_id', $tenantId)->get();
+        LivestockAnimal::withoutGlobalScopes()->updateOrCreate(
+            ['tenant_id' => $tenantId, 'tag_number' => $row['tag']],
+            [
+                'tenant_id'      => $tenantId,
+                'tag_number'     => $row['tag'],
+                'species_id'     => $sp->id,
+                'breed_id'       => $breed?->id,
+                'gender'         => $row['gender'],
+                'status'         => $row['status'],
+                'health_status'  => $row['health'],
+                'birth_date'     => $row['dob'],
+                'source_type'    => $row['source'],
+                'purchase_price' => $row['price'] > 0 ? $row['price'] : null,
+                'purchase_date'  => $row['source'] === 'purchased' ? now()->subYear()->toDateString() : null,
+                'notes'          => 'Seeded animal',
+            ]
+        );
     }
+
+    return LivestockAnimal::withoutGlobalScopes()->where('tenant_id', $tenantId)->get();
+}
 
     // ─────────────────────────────────────────────
     // Feeding Logs
