@@ -242,29 +242,29 @@ class FullLivestockSeeder extends Seeder
     // Health Records
     // ─────────────────────────────────────────────
     private function seedHealthRecords(string $tenantId, $animals): void
-    {
-        $types = [
-            ['type' => 'checkup',   'diagnosis' => 'Routine periodic checkup',      'treatment' => 'Vitamins and hydration',   'cost' => 120.00],
-            ['type' => 'treatment', 'diagnosis' => 'Mild respiratory infection',     'treatment' => 'Antibiotics for 5 days',   'cost' => 250.00],
-            ['type' => 'surgery',   'diagnosis' => 'Minor wound on left hind leg',   'treatment' => 'Stitching and dressing',   'cost' => 500.00],
-        ];
+{
+    $types = [
+        ['type' => 'checkup',  'diagnosis' => 'Routine periodic checkup',    'treatment' => 'Vitamins and hydration',  'cost' => 120.00],
+        ['type' => 'illness',  'diagnosis' => 'Mild respiratory infection',   'treatment' => 'Antibiotics for 5 days', 'cost' => 250.00],
+        ['type' => 'injury',   'diagnosis' => 'Minor wound on left hind leg', 'treatment' => 'Stitching and dressing', 'cost' => 500.00],
+    ];
 
-        foreach ($animals as $i => $animal) {
-            $t = $types[$i % count($types)];
-            AnimalHealthRecord::withoutGlobalScopes()->updateOrCreate(
-                ['tenant_id' => $tenantId, 'animal_id' => $animal->id, 'record_type' => $t['type']],
-                [
-                    'tenant_id'        => $tenantId,
-                    'animal_id'        => $animal->id,
-                    'record_type'      => $t['type'],
-                    'diagnosis'        => $t['diagnosis'],
-                    'treatment'        => $t['treatment'],
-                    'cost'             => $t['cost'],
-                    'next_followup_date'=> now()->addMonth()->toDateString(),
-                ]
-            );
-        }
+    foreach ($animals as $i => $animal) {
+        $t = $types[$i % count($types)];
+        AnimalHealthRecord::withoutGlobalScopes()->updateOrCreate(
+            ['tenant_id' => $tenantId, 'animal_id' => $animal->id, 'record_type' => $t['type']],
+            [
+                'tenant_id'          => $tenantId,
+                'animal_id'          => $animal->id,
+                'record_type'        => $t['type'],
+                'diagnosis'          => $t['diagnosis'],
+                'treatment'          => $t['treatment'],
+                'cost'               => $t['cost'],
+                'next_followup_date' => now()->addMonth()->toDateString(),
+            ]
+        );
     }
+}
 
     // ─────────────────────────────────────────────
     // Weight Logs
@@ -349,49 +349,51 @@ class FullLivestockSeeder extends Seeder
     // ─────────────────────────────────────────────
     // Reproduction Cycles & Births
     // ─────────────────────────────────────────────
-    private function seedReproductionAndBirths(string $tenantId, $animals): void
-    {
-        $females = $animals->where('gender', 'female')->values();
-        $males   = $animals->where('gender', 'male')->values();
+   private function seedReproductionAndBirths(string $tenantId, $animals): void
+{
+    $females = $animals->where('gender', 'female')->values();
+    $males   = $animals->where('gender', 'male')->values();
 
-        if ($females->isEmpty() || $males->isEmpty()) return;
+    if ($females->isEmpty() || $males->isEmpty()) return;
 
-        foreach ($females as $i => $female) {
-            $male = $males[$i % $males->count()];
+    foreach ($females as $i => $female) {
+        $male = $males[$i % $males->count()];
 
-            $cycle = ReproductionCycle::withoutGlobalScopes()->updateOrCreate(
-                [
-                    'tenant_id'        => $tenantId,
-                    'female_animal_id' => $female->id,
-                ],
-                [
-                    'tenant_id'              => $tenantId,
-                    'female_animal_id'       => $female->id,
-                    'male_animal_id'         => $male->id,
-                    'status'                 => 'delivered',
-                    'cycle_start_date'       => now()->subMonths(10)->toDateString(),
-                    'insemination_date'      => now()->subMonths(9)->toDateString(),
-                    'pregnancy_confirmed_at' => now()->subMonths(8)->toDateString(),
-                    'expected_delivery_date' => now()->subMonths(1)->toDateString(),
-                    'notes'                  => 'Seeded reproduction cycle',
-                ]
-            );
+        $cycle = ReproductionCycle::withoutGlobalScopes()->updateOrCreate(
+            [
+                'tenant_id'        => $tenantId,
+                'female_animal_id' => $female->id,
+            ],
+            [
+                'tenant_id'              => $tenantId,
+                'female_animal_id'       => $female->id,
+                'male_animal_id'         => $male->id,
+                'heat_date'              => now()->subMonths(10)->toDateString(),
+                'insemination_date'      => now()->subMonths(9)->toDateString(),
+                'insemination_type'      => 'natural',
+                'pregnancy_confirmed'    => 1,
+                'pregnancy_check_date'   => now()->subMonths(8)->toDateString(),
+                'expected_delivery_date' => now()->subMonths(1)->toDateString(),
+                'status'                 => 'delivered',
+                'notes'                  => 'Seeded reproduction cycle',
+            ]
+        );
 
-            AnimalBirth::withoutGlobalScopes()->updateOrCreate(
-                [
-                    'tenant_id'              => $tenantId,
-                    'mother_id'              => $female->id,
-                    'reproduction_cycle_id'  => $cycle->id,
-                ],
-                [
-                    'tenant_id'              => $tenantId,
-                    'mother_id'              => $female->id,
-                    'reproduction_cycle_id'  => $cycle->id,
-                    'birth_date'             => now()->subMonths(1)->toDateString(),
-                    'complications'          => null,
-                    'notes'                  => 'Seeded birth record',
-                ]
-            );
-        }
+        AnimalBirth::withoutGlobalScopes()->updateOrCreate(
+            [
+                'tenant_id'             => $tenantId,
+                'mother_id'             => $female->id,
+                'reproduction_cycle_id' => $cycle->id,
+            ],
+            [
+                'tenant_id'             => $tenantId,
+                'mother_id'             => $female->id,
+                'reproduction_cycle_id' => $cycle->id,
+                'birth_date'            => now()->subMonths(1)->toDateString(),
+                'complications'         => null,
+                'notes'                 => 'Seeded birth record',
+            ]
+        );
     }
+}
 }
