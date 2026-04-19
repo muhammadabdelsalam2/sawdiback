@@ -21,7 +21,32 @@
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <div style="font-size:13px; color:gray;">Total Products</div>
+                    <div style="font-size:24px; font-weight:600;">{{ $totalProducts }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <div style="font-size:13px; color:gray;">Active</div>
+                    <div style="font-size:24px; font-weight:600; color:green;">{{ $activeProducts }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <div style="font-size:13px; color:gray;">Low Stock</div>
+                    <div style="font-size:24px; font-weight:600; color:red;">{{ $lowStock }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <div style="font-size:13px; color:gray;">Best Selling</div>
+                    <div style="font-size:24px; font-weight:600; color:orange;">{{ $bestSelling }}</div>
+                </div>
+            </div>
+        </div>
         <div class="table-container">
             <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
@@ -30,6 +55,7 @@
                         <th>{{ __('warehouse.fields.code') }}</th>
                         <th>{{ __('warehouse.fields.name') }}</th>
                         <th>{{ __('warehouse.fields.category') }}</th>
+                        <th>{{ __('warehouse.fields.image') }}</th>
                         <th>{{ __('warehouse.fields.unit') }}</th>
                         <th>{{ __('warehouse.fields.tax') }}</th>
                         <th>{{ __('warehouse.fields.low_stock_threshold') }}</th>
@@ -44,6 +70,10 @@
                             <td>{{ $row->name }}</td>
                             <td>
                                 {{ $row->category?->name ?? ($row->getAttribute('category') ? __('warehouse.options.' . $row->getAttribute('category')) : '-') }}
+                            </td>
+                            <td>
+                                <img src="{{ $row->image_url }}" alt="{{ $row->name }}"
+                                    style="width:48px; height:48px; border-radius:8px; object-fit:cover;">
                             </td>
                             <td>{{ $row->unit }}</td>
                             <td>{{ number_format($row->tax ?? 0, 2) }}</td>
