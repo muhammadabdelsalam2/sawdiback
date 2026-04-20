@@ -9,10 +9,15 @@ use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
 use App\Http\Controllers\Api\Product\ProductController;
 use App\Http\Controllers\Api\Setting\SupportController;
+use App\Http\Controllers\setting\SearchController;
 
 Route::prefix('v1/{locale}')
     ->middleware(['auth:sanctum', 'role:Client'])
     ->group(function () {
+
+        // Search Global 
+    
+       
 
         // Categories Routes
         Route::prefix('categories')
@@ -168,7 +173,7 @@ Route::prefix('v1/{locale}')
 
             // Support Items Get Values 
             Route::get('/{supportItem}/value', 'getValue')->name('value');
-            
+
         });
 
 

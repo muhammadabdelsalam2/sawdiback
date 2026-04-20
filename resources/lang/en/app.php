@@ -2,6 +2,12 @@
 
 return [
 
+
+    'nav_contact' => 'Contact',
+    'nav_about' => 'About Us',
+    'nav_products' => 'Products',
+    'nav_logic' => 'How It Works',
+    'nav_best_selling' => 'Best Selling',
     'start_trial' => 'Start 14-Day Free Trial',
     'request_demo' => 'Request Enterprise Demo',
 

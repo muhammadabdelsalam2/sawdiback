@@ -101,4 +101,16 @@ class LoginController extends Controller
         return redirect()->route('login.form', ['locale' => $locale]);
     }
 
+    public function generateToken($locale , Request $request)
+    {
+      
+        $user = Auth::user();
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'status' => true,
+            'token' => $token,
+        ]);
+    }
+
 }

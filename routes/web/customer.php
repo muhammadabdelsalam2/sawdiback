@@ -41,12 +41,16 @@ use App\Http\Controllers\Customer\Procurement\QuotationController;
 use App\Http\Controllers\Customer\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Customer\Procurement\GoodsReceiptController;
 use App\Http\Controllers\Customer\Procurement\PurchaseInvoiceController;
+use App\Http\Controllers\setting\SearchController;
 
 Route::prefix('{locale}')
     ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
     ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
     ->name('customer.')
     ->group(function () {
+
+        Route::get('/global-search', [SearchController::class, 'index'])
+            ->name('global.search'); // Make it public for testing, can be protected later
         // =========================
         // Subscription (Always Allowed)
         // =========================
@@ -172,10 +176,10 @@ Route::prefix('{locale}')
         Route::prefix('ecommerce')
             ->name('ecommerce.')
             ->group(function () {
-                Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
-                Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
-                Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
-            });
+            Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
+            Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
+        });
 
         // =========================
         // HR Management (Feature Gated)

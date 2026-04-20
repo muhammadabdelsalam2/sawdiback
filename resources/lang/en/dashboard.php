@@ -7,6 +7,11 @@ return [
         'settings' => 'Settings',
         'logout' => 'Logout',
         'module' => 'Module',
+        'language' => 'Language',
+        'english' => 'English',
+        'arabic' => 'Arabic',
+        'saudi_arabia' => 'Saudi Arabia',
+        'egypt' => 'Egypt',
     ],
     'sidebar' => [
         'dashboard' => 'Dashboard',
