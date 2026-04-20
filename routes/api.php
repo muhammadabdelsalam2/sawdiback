@@ -30,6 +30,7 @@ Route::prefix('v1/{locale}')->group(function () {
         ->controller(AuthController::class)
         ->group(function () {
             Route::post('login', 'login')->name('api.auth.login');
+            
             Route::post('social-login', 'socialLogin')->name('api.auth.social-login');
             Route::post('register', 'register')->name('api.auth.register');
         });
