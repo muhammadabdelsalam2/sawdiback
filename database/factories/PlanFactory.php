@@ -20,40 +20,40 @@ class PlanFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->faker->unique()->words(2, true);
-        $slug = Str::slug($name, '_') . '-' . $this->faker->unique()->numberBetween(100, 999);
+        // $name = $this->faker->unique()->words(2, true);
+        // $slug = Str::slug($name, '_') . '-' . $this->faker->unique()->numberBetween(100, 999);
 
-        $featureKeys = [
-            ['key' => 'max_users', 'type' => 'numeric'],
-            ['key' => 'advanced_reports', 'type' => 'boolean'],
-            ['key' => 'priority_support', 'type' => 'boolean'],
-            ['key' => 'storage_limit', 'type' => 'numeric'],
-            ['key' => 'custom_domain', 'type' => 'boolean'],
-        ];
+        // $featureKeys = [
+        //     ['key' => 'max_users', 'type' => 'numeric'],
+        //     ['key' => 'advanced_reports', 'type' => 'boolean'],
+        //     ['key' => 'priority_support', 'type' => 'boolean'],
+        //     ['key' => 'storage_limit', 'type' => 'numeric'],
+        //     ['key' => 'custom_domain', 'type' => 'boolean'],
+        // ];
 
-        $randomFeatures = collect($featureKeys)->random(rand(2, 4));
+        // $randomFeatures = collect($featureKeys)->random(rand(2, 4));
 
-        $featuresJson = [];
+        // $featuresJson = [];
 
-        foreach ($randomFeatures as $feature) {
-            $featuresJson[$feature['key']] = [
-                'value' => $feature['type'] === 'boolean'
-                    ? true
-                    : $this->faker->numberBetween(1, 100),
-                'enabled' => true
-            ];
-        }
+        // foreach ($randomFeatures as $feature) {
+        //     $featuresJson[$feature['key']] = [
+        //         'value' => $feature['type'] === 'boolean'
+        //             ? true
+        //             : $this->faker->numberBetween(1, 100),
+        //         'enabled' => true
+        //     ];
+        // }
 
-        return [
-            'name' => $name,
-            'slug' => $slug,
-            'price' => $this->faker->randomFloat(2, 10, 500),
-            'currency_id' => Currency::factory(),
-            'billing_cycle' => $this->faker->randomElement(['monthly', 'yearly']),
-            'is_active' => true,
-            'description' => $this->faker->sentence(),
-            'sort_order' => $this->faker->numberBetween(0, 10),
-            'features' => $featuresJson,
-        ];
+        // return [
+        //     'name' => $name,
+        //     'slug' => $slug,
+        //     'price' => $this->faker->randomFloat(2, 10, 500),
+        //     'currency_id' => Currency::factory(),
+        //     'billing_cycle' => $this->faker->randomElement(['monthly', 'yearly']),
+        //     'is_active' => true,
+        //     'description' => $this->faker->sentence(),
+        //     'sort_order' => $this->faker->numberBetween(0, 10),
+        //     'features' => $featuresJson,
+        // ];
     }
 }
