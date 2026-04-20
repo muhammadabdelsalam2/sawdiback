@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const productionCanvas = document.getElementById('productionChart');
     if (productionCanvas) {
         const productionCtx = productionCanvas.getContext('2d');
-        const labels = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.labels.length > 0) 
-            ? window.dashboardData.production.labels 
+        const labels = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.labels.length > 0)
+            ? window.dashboardData.production.labels
             : ['1', '2', '3', '4', '5', '6'];
         const data = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.data.length > 0)
             ? window.dashboardData.production.data
@@ -298,3 +298,141 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+const input = $('#globalSearch');
+const dropdown = $('#searchDropdown');
+
+let timeout = null;
+let lastQuery = '';
+let hasOpenedOnce = false;
+
+// Default modules
+const defaultModules = [
+    {
+        name: 'Animals',
+        url: window.appConfig.animalsUrl,
+        icon: 'fa fa-paw'
+    },
+    {
+        name: 'Orders',
+        url: window.appConfig.ordersUrl,
+        icon: 'fa fa-shopping-cart'
+    },
+    {
+        name: 'Products',
+        url: window.appConfig.productsUrl,
+        icon: 'fa fa-box'
+    }
+];
+
+// Render modules
+function renderModules(modules) {
+
+    let html = '';
+
+    modules.forEach(m => {
+        html += `
+            <div class="search-item" onclick="window.location='${m.url}'">
+                <i class="${m.icon}"></i> ${m.name}
+            </div>
+        `;
+    });
+
+    dropdown.html(html);
+}
+
+// Focus event
+input.on('focus', function () {
+
+    dropdown.removeClass('d-none').addClass('show');
+
+    renderModules(defaultModules);
+
+    if (!hasOpenedOnce) {
+        hasOpenedOnce = true;
+        console.log('Search opened first time');
+    }
+});
+
+// Outside click
+$(document).on('click', function (e) {
+
+    const container = $('.search-container');
+
+    if (!container.has(e.target).length) {
+        dropdown.addClass('d-none').removeClass('show');
+    }
+});
+
+// Input event
+input.on('input', function () {
+
+    clearTimeout(timeout);
+
+    let q = $(this).val().trim();
+
+    if (!q) {
+        renderModules(defaultModules);
+        return;
+    }
+
+    if (q === lastQuery) return;
+    lastQuery = q;
+
+    timeout = setTimeout(() => {
+        search(q);
+    }, 500);
+});
+
+// Search function (Axios)
+function search(q) {
+
+    dropdown.html(`
+        <div class="search-item ai-loader">
+            <div class="ai-spinner"></div>
+            AI Searching...
+        </div>
+    `);
+
+    dropdown.removeClass('d-none').addClass('show');
+
+    axios.get(window.appConfig.searchUrl, {
+        params: { q: q },
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + window.appConfig.token
+        }
+    })
+        .then(res => {
+
+            const data = res.data;
+
+            dropdown.html('');
+
+            if (!data || data.length === 0) {
+                dropdown.html(`<div class="search-item">No results found</div>`);
+                return;
+            }
+
+            let html = '';
+
+            data.forEach(item => {
+                html += `
+                <div class="search-item" onclick="window.location='${item.url}'">
+                    <strong>${item.type}</strong> - ${item.name}
+                </div>
+            `;
+            });
+
+            dropdown.html(html);
+        })
+        .catch(err => {
+
+            console.error(err);
+
+            dropdown.html(`
+            <div class="search-item text-danger">
+                Something went wrong
+            </div>
+        `);
+        });
+}

@@ -12,9 +12,10 @@ class SearchController extends Controller
     //
     public function index($locale, Request $request)
     {
-        $q = $request->q;
+        $query = trim($request->q);
 
-        if (!$q) {
+        // Return empty response if no query provided
+        if (!$query) {
             return response()->json([]);
         }
 
@@ -22,43 +23,77 @@ class SearchController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | USERS
+        | SEARCH ROUTER
         |--------------------------------------------------------------------------
+        | Route query to different search handlers based on keywords
         */
-
-
-        // AI Search Example (pseudo-code, replace with actual AI search logic)
-        // Start Search Automatic In Google Style
-        // if (strlen($q) < 3) {
-        //     return [];
-        // }
-        // $key = "ai_search_" . md5($q);
-
-        // $result = Cache::remember($key, 3600, function () use ($q) {
-        //     return OpenAI::chat()->create([
-        //         'model' => 'gpt-4o-mini',
-        //         'messages' => [
-        //             ['role' => 'user', 'content' => $q],
-        //         ],
-        //     ]);
-        // });
-
-
-        /*
-              |--------------------------------------------------------------------------
-              | Animals
-              |--------------------------------------------------------------------------
-        */
-        $animals = \App\Models\LivestockAnimal::where('tag_number', 'like', "%{$q}%")
-            ->limit(5)
-            ->get();
-        if ($q == 'animals') {
-            $animals = \App\Models\LivestockAnimal::latest()->limit(5)->get();
-        } elseif ($q == 'animals:today') {
-            $animals = \App\Models\LivestockAnimal::whereDate('created_at', now()->toDateString())->get();
+        if ($this->isSpecialQuery($query)) {
+            $results = array_merge($results, $this->handleSpecialQueries($query, $locale));
+        } else {
+            $results = array_merge($results, $this->handleNormalSearch($query, $locale));
         }
-        foreach ($animals as $animal) {
-            $results[] = [
+
+        return response()->json($results);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DETECT SPECIAL QUERIES
+    |--------------------------------------------------------------------------
+    */
+    private function isSpecialQuery(string $query): bool
+    {
+        return str_contains($query, ':')
+            || in_array($query, ['animals', 'orders', 'products']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HANDLE SPECIAL QUERIES (COMMAND STYLE SEARCH)
+    |--------------------------------------------------------------------------
+    */
+    private function handleSpecialQueries(string $query, string $locale): array
+    {
+        return array_merge(
+            $this->searchAnimals($query, $locale),
+            $this->searchOrders($query, $locale),
+            $this->searchProducts($query, $locale),
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HANDLE NORMAL SEARCH
+    |--------------------------------------------------------------------------
+    */
+    private function handleNormalSearch(string $query, string $locale): array
+    {
+        return array_merge(
+            $this->searchAnimals($query, $locale),
+            $this->searchOrders($query, $locale),
+            $this->searchProducts($query, $locale),
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ANIMALS SEARCH
+    |--------------------------------------------------------------------------
+    */
+    private function searchAnimals(string $query, string $locale): array
+    {
+        $builder = \App\Models\LivestockAnimal::query();
+
+        if ($query === 'animals') {
+            $builder->latest();
+        } elseif ($query === 'animals:today') {
+            $builder->whereDate('created_at', now()->toDateString());
+        } else {
+            $builder->where('tag_number', 'like', "%{$query}%");
+        }
+
+        return $builder->limit(5)->get()->map(function ($animal) use ($locale) {
+            return [
                 'type' => 'Animal',
                 'name' => $animal->tag_number,
                 'url' => route('customer.livestock.animals.edit', [
@@ -66,23 +101,28 @@ class SearchController extends Controller
                     'animal' => $animal->id
                 ]),
             ];
+        })->toArray();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ORDERS SEARCH
+    |--------------------------------------------------------------------------
+    */
+    private function searchOrders(string $query, string $locale): array
+    {
+        $builder = \App\Models\Order::query();
+
+        if ($query === 'orders') {
+            $builder->latest();
+        } elseif ($query === 'orders:today') {
+            $builder->whereDate('created_at', now()->toDateString());
+        } else {
+            $builder->where('order_no', 'like', "%{$query}%");
         }
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ORDERS
-        |--------------------------------------------------------------------------
-        */
-        $orders = \App\Models\Order::where('order_no', 'like', "%{$q}%")
-            ->limit(5)
-            ->get();
-        if ($q == 'orders') {
-            $orders = \App\Models\Order::latest()->limit(5)->get();
-        }
-        foreach ($orders as $order) {
-            $results[] = [
+        return $builder->limit(5)->get()->map(function ($order) use ($locale) {
+            return [
                 'type' => 'Order',
                 'name' => $order->order_no,
                 'url' => route('customer.ecommerce.orders.show', [
@@ -90,21 +130,28 @@ class SearchController extends Controller
                     'order' => $order->id
                 ]),
             ];
+        })->toArray();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCTS SEARCH
+    |--------------------------------------------------------------------------
+    */
+    private function searchProducts(string $query, string $locale): array
+    {
+        $builder = \App\Models\InventoryProduct::query();
+
+        if ($query === 'products') {
+            $builder->latest();
+        } elseif ($query === 'products:today') {
+            $builder->whereDate('created_at', now()->toDateString());
+        } else {
+            $builder->where('name', 'like', "%{$query}%");
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | PRODUCTS (example)
-        |--------------------------------------------------------------------------
-        */
-        $products = \App\Models\InventoryProduct::where('name', 'like', "%{$q}%")
-            ->limit(5)
-            ->get();
-        if ($q == 'products') {
-            $products = \App\Models\InventoryProduct::latest()->limit(5)->get();
-        }
-        foreach ($products as $product) {
-            $results[] = [
+        return $builder->limit(5)->get()->map(function ($product) use ($locale) {
+            return [
                 'type' => 'Product',
                 'name' => $product->name,
                 'url' => route('customer.inventory.products.edit', [
@@ -112,14 +159,6 @@ class SearchController extends Controller
                     'product' => $product->id
                 ]),
             ];
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | RESPONSE
-        |--------------------------------------------------------------------------
-        */
-
-        return response()->json($results);
+        })->toArray();
     }
 }
