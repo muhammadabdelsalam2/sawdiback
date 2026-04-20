@@ -20,8 +20,8 @@ class PlanFactory extends Factory
 
     public function definition(): array
     {
-        $name = $this->fake->unique()->words(2, true);
-        $slug = Str::slug($name, '_') . '-' . $this->fake->unique()->numberBetween(100, 999);
+        $name = $this->faker->unique()->words(2, true);
+        $slug = Str::slug($name, '_') . '-' . $this->faker->unique()->numberBetween(100, 999);
 
         $featureKeys = [
             ['key' => 'max_users', 'type' => 'numeric'],
@@ -39,7 +39,7 @@ class PlanFactory extends Factory
             $featuresJson[$feature['key']] = [
                 'value' => $feature['type'] === 'boolean'
                     ? true
-                    : $this->fake->numberBetween(1, 100),
+                    : $this->faker->numberBetween(1, 100),
                 'enabled' => true
             ];
         }
@@ -47,12 +47,12 @@ class PlanFactory extends Factory
         return [
             'name' => $name,
             'slug' => $slug,
-            'price' => $this->fake->randomFloat(2, 10, 500),
+            'price' => $this->faker->randomFloat(2, 10, 500),
             'currency_id' => Currency::factory(),
-            'billing_cycle' => $this->fake->randomElement(['monthly', 'yearly']),
+            'billing_cycle' => $this->faker->randomElement(['monthly', 'yearly']),
             'is_active' => true,
-            'description' => $this->fake->sentence(),
-            'sort_order' => $this->fake->numberBetween(0, 10),
+            'description' => $this->faker->sentence(),
+            'sort_order' => $this->faker->numberBetween(0, 10),
             'features' => $featuresJson,
         ];
     }
