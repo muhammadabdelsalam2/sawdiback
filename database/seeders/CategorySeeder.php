@@ -38,238 +38,96 @@ class CategorySeeder extends Seeder
 
         $categories = [
             [
-                'code' => 'electronics',
+                'code' => 'feed',
                 'translations' => [
-                    'en' => 'Electronics',
-                    'ar' => 'إلكترونيات',
+                    'en' => 'Feed',
+                    'ar' => 'أعلاف',
                 ],
                 'children' => [
                     [
-                        'code' => 'mobiles',
+                        'code' => 'corn-feed',
                         'translations' => [
-                            'en' => 'Mobile Phones',
-                            'ar' => 'موبايلات',
+                            'en' => 'Corn Feed',
+                            'ar' => 'علف ذرة',
                         ],
                     ],
                     [
-                        'code' => 'laptops',
+                        'code' => 'alfalfa',
                         'translations' => [
-                            'en' => 'Laptops',
-                            'ar' => 'لابتوبات',
-                        ],
-                    ],
-                    [
-                        'code' => 'accessories',
-                        'translations' => [
-                            'en' => 'Accessories',
-                            'ar' => 'إكسسوارات',
-                        ],
-                    ],
-                    [
-                        'code' => 'cameras',
-                        'translations' => [
-                            'en' => 'Cameras',
-                            'ar' => 'كاميرات',
+                            'en' => 'Alfalfa',
+                            'ar' => 'برسيم',
                         ],
                     ],
                 ],
             ],
 
             [
-                'code' => 'fashion',
+                'code' => 'vet_medicine',
                 'translations' => [
-                    'en' => 'Fashion',
-                    'ar' => 'موضة',
+                    'en' => 'Veterinary Medicine',
+                    'ar' => 'أدوية بيطرية',
                 ],
                 'children' => [
                     [
-                        'code' => 'men',
+                        'code' => 'antibiotics',
                         'translations' => [
-                            'en' => 'Men',
-                            'ar' => 'رجالي',
+                            'en' => 'Antibiotics',
+                            'ar' => 'مضادات حيوية',
                         ],
                     ],
                     [
-                        'code' => 'women',
+                        'code' => 'vitamins',
                         'translations' => [
-                            'en' => 'Women',
-                            'ar' => 'حريمي',
-                        ],
-                    ],
-                    [
-                        'code' => 'kids',
-                        'translations' => [
-                            'en' => 'Kids',
-                            'ar' => 'أطفال',
-                        ],
-                    ],
-                    [
-                        'code' => 'shoes',
-                        'translations' => [
-                            'en' => 'Shoes',
-                            'ar' => 'أحذية',
+                            'en' => 'Vitamins',
+                            'ar' => 'فيتامينات',
                         ],
                     ],
                 ],
             ],
 
             [
-                'code' => 'home',
+                'code' => 'equipment',
                 'translations' => [
-                    'en' => 'Home & Living',
-                    'ar' => 'المنزل والمعيشة',
+                    'en' => 'Equipment',
+                    'ar' => 'معدات',
                 ],
                 'children' => [
                     [
-                        'code' => 'furniture',
+                        'code' => 'milking',
                         'translations' => [
-                            'en' => 'Furniture',
-                            'ar' => 'أثاث',
+                            'en' => 'Milking Equipment',
+                            'ar' => 'معدات الحلب',
                         ],
                     ],
                     [
-                        'code' => 'kitchen',
+                        'code' => 'pumps',
                         'translations' => [
-                            'en' => 'Kitchen',
-                            'ar' => 'مطبخ',
-                        ],
-                    ],
-                    [
-                        'code' => 'decor',
-                        'translations' => [
-                            'en' => 'Home Decor',
-                            'ar' => 'ديكور',
-                        ],
-                    ],
-                    [
-                        'code' => 'lighting',
-                        'translations' => [
-                            'en' => 'Lighting',
-                            'ar' => 'إضاءة',
+                            'en' => 'Pumps',
+                            'ar' => 'مضخات',
                         ],
                     ],
                 ],
             ],
 
             [
-                'code' => 'beauty',
+                'code' => 'animal_product',
                 'translations' => [
-                    'en' => 'Beauty',
-                    'ar' => 'الجمال',
+                    'en' => 'Animal Products',
+                    'ar' => 'منتجات حيوانية',
                 ],
                 'children' => [
                     [
-                        'code' => 'makeup',
+                        'code' => 'milk',
                         'translations' => [
-                            'en' => 'Makeup',
-                            'ar' => 'مكياج',
+                            'en' => 'Milk',
+                            'ar' => 'ألبان',
                         ],
                     ],
                     [
-                        'code' => 'skincare',
+                        'code' => 'meat',
                         'translations' => [
-                            'en' => 'Skincare',
-                            'ar' => 'العناية بالبشرة',
-                        ],
-                    ],
-                    [
-                        'code' => 'haircare',
-                        'translations' => [
-                            'en' => 'Haircare',
-                            'ar' => 'العناية بالشعر',
-                        ],
-                    ],
-                    [
-                        'code' => 'fragrances',
-                        'translations' => [
-                            'en' => 'Fragrances',
-                            'ar' => 'عطور',
-                        ],
-                    ],
-                ],
-            ],
-
-            [
-                'code' => 'sports',
-                'translations' => [
-                    'en' => 'Sports',
-                    'ar' => 'رياضة',
-                ],
-                'children' => [
-                    [
-                        'code' => 'fitness',
-                        'translations' => [
-                            'en' => 'Fitness',
-                            'ar' => 'لياقة بدنية',
-                        ],
-                    ],
-                    [
-                        'code' => 'football',
-                        'translations' => [
-                            'en' => 'Football',
-                            'ar' => 'كرة القدم',
-                        ],
-                    ],
-                    [
-                        'code' => 'cycling',
-                        'translations' => [
-                            'en' => 'Cycling',
-                            'ar' => 'دراجات',
-                        ],
-                    ],
-                ],
-            ],
-
-            [
-                'code' => 'books',
-                'translations' => [
-                    'en' => 'Books',
-                    'ar' => 'كتب',
-                ],
-                'children' => [
-                    [
-                        'code' => 'education',
-                        'translations' => [
-                            'en' => 'Education',
-                            'ar' => 'تعليم',
-                        ],
-                    ],
-                    [
-                        'code' => 'novels',
-                        'translations' => [
-                            'en' => 'Novels',
-                            'ar' => 'روايات',
-                        ],
-                    ],
-                    [
-                        'code' => 'kids-books',
-                        'translations' => [
-                            'en' => 'Kids Books',
-                            'ar' => 'كتب أطفال',
-                        ],
-                    ],
-                ],
-            ],
-
-            [
-                'code' => 'automotive',
-                'translations' => [
-                    'en' => 'Automotive',
-                    'ar' => 'السيارات',
-                ],
-                'children' => [
-                    [
-                        'code' => 'car-accessories',
-                        'translations' => [
-                            'en' => 'Car Accessories',
-                            'ar' => 'إكسسوارات سيارات',
-                        ],
-                    ],
-                    [
-                        'code' => 'motorcycles',
-                        'translations' => [
-                            'en' => 'Motorcycles',
-                            'ar' => 'دراجات نارية',
+                            'en' => 'Meat',
+                            'ar' => 'لحوم',
                         ],
                     ],
                 ],
