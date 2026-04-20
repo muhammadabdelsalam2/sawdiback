@@ -382,8 +382,6 @@ input.on('input', function () {
         search(q);
     }, 500);
 });
-
-// Search function (Axios)
 function search(q) {
 
     dropdown.html(`
@@ -404,18 +402,26 @@ function search(q) {
     })
         .then(res => {
 
-            const data = res?.data;
+            const response = res?.data;
 
-            if (!data || !data.payload) {
-                console.warn('Invalid response format', data);
+            // normalize response (IMPORTANT)
+            const payload = Array.isArray(response)
+                ? response
+                : (response?.payload ?? []);
+
+            if (!Array.isArray(payload)) {
+                console.warn('Invalid response format', response);
                 return;
             }
 
-            const payload = data.payload;
+            if (payload.length === 0) {
+                dropdown.html(`<div class="search-item">No results found</div>`);
+                return;
+            }
 
             let html = '';
 
-            data.forEach(item => {
+            payload.forEach(item => {
                 html += `
                 <div class="search-item" onclick="window.location='${item.url}'">
                     <strong>${item.type}</strong> - ${item.name}
