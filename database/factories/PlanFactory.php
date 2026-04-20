@@ -16,9 +16,12 @@ class PlanFactory extends Factory
 
     protected $model = Plan::class;
 
+    use Illuminate\Support\Str;
+
     public function definition(): array
     {
         $name = $this->fake->unique()->words(2, true);
+        $slug = Str::slug($name, '_') . '-' . $this->fake->unique()->numberBetween(100, 999);
 
         $featureKeys = [
             ['key' => 'max_users', 'type' => 'numeric'],
@@ -31,6 +34,7 @@ class PlanFactory extends Factory
         $randomFeatures = collect($featureKeys)->random(rand(2, 4));
 
         $featuresJson = [];
+
         foreach ($randomFeatures as $feature) {
             $featuresJson[$feature['key']] = [
                 'value' => $feature['type'] === 'boolean'
@@ -42,13 +46,13 @@ class PlanFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name) . '-' . $this->faker->unique()->numberBetween(100, 999),
-            'price' => $this->faker->randomFloat(2, 10, 500),
+            'slug' => $slug,
+            'price' => $this->fake->randomFloat(2, 10, 500),
             'currency_id' => Currency::factory(),
-            'billing_cycle' => $this->faker->randomElement(['monthly', 'yearly']),
+            'billing_cycle' => $this->fake->randomElement(['monthly', 'yearly']),
             'is_active' => true,
-            'description' => $this->faker->sentence(),
-            'sort_order' => $this->faker->numberBetween(0, 10),
+            'description' => $this->fake->sentence(),
+            'sort_order' => $this->fake->numberBetween(0, 10),
             'features' => $featuresJson,
         ];
     }
