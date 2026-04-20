@@ -16,7 +16,7 @@ class PlanFactory extends Factory
 
     protected $model = Plan::class;
 
-    use Illuminate\Support\Str;
+
 
     public function definition(): array
     {
