@@ -404,14 +404,14 @@ function search(q) {
     })
         .then(res => {
 
-            const data = res.data;
+            const data = res?.data;
 
-            dropdown.html('');
-
-            if (!data || data.length === 0) {
-                dropdown.html(`<div class="search-item">No results found</div>`);
+            if (!data || !data.payload) {
+                console.warn('Invalid response format', data);
                 return;
             }
+
+            const payload = data.payload;
 
             let html = '';
 
