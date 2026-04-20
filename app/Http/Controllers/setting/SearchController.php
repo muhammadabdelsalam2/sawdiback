@@ -122,15 +122,17 @@ class SearchController extends Controller
         }
 
         return $builder->limit(5)->get()->map(function ($order) use ($locale) {
+            // return json with order type (ecommerce, sales, purchase) to allow frontend to route to correct page
             return [
                 'type' => 'Order',
                 'name' => $order->order_no,
-                'url' => route('customer.ecommerce.orders.show', [
+                'url' => route('customer.ecommerce.orders.edit', [
                     'locale' => $locale,
                     'order' => $order->id
                 ]),
             ];
         })->toArray();
+        
     }
 
     /*
