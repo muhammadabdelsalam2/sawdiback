@@ -50,6 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->alias([
+            
             'set.locale' => SetLocale::class,
             'auth' => Authenticate::class,
             'role' => RoleMiddleware::class,
