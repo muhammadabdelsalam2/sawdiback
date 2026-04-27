@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Services\API\Auth\Social\Providers\FacebookAuthProvider;
 use App\Services\API\Auth\Social\Providers\GoogleAuthProvider;
 use App\Services\API\Auth\Social\SocialAuthService;
+use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -24,7 +25,9 @@ class SocialAuthController extends Controller
             ->stateless()
             ->redirectUrl(config('app.url') . "api/v1/en/auth/social/$provider/callback")
             ->redirect()->getTargetUrl();
-        return response()->json($redirectLink);
+        return ApiResponse::success([
+            'redirect_link' => $redirectLink
+        ]);
     }
 
     public function callback($locale, string $provider, SocialAuthService $service)

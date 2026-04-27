@@ -14,7 +14,6 @@ return new class extends Migration {
             //
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
-            $table->string('avatar')->nullable();
         });
     }
 
