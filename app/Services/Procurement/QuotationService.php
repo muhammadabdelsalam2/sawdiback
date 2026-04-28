@@ -7,6 +7,7 @@ use App\Models\Rfq;
 use App\Repositories\Contracts\Procurement\QuotationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Str;
 
 class QuotationService
 {
@@ -23,7 +24,7 @@ class QuotationService
     {
         return DB::transaction(function () use ($data) {
             [$header, $items, $total] = $this->normalizePayload($data);
-
+                $header['id'] = $header['id'] ?? (string) Str::uuid();
             $quotation = $this->repo->create([
                 ...$header,
                 'total' => $total,
@@ -73,6 +74,7 @@ class QuotationService
                 $total = round($qty * $unitPrice, 2);
 
                 return [
+                    'id' => $item['id'] ?? (string) Str::uuid(),
                     'product_id' => (int) $item['product_id'],
                     'quantity' => $qty,
                     'unit_price' => $unitPrice,

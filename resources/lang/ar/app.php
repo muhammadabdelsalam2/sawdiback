@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'nav_contact' => 'اتصل بنا',
+    'nav_about' => 'من نحن',
+    'nav_products' => 'منتجاتنا',
+    'nav_logic' => 'كيف يعمل',
+    'nav_best_selling' => 'الأكثر مبيعاً',
     'start_trial' => 'ابدأ تجربة مجانية لمدة 14 يومًا',
     'request_demo' => 'اطلب عرضًا توضيحيًا للمؤسسات',
 

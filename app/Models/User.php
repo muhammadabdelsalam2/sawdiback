@@ -32,7 +32,8 @@ class User extends Authenticatable
         'password_reset_token',
         'password_reset_at',
         'google_id',
-        'facebook_id',
+        'provider',
+        'provider_id',
         'instagram_id',
         'social_avatar',
     ];

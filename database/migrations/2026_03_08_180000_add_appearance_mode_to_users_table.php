@@ -11,6 +11,9 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumn('users', 'appearance_mode')) {
                 $table->string('appearance_mode', 20)->nullable()->after('preferred_language');
+            }
+
+            if (!Schema::hasColumn('users', 'name')) {
                 $table->string('name')->nullable()->after('id');
             }
         });

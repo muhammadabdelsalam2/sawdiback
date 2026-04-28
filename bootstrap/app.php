@@ -4,6 +4,7 @@ use App\Http\Middleware\ApiErrorMiddleware;
 use App\Http\Middleware\CheckAuthorized;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\EnsureFeatureEnabled;
+use App\Http\Middleware\RedirectIfAuthenticatedCustom;
 use App\Http\Middleware\SetLocaleApi;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -50,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->alias([
+
             'set.locale' => SetLocale::class,
             'auth' => Authenticate::class,
             'role' => RoleMiddleware::class,
@@ -63,9 +65,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Append API error middleware
-        $middleware->appendToGroup('api', [
+        $middleware->appendToGroup('api/*', [
             SetLocaleApi::class,
             ApiErrorMiddleware::class,
+            RedirectIfAuthenticatedCustom::class,
+        ]);
+        $middleware->appendToGroup('web/*', [
+            RedirectIfAuthenticatedCustom::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

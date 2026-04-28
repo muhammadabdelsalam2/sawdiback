@@ -41,6 +41,7 @@ class PurchaseOrderService
     {
         $items = $quotation->items()->get()->map(function ($item) {
             return [
+                'id' => (string) Str::uuid(),
                 'product_id' => $item->product_id,
                 'quantity' => (float) $item->quantity,
                 'unit_price' => (float) $item->unit_price,
@@ -48,6 +49,7 @@ class PurchaseOrderService
         })->toArray();
 
         $order = $this->create([
+            'id' => $data['id'] ?? (string) Str::uuid(),
             'supplier_id' => $quotation->supplier_id,
             'rfq_id' => $quotation->rfq_id,
             'quotation_id' => $quotation->id,
@@ -91,6 +93,7 @@ class PurchaseOrderService
                 $total = round($qty * $unitPrice, 2);
 
                 return [
+                    'id' => $item['id'] ?? (string) Str::uuid(),
                     'product_id' => (int) $item['product_id'],
                     'quantity' => $qty,
                     'unit_price' => $unitPrice,

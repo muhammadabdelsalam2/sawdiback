@@ -13,15 +13,23 @@ use Throwable;
 
 class InventoryProductController extends Controller
 {
-    public function index(string $locale): View
-    {
-        $rows = InventoryProduct::query()
-            ->with(['category.translation'])
-            ->orderBy('name')
-            ->paginate(15);
+public function index(string $locale): View
+{
+    $rows = InventoryProduct::query()
+        ->with(['category.translation'])
+        ->orderBy('name')
+        ->paginate(15);
 
-        return view('dashboard.warehouse.products.index', compact('rows'));
-    }
+    // إحصائيات للداشبورد
+    $totalProducts = InventoryProduct::count();
+    $activeProducts = InventoryProduct::where('is_active', true)->count();
+    $lowStock = InventoryProduct::where('low_stock_threshold', '>', 0)->count();
+    $bestSelling = InventoryProduct::where('is_best_selling', true)->count();
+
+    return view('dashboard.warehouse.products.index', compact(
+        'rows', 'totalProducts', 'activeProducts', 'lowStock', 'bestSelling'
+    ));
+}
 
     public function create(string $locale): View
     {
@@ -30,28 +38,28 @@ class InventoryProductController extends Controller
         return view('dashboard.warehouse.products.create', compact('categories'));
     }
 
-    public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
-    {
-        $data = $request->validated();
+public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
+{
+    $data = $request->validated();
 
-        $category = $this->findCategoryForTenant($data['category_id']);
-        $data['category'] = $category->code;
-        $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
+    $category = $this->findCategoryForTenant($data['category_id']);
+    // $data['category'] = $category->code;
+    $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
 
-        $data['is_active'] = $request->boolean('is_active');
-        $data['track_expiry'] = $request->boolean('track_expiry');
-        $data['is_best_selling'] = $request->boolean('is_best_selling');
+    $data['is_active'] = $request->boolean('is_active');
+    $data['track_expiry'] = $request->boolean('track_expiry');
+    $data['is_best_selling'] = $request->boolean('is_best_selling');
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('inventory/products', 'public');
-        }
-
-        InventoryProduct::query()->create($data);
-
-        return redirect()
-            ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Product created successfully.');
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('inventory/products', 'public');
     }
+
+    InventoryProduct::query()->create($data);
+
+    return redirect()
+        ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
+        ->with('success', 'Product created successfully.');
+}
 
     public function edit(string $locale, InventoryProduct $product): View
     {
@@ -65,7 +73,7 @@ class InventoryProductController extends Controller
         $data = $request->validated();
 
         $category = $this->findCategoryForTenant($data['category_id']);
-        $data['category'] = $category->code;
+        //$data['category'] = $category->code;
         $data['tenant_id'] = $product->tenant_id ?: ($category->tenant_id ?? $this->tenantId());
 
         $data['is_active'] = $request->boolean('is_active');

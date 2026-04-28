@@ -18,8 +18,9 @@ class SetLocaleApi
     public function handle(Request $request, Closure $next)
     {
         // Get locale from route
-        $locale = $request->route('locale'); // "en" or "ar"
-
+        $locale = $request->route('locale')
+            ?? $request->header('Accept-Language')
+            ?? app()->getLocale();
         // Validate locale
         if (!in_array($locale, ['en', 'ar'])) {
             return response()->json([

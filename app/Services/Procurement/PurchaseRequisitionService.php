@@ -4,6 +4,7 @@ namespace App\Services\Procurement;
 
 use App\Models\PurchaseRequisition;
 use App\Repositories\Contracts\Procurement\PurchaseRequisitionRepositoryInterface;
+use App\Repositories\Procurement\PurchaseRequisitionRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 class PurchaseRequisitionService
 {
     public function __construct(
-        private readonly PurchaseRequisitionRepositoryInterface $repo
+        private readonly PurchaseRequisitionRepository $repo
     ) {}
 
     public function paginate(array $filters): LengthAwarePaginator
@@ -57,6 +58,7 @@ class PurchaseRequisitionService
         $items = collect($data['items'] ?? [])
             ->map(function (array $item) {
                 return [
+                    'id' => $item['id'] ?? (string) Str::uuid(),
                     'product_id' => (int) $item['product_id'],
                     'quantity' => (float) $item['quantity'],
                     'estimated_price' => (float) ($item['estimated_price'] ?? 0),

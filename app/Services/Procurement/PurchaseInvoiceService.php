@@ -73,6 +73,7 @@ class PurchaseInvoiceService
         $tax = round((float) ($data['tax'] ?? 0), 2);
         $discount = round((float) ($data['discount'] ?? 0), 2);
         $total = round($subtotal + $tax - $discount, 2);
+        $data['id'] = $data['id'] ?? (string) Str::uuid();
 
         unset($data['subtotal'], $data['tax'], $data['discount'], $data['total']);
 

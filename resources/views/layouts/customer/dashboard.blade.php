@@ -43,6 +43,10 @@
             <main id="content">
                 @yield('content')
             </main>
+            <x-modals.over />
+            <x-modals.basic />
+            <x-modals.notification />
+            <x-modals.toast />
 
         </div>
     </main>
@@ -52,6 +56,7 @@
     <!-- Bootstrap JS -->
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -66,6 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom JS -->
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/customForm.js') }}"></script>
     <script src="{{ asset('assets/js/pages/sd-export-buttons.js') }}"></script>
     <script>
         (function () {
@@ -205,6 +211,69 @@
                 initGlobalSelectSearch();
             }
         })();
+
+        // Global looding state management for AJAX requests
+        (function () {
+            let activeRequests = 0;
+            function showLoading() {
+                if (activeRequests === 0) {
+                    jQuery('body').addClass('loading');
+                }
+                activeRequests++;
+            }
+            function hideLoading() {
+                activeRequests = Math.max(activeRequests - 1, 0);
+                if (activeRequests === 0) {
+                    jQuery('body').removeClass('loading');
+                }
+            }
+            jQuery(document).ajaxStart(showLoading).ajaxStop(hideLoading);
+        })();
+
+
+        { { --Validation Script-- } }
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        { { --Sidebar Toggle Script-- } }
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('show');
+                });
+
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function (event) {
+                    if (window.innerWidth <= 768) {
+                        if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                            sidebar.classList.remove('show');
+                        }
+                    }
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 768) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+
     </script>
     @stack('scripts')
 </body>

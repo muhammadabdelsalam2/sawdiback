@@ -5,11 +5,13 @@ namespace App\Providers;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Repositories\Api\Product\ProductRepository;
+use App\Repositories\Api\Setting\SupportRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ClientRepository;
 use App\Repositories\Contracts\Api\CategoryRepositoryInterface;
 use App\Repositories\Contracts\Api\PlusRepositoryInterface;
 use App\Repositories\Contracts\Api\ProductRepositoryInterface;
+use App\Repositories\Contracts\Setting\SupportRepositoryInterface;
 use App\Repositories\Contracts\ClientRepositoryInterface;
 use App\Repositories\Contracts\OtpRepositoryInterface;
 use App\Repositories\Contracts\TenantRepositoryInterface;
@@ -76,6 +78,7 @@ class RepositoryServiceProvider extends ServiceProvider
         ClientRepositoryInterface::class => ClientRepository::class,
         CategoryRepositoryInterface::class => CategoryRepository::class,
         ProductRepositoryInterface::class => ProductRepository::class,
+        SupportRepositoryInterface::class => SupportRepository::class,
     ];
 
     public function register(): void

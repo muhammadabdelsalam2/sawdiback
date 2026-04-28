@@ -7,7 +7,12 @@ return [
         'settings' => 'الإعدادات',
         'logout' => 'تسجيل الخروج',
         'module' => 'موديول',
-    ],
+        'language' => 'اللغة',
+        'english' => 'الإنجليزية',
+        'arabic' => 'العربية',
+        'saudi_arabia' => 'السعودية',
+        'egypt' => 'مصر',
+        ],
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
         'livestock' => 'إدارة الماشية',

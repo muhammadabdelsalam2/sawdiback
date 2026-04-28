@@ -11,6 +11,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.26",
         "laravel/tinker": "^2.10.1",
+        "openai-php/laravel": "^0.19.1",
         "socialiteproviders/instagram": "^5.2",
         "spatie/laravel-permission": "^6.24"
     },
@@ -28,7 +29,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+           "files": [
+        "vendor/laravel/framework/src/Illuminate/Support/helpers.php"
+    ]
     },
     "autoload-dev": {
         "psr-4": {

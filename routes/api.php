@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Account\AccountController;
 use App\Http\Controllers\Api\Account\PasswordManagmentController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,12 +27,18 @@ Route::prefix('v1/{locale}')->group(function () {
     | Routes for authentication and account verification for guests.
     */
     Route::prefix('auth')
-        ->middleware(['guest:sanctum', 'throttle:10,1', 'api.error','SetLocaleApi'])
+        ->middleware(['guest:sanctum', 'throttle:10,1', 'api.error'])
         ->controller(AuthController::class)
         ->group(function () {
             Route::post('login', 'login')->name('api.auth.login');
+
             Route::post('social-login', 'socialLogin')->name('api.auth.social-login');
             Route::post('register', 'register')->name('api.auth.register');
+
+            Route::prefix('social')->group(function () {
+                Route::get('{provider}/redirect', [SocialAuthController::class, 'redirect']);
+                Route::get('{provider}/callback', [SocialAuthController::class, 'callback']);
+            });
         });
 
     Route::prefix('account')
