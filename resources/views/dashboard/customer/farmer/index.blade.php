@@ -148,7 +148,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5 text-muted">
                                 <i class="fa-solid fa-box-open fa-2x mb-3"></i>
-                                <p class="mb-0">{{ __('crops_feed.empty.no_crops') }}</p>
+                                <p class="mb-0">{{ __('farmers.empty.no_farmers') }}</p>
                             </td>
                         </tr>
                     @endforelse

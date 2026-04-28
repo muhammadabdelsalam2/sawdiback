@@ -73,7 +73,10 @@ return [
 
     'location' => 'الموقع',
     'status' => 'الحالة',
-
+    'empty' =>
+        [
+            'no_farmers' => 'لا يوجد مزارعين حتى الآن.',
+        ],
     'suspended' => 'موقوف',
 
     'verified' => 'موثق',

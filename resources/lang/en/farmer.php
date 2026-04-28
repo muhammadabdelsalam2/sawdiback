@@ -72,5 +72,8 @@ return [
     'score' => 'Score',
     'orders' => 'Orders',
     'rating' => 'Rating',
-    'view_profile' => 'View Profile',
+    // 'view_profile' => 'View Profile',
+    'empty' => [
+        'no_farmers' => 'No farmers found.',
+    ],
 ];
