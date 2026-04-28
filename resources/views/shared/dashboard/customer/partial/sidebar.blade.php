@@ -173,7 +173,7 @@
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.farmers.index', ['locale' => $activeLocale]) }}"
-                    class="dropdown-item {{ request()->routeIs('customer.farmers.farmer.index') ? 'active' : '' }}">{{ __('farmer.titles.farmer') }}</a>
+                    class="dropdown-item {{ request()->routeIs('customer.farmers.index') ? 'active' : '' }}">{{ __('farmer.titles.farmer') }}</a>
 
             </div>
         </div>

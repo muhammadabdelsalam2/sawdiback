@@ -112,7 +112,7 @@ $(document).on('click', '[data-ajax-popup="true"]', function (e) {
         success: function (response) {
             $modalBody.html(response);
             $modal.modal('show');
-            show_toastr('Modal loaded successfully.', 'success');
+            // show_toastr('Modal loaded successfully.', 'success');
             if (typeof taskCheckbox === 'function') taskCheckbox();
             if (typeof common_bind === 'function') common_bind('#commonModal');
             if (typeof commonLoader === 'function') commonLoader();
@@ -251,51 +251,51 @@ function select_search() {
     });
 
     // Axios AJAX submit
-    $(document).on('submit', 'form[data-axios="true"]', function (e) {
-        e.preventDefault();
+    // $(document).on('submit', 'form[data-axios="true"]', function (e) {
+    //     e.preventDefault();
 
-        let $form = $(this);
-        let url = $form.data('action');
-        let method = $form.data('method') || 'POST';
-        let formData = new FormData(this);
+    //     let $form = $(this);
+    //     let url = $form.data('action');
+    //     let method = $form.data('method') || 'POST';
+    //     let formData = new FormData(this);
 
-        // Disable button while processing
-        let $btn = $form.find('button[type="submit"]');
-        $btn.prop('disabled', true).text('Processing...');
+    //     // Disable button while processing
+    //     let $btn = $form.find('button[type="submit"]');
+    //     $btn.prop('disabled', true).text('Processing...');
 
-        axios({
-            method: method,
-            url: url,
-            data: formData,
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-            .then(response => {
-                if (response.data.redirect) {
-                    window.location.href = response.data.redirect;
-                } else {
-                    alert(response.data.message);
-                    console.log(response.data);
-                }
-            })
-            .catch(error => {
-                if (error.response && error.response.data.errors) {
-                    let errors = error.response.data.errors;
+    //     axios({
+    //         method: method,
+    //         url: url,
+    //         data: formData,
+    //         headers: { 'Content-Type': 'multipart/form-data' }
+    //     })
+    //         .then(response => {
+    //             if (response.data.redirect) {
+    //                 window.location.href = response.data.redirect;
+    //             } else {
+    //                 alert(response.data.message);
+    //                 console.log(response.data);
+    //             }
+    //         })
+    //         .catch(error => {
+    //             if (error.response && error.response.data.errors) {
+    //                 let errors = error.response.data.errors;
 
-                    // Show errors below each input
-                    $.each(errors, function (field, messages) {
-                        let $input = $form.find(`[name="${field}"]`);
-                        $input.addClass('is-invalid');
-                        let $errorDiv = $input.siblings('.invalid-feedback');
-                        if ($errorDiv.length) {
-                            $errorDiv.text(messages[0]).show();
-                        }
-                    });
-                }
-            })
-            .finally(() => {
-                $btn.prop('disabled', false).text('Success ✔');
-            });
-    });
+    //                 // Show errors below each input
+    //                 $.each(errors, function (field, messages) {
+    //                     let $input = $form.find(`[name="${field}"]`);
+    //                     $input.addClass('is-invalid');
+    //                     let $errorDiv = $input.siblings('.invalid-feedback');
+    //                     if ($errorDiv.length) {
+    //                         $errorDiv.text(messages[0]).show();
+    //                     }
+    //                 });
+    //             }
+    //         })
+    //         .finally(() => {
+    //             $btn.prop('disabled', false).text('Success ✔');
+    //         });
+    // });
 
 })(jQuery);
 

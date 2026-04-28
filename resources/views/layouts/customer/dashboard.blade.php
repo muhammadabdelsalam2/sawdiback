@@ -17,6 +17,8 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet">
+    {{-- Icon In Title --}}
+    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -54,8 +56,8 @@
     {{-- @include('shared.dashboard.footer') --}}
 
     <!-- Bootstrap JS -->
-    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
@@ -74,10 +76,11 @@
     <script src="{{ asset('assets/js/pages/customForm.js') }}"></script>
     <script src="{{ asset('assets/js/pages/sd-export-buttons.js') }}"></script>
     <script>
-        (function () {
+        (function() {
             const dataTableLanguage = {
                 search: @json(__('datatable.search')),
-                lengthMenu: @json(__('datatable.show')) + ' ' + @json(__('datatable.show_menu')) + ' ' + @json(__('datatable.entries')),
+                lengthMenu: @json(__('datatable.show')) + ' ' + @json(__('datatable.show_menu')) + ' ' +
+                    @json(__('datatable.entries')),
                 info: @json(__('datatable.info')),
                 infoEmpty: @json(__('datatable.info_empty')),
                 zeroRecords: @json(__('datatable.zero_records')),
@@ -101,25 +104,27 @@
 
                 const tables = jQuery('#content table').not('.no-datatable');
 
-                tables.each(function () {
+                tables.each(function() {
                     if (jQuery.fn.dataTable.isDataTable(this)) return;
 
                     const $table = jQuery(this);
                     const columnCount = $table.find('thead th').length;
-                    const colspannedRows = $table.find('tbody tr').filter(function () {
+                    const colspannedRows = $table.find('tbody tr').filter(function() {
                         return jQuery(this).find('td[colspan], td[rowspan]').length > 0;
                     });
 
                     if (colspannedRows.length) {
                         let hasComplexRows = false;
 
-                        colspannedRows.each(function () {
+                        colspannedRows.each(function() {
                             const $row = jQuery(this);
                             const $cells = $row.children('td');
                             const $firstCell = $cells.first();
-                            const hasFormContent = $row.find('form, input, select, textarea, button').length > 0;
+                            const hasFormContent = $row.find('form, input, select, textarea, button')
+                                .length > 0;
                             const spanValue = parseInt($firstCell.attr('colspan') || '1', 10);
-                            const isSimpleEmptyRow = $cells.length === 1 && !hasFormContent && spanValue >= columnCount;
+                            const isSimpleEmptyRow = $cells.length === 1 && !hasFormContent &&
+                                spanValue >= columnCount;
 
                             if (isSimpleEmptyRow) {
                                 $row.remove();
@@ -133,7 +138,7 @@
                         }
                     }
 
-                    const valid = $table.find('tbody tr').toArray().every(function (tr) {
+                    const valid = $table.find('tbody tr').toArray().every(function(tr) {
                         return jQuery(tr).find('td').length === columnCount;
                     });
 
@@ -143,7 +148,7 @@
                     }
 
                     const noSortIndexes = [];
-                    $table.find('thead th').each(function (idx) {
+                    $table.find('thead th').each(function(idx) {
                         if (jQuery(this).hasClass('no-sort')) {
                             noSortIndexes.push(idx);
                         }
@@ -172,7 +177,7 @@
                     .not('.no-select-search')
                     .not('.select2-hidden-accessible');
 
-                selects.each(function () {
+                selects.each(function() {
                     const $select = jQuery(this);
                     const inModal = $select.closest('.modal').length > 0;
 
@@ -198,8 +203,8 @@
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function () {
-                    (function () {
+                document.addEventListener('DOMContentLoaded', function() {
+                    (function() {
                         initGlobalDataTables();
                         initSalesDistributionExportTables();
                     })();
@@ -213,14 +218,16 @@
         })();
 
         // Global looding state management for AJAX requests
-        (function () {
+        (function() {
             let activeRequests = 0;
+
             function showLoading() {
                 if (activeRequests === 0) {
                     jQuery('body').addClass('loading');
                 }
                 activeRequests++;
             }
+
             function hideLoading() {
                 activeRequests = Math.max(activeRequests - 1, 0);
                 if (activeRequests === 0) {
@@ -231,7 +238,6 @@
         })();
 
 
-        { { --Validation Script-- } }
         (() => {
             'use strict';
             const forms = document.querySelectorAll('.needs-validation');
@@ -246,18 +252,17 @@
             });
         })();
 
-        { { --Sidebar Toggle Script-- } }
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebar = document.getElementById('sidebar');
 
             if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function () {
+                sidebarToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('show');
                 });
 
                 // Close sidebar when clicking outside on mobile
-                document.addEventListener('click', function (event) {
+                document.addEventListener('click', function(event) {
                     if (window.innerWidth <= 768) {
                         if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
                             sidebar.classList.remove('show');
@@ -266,14 +271,13 @@
                 });
 
                 // Handle window resize
-                window.addEventListener('resize', function () {
+                window.addEventListener('resize', function() {
                     if (window.innerWidth > 768) {
                         sidebar.classList.remove('show');
                     }
                 });
             }
         });
-
     </script>
     @stack('scripts')
 </body>

@@ -18,7 +18,7 @@ class FarmerRepository implements FarmerRepositoryInterface
     // Get all farmers with pagination
     public function getAll(int $perPage = 15)
     {
-        return $this->model->paginate($perPage);
+        return $this->model->latest()->paginate($perPage);
     }
 
     public function create(FarmerDTO $dto)

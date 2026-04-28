@@ -14,6 +14,7 @@ class FarmerDTO
         public ?string $address = null,
         public ?float $opening_balance = null,
         public ?bool $is_active = null,
+        public ?string $image = null,
     ) {
     }
 
@@ -26,6 +27,7 @@ class FarmerDTO
             address: $data['address'] ?? null,
             opening_balance: $data['opening_balance'] ?? null,
             is_active: $data['is_active'] ?? null,
+            image: $data['image'] ?? null,
         );
     }
 }

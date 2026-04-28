@@ -4,11 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Farmer extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     // Model properties and methods go here
+
+
+
+
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'name',
@@ -17,6 +25,7 @@ class Farmer extends Model
         'address',
         'opening_balance',
         'is_active',
+        'image',
         'account_id',
         'user_id',
         // Add other fields as necessary
@@ -49,7 +58,10 @@ class Farmer extends Model
         return $this->image ? asset('storage/' . $this->image) : asset('images/default-farmer.png');
     }
 
-
+    public function getRouteKeyName()
+    {
+        return 'id'; // UUID column
+    }
     // Generate Unique id UUID for Farmer Automatically
     protected static function boot()
     {

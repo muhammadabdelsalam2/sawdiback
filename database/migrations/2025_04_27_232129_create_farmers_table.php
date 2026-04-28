@@ -25,6 +25,9 @@ return new class extends Migration {
             $table->string('farm_name')->nullable();
             $table->text('address')->nullable();
 
+            // Farmer Image
+            $table->string('image')->nullable();
+
             // Optional: Link to user account if farmers can log in
             $table->unsignedBigInteger('user_id')->nullable();
 

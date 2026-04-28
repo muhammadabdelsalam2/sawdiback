@@ -22,6 +22,8 @@ class StoreFarmerRequest extends FormRequest
             'address' => 'required|string|max:255',
             'opening_balance' => 'required|numeric|min:0',
             'is_active' => 'boolean',
+            // Validate width and height of the image if needed, for example: 300x300
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048|dimensions:width=300,height=300',
         ];
     }
 
@@ -51,6 +53,7 @@ class StoreFarmerRequest extends FormRequest
             email: $this->input('email'),
             phone: $this->input('phone'),
             address: $this->input('address'),
+            image: $this->file('image'),
             opening_balance: $this->input('opening_balance'),
             is_active: $this->boolean('is_active', true),
         );

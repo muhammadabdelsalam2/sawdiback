@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Farmer;
 
 use App\Http\Controllers\Controller;
-use App\DTOs\Farmer\FarmerDTO;
 use App\Http\Requests\Farmer\StoreFarmerRequest;
+use App\Models\Farmer;
 use App\Services\Farmer\FarmerService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FarmerController extends Controller
 {
     //
-    protected $farmerService;
+    protected FarmerService $farmerService;
     public function __construct(FarmerService $farmerService)
     {
         $this->farmerService = $farmerService;
@@ -45,14 +46,67 @@ class FarmerController extends Controller
     // Store a new farmer
     public function store(StoreFarmerRequest $request)
     {
-        $dto = $request->toDTO();
 
-        $this->farmerService->create($dto);
-        // Check if created successfully and redirect with success message
+        // transaction to ensure data integrity
+        try {
+            $dto = $request->toDTO();
 
-        return redirect()
-            ->route('customer.farmers.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', '__(farmer.created_successfully)');
+            $newFarmer = $this->farmerService->create($dto);
+            // Check if created successfully and redirect with success message
+            // Store Image if exists
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('farmers', 'public');
+                $newFarmer->image = $imagePath;
+                $newFarmer->save();
+            }
+            // return Response Json for AJAX request
+            if ($newFarmer) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.farmer.created_successfully'),
+                    'data' => $newFarmer
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.farmer.creation_failed'),
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.farmer.creation_failed'),
+            ], 500);
+        }
 
+
+    }
+
+
+    // Delete Farmer 
+
+    public function force($locale, Farmer $farmer)
+    {
+        try {
+            DB::beginTransaction();
+
+
+            $farmer->forceDelete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('customer.farmers.index', ['locale' => $locale])
+                ->with('success', __('farmer.messages.deleted_successfully'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Force delete farmer failed: ' . $e->getMessage());
+
+            return redirect()
+                ->route('customer.farmers.index', ['locale' => $locale])
+                ->with('error', __('farmer.messages.deletion_failed'));
+        }
     }
 }

@@ -507,6 +507,45 @@ html[dir="rtl"] #content.sidebar-collapsed {
     padding: 8px 16px;
 }
 
+::selection {
+    background-color: #d1e7dd;
+    /* The highlight color */
+    color: black;
+    /* The text color when selected */
+}
+
+/* Specific support for Firefox */
+::-moz-selection {
+    background-color: #d1e7dd;
+    color: black;
+}
+
+/* Global Select Text color */
+.custom-highlight {
+    background-color: #d1e7dd;
+    color: black;
+    animation: fadeHighlight 0.4s ease-in-out;
+    border-radius: 3px;
+}
+
+@keyframes fadeHighlight {
+    from {
+        background-color: transparent;
+    }
+
+    to {
+        background-color: #d1e7dd;
+    }
+}
+
+.text-color {
+    color: var(--primary-green);
+}
+
+.bg-main {
+    background: var(--primary-green);
+}
+
 /* Registry Search and Filters */
 /* Registry Search Header Area Styling */
 .search-registry-container {
