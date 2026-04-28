@@ -187,7 +187,6 @@ Route::prefix('{locale}')
         // =========================================================================
         Route::prefix('farmers')
             ->name('farmers.')
-            ->middleware(['feature:farmer_management'])
             ->group(function () {
             Route::get('index', [FarmerController::class, 'index'])->name('index'); // Placeholder route for farmers listing
             // Future routes for farmer management will go here
