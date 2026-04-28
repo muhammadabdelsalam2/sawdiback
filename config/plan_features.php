@@ -207,12 +207,20 @@ return [
     | HR Management
     |--------------------------------------------------------------------------
     */
-
-    'hr_management' => [
-        'label' => 'HR Management',
+    'farmer_management' => [
+        'label' => 'Farmer Management',
         'type' => 'boolean',
         'default' => false,
-        'description' => 'Enable HR module in dashboard navigation',
+        'description' => 'Enable farmer management features and navigation',
     ],
+
+    // 'hr_management' => [
+    //     'label' => 'HR Management',
+    //     'type' => 'boolean',
+    //     'default' => false,
+    //     'description' => 'Enable HR module in dashboard navigation',
+    // ],
+
+
 
 ];

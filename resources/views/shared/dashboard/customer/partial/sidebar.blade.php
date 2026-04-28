@@ -11,7 +11,69 @@
         // Feature flag (new structure: ['hr_management' => ['enabled' => bool, ...]])
         $hrEnabled = (bool) ($features['hr_management']['enabled'] ?? false);
     @endphp
+    <style>
+        .sidebar-nav {
+            max-height: 100vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
 
+        /* Scrollbar */
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(35, 76, 20, 0.1);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg,
+                    #234c14,
+                    #3e7a2f,
+                    #6aa84f);
+            border-radius: 10px;
+        }
+
+        .sidebar-nav {
+            max-height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #234c14 transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: #234c14;
+            border-radius: 8px;
+        }
+
+        .sidebar {
+            background: #1b3a10;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: #234c14;
+            border: 1px solid #6aa84f;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .sidebar-nav .active {
+            background: rgba(35, 76, 20, 0.15);
+            border-left: 3px solid #234c14;
+            color: #234c14;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(35, 76, 20, 0.08);
+            padding-left: 18px;
+            transition: 0.3s;
+        }
+    </style>
     {{-- You Can Start Get Features About Current Subscription Plan auth()->user()->planFeatures() --}}
     <nav class="sidebar-nav mt-4">
 
@@ -29,7 +91,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.*') || request()->routeIs('livestock.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-2.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.livestock') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}  "></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.livestock.animals.index', ['locale' => $activeLocale]) }}"
@@ -55,7 +118,8 @@
             <a href="javascript:void(0)" class="nav-item has-dropdown">
                 <img src="{{ asset('assets/images/sidebar-icon-3.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.production') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}  "></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}"
@@ -83,7 +147,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.crops-feed.*') || request()->routeIs('crops-feed.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-4.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.crops_feed') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.crops-feed.crops.index', ['locale' => $activeLocale]) }}"
@@ -96,6 +161,22 @@
                     class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
             </div>
         </div>
+        {{-- Farmer Management --}}
+        <div class="nav-dropdown {{ request()->routeIs('customer.farmers.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)"
+                class="nav-item has-dropdown {{ request()->routeIs('customer.farmers.*') ? 'active' : '' }}">
+                {{-- <i class="fas fa-seedling fs-6"></i> --}}
+                <img src="{{ asset('assets/images/sidebar-icon-14.png') }}" alt="" class="nav-icon ">
+                <span class="nav-label">{{ __('farmer.titles.farmer_management') }}</span>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
+            </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.farmers.index', ['locale' => $activeLocale]) }}"
+                    class="dropdown-item {{ request()->routeIs('customer.farmers.farmer.index') ? 'active' : '' }}">{{ __('farmer.titles.farmer') }}</a>
+
+            </div>
+        </div>
 
         {{-- Inventory --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
@@ -103,7 +184,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.inventory') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.inventory.index', ['locale' => $activeLocale]) }}"
@@ -125,7 +207,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.ecommerce') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.ecommerce.orders.index', ['locale' => $activeLocale]) }}"
@@ -139,7 +222,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('sales_dist.sidebar.title') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.sales-distribution.dashboard', ['locale' => $activeLocale]) }}"
@@ -163,7 +247,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.procurement.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-7.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('procurement.sidebar.title') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.procurement.suppliers.index', ['locale' => $activeLocale]) }}"
@@ -189,7 +274,8 @@
                 class="nav-item has-dropdown {{ request()->routeIs('customer.finance.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-8.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.finance') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
             <div class="dropdown-container">
                 <a href="{{ route('customer.finance.dashboard', ['locale' => $activeLocale]) }}"
@@ -215,7 +301,8 @@
                     class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
                     <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
-                    <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                    <i
+                        class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
                 </a>
 
                 <div class="dropdown-container">
@@ -257,7 +344,8 @@
             <a href="#" class="nav-item">
                 <img src="{{ asset('assets/images/sidebar-icon-10.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.maintenance') }}</span>
-                <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                <i
+                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
             </a>
         </div>
 
@@ -275,7 +363,8 @@
                     class="nav-item has-dropdown {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                     <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
                     <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
-                    <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
+                    <i
+                        class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
                 </a>
 
                 <div class="dropdown-container">

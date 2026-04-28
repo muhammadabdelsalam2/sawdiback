@@ -40,8 +40,8 @@
                                 SA</a></li>
                         <li><a class="dropdown-item py-2" href="{{ route('language.switch', 'ar-SA') }}">العربية -
                                 السعودية</a></li>
-                     
-               
+
+
                     </ul>
                 </li>
             </ul>

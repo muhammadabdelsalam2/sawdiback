@@ -66,32 +66,32 @@ class DemoDataSeeder extends Seeder
             ['key' => 'custom_domain', 'type' => 'boolean'],
         ];
 
-        // $plans = Plan::factory(5)->create()->each(function ($plan) use ($featureKeys) {
-        //     $planFeatures = [];
-        //     $randomFeatures = collect($featureKeys)->random(rand(2, 4));
-        //     foreach ($randomFeatures as $feature) {
-        //         $planFeatures[$feature['key']] = [
-        //             'value' => $feature['type'] === 'boolean' ? true : rand(5, 100),
-        //             'enabled' => true,
-        //         ];
-        //     }
-        //     $plan->features = $planFeatures;
-        //     $plan->save();
-        // });
+        $plans = Plan::factory(5)->create()->each(function ($plan) use ($featureKeys) {
+            $planFeatures = [];
+            $randomFeatures = collect($featureKeys)->random(rand(2, 4));
+            foreach ($randomFeatures as $feature) {
+                $planFeatures[$feature['key']] = [
+                    'value' => $feature['type'] === 'boolean' ? true : rand(5, 100),
+                    'enabled' => true,
+                ];
+            }
+            $plan->features = $planFeatures;
+            $plan->save();
+        });
 
         // Step:5 Create Subscription for the Tenant
-        // $plan = $plans->random();
+        $plan = $plans->random();
 
-        // Subscription::create([
-        //     'customer_id' => $customer->id,
-        //     'plan_id' => $plan->id,
-        //     'status' => Subscription::STATUS_ACTIVE,
-        //     'start_at' => now(),
-        //     'end_at' => now()->addMonth(),
-        //     'renewal_at' => now()->addMonth(),
-        //     'canceled_at' => null,
-        //     'metadata' => null,
-        // ]);
+        Subscription::create([
+            'customer_id' => $customer->id,
+            'plan_id' => $plan->id,
+            'status' => Subscription::STATUS_ACTIVE,
+            'start_at' => now(),
+            'end_at' => now()->addMonth(),
+            'renewal_at' => now()->addMonth(),
+            'canceled_at' => null,
+            'metadata' => null,
+        ]);
 
         $this->command->info("Seeder finished: SuperAdmin, Customer, Tenant, Plans, Subscription created.");
     }

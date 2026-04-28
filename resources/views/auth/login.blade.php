@@ -197,4 +197,14 @@
     </div>
 </div>
 
+<script>
+    //  When Supmit Make Loading State
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${submitButton.textContent}`;
+    }); 
+</script>
+
 @endsection

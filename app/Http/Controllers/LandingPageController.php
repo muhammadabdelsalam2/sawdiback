@@ -27,11 +27,11 @@ class LandingPageController extends Controller
         $currencyId = $currency?->id;
 
         // Get all active plans with currency
-       $products = InventoryProduct::where('is_active', true)->get();
-       $bestSellingProducts = InventoryProduct::where('is_active', true)->where('is_best_selling', true)->get();
-
+        $products = InventoryProduct::where('is_active', true)->get();
+        $bestSellingProducts = InventoryProduct::where('is_active', true)->where('is_best_selling', true)->get();
+        $farmers = app()->make('App\Services\Farmer\FarmerService')->getAllFarmers(5); // Get 5 farmers for the landing page
         // Pass plans & currency to the view
-        return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts'));
+        return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts', 'farmers'));
     }
 
 }
