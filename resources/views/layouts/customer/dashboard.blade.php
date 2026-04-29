@@ -10,7 +10,6 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.rtl.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/pages/datatables-global.css') }}">
@@ -26,6 +25,7 @@
     <!-- Main CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{{ asset('assets/css/pages/dashboard.css') }}">
 
     @stack('styles')
 </head>

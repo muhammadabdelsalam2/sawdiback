@@ -27,11 +27,14 @@ class FarmerController extends Controller
     }
 
 
-    public function show($id)
+    public function show($locale, Farmer $farmer)
     {
-        // Placeholder for showing farmer details
-        // You can implement this method to retrieve and display details of a specific farmer
-        return view('dashboard.customer.farmer.show', compact('id'));
+        // Get Products and Orders related to the farmer
+        $products = $this->farmerService->getProductsByFarmer($farmer);
+        $orders = $this->farmerService->getOrdersByFarmer($farmer);
+        $livestock = $this->farmerService->getLivestockByFarmer($farmer); // Assuming Farmer has a relationship defined as livestock()
+
+        return view('dashboard.customer.farmer.show', compact('farmer', 'products', 'orders', 'livestock'));
     }
 
 

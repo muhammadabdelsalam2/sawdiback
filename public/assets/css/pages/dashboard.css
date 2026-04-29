@@ -1652,3 +1652,65 @@ html[dir="rtl"] .nav-dropdown.open .chevron {
     border-color: var(--primary-green);
     box-shadow: 0 0 0 0.2rem rgba(35, 76, 20, 0.18);
 }
+
+/*  Farmer Page Details Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, #234c14, #3e7d2c);
+    border-radius: 20px;
+    color: white;
+    padding: 30px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    border-radius: 18px;
+    padding: 22px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+    transition: .3s;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edf7eb;
+    color: #234c14;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.section-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .04);
+    margin-bottom: 25px;
+}
+
+.animal-card {
+    border-radius: 16px;
+    padding: 18px;
+    background: #f8faf8;
+    border-left: 5px solid #234c14;
+}
+
+.table thead {
+    background: #234c14;
+    color: white;
+}
+
+.badge-status {
+    background: #dff3da;
+    color: #234c14;
+    padding: 6px 12px;
+    border-radius: 20px;
+}

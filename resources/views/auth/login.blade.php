@@ -23,7 +23,7 @@
                                     </span>
                                 </div>
 
-                                <h2 class="display-6 fw-bold">
+                                <h2 class="display-6 fw-bold text-white">
                                     {{ __('auth.hero_title') }}
                                 </h2>
 
@@ -133,7 +133,7 @@
                                 {{ __('auth.login_button') }}
                             </button>
                         </form>
-
+{{-- 
                         <div class="text-center mt-4">
                             <p class="small text-muted">
                                 {{ __('auth.support_text') }}
@@ -188,7 +188,7 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div>

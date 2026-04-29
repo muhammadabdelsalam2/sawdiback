@@ -30,4 +30,21 @@ class FarmerService
         return $this->farmerRepository->create($dto);
     }
 
+
+    public function getProductsByFarmer(Farmer $farmer)
+    {
+        return $this->farmerRepository->getProductsByFarmer($farmer);
+    }
+
+    public function getOrdersByFarmer(Farmer $farmer)
+    {
+        return $this->farmerRepository->getOrdersByFarmer($farmer);
+    }
+
+    public function getLivestockByFarmer(Farmer $farmer)
+    {
+        // Assuming Farmer has a relationship defined as livestock()
+        return [];
+    }
+
 }

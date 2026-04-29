@@ -87,4 +87,9 @@ return [
 
     'view_profile' => 'عرض الملف',
 
+    'products' => [
+        'add_product' => 'إضافة منتج',
+        'title' => 'منتجات المزارع',
+    ],
+
 ];

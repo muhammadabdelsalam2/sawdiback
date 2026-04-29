@@ -76,4 +76,6 @@ return [
     'empty' => [
         'no_farmers' => 'No farmers found.',
     ],
+
+        
 ];

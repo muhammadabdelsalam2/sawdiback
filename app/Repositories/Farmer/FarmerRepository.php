@@ -33,4 +33,19 @@ class FarmerRepository implements FarmerRepositoryInterface
         ]);
     }
 
+    public function getProductsByFarmer(Farmer $farmer, $perPage = 10)
+    {
+        // Assuming Farmer has a relationship defined as products()
+        return $farmer->products()->paginate($perPage); // Adjust pagination as needed
+
+    }
+
+    public function getOrdersByFarmer(Farmer $farmer)
+    {
+        // Assuming Farmer has a relationship defined as orders()
+        // fake data for arrays 
+        return [];
+    }
+
+
 }
