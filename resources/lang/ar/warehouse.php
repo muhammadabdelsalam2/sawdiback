@@ -34,6 +34,7 @@ return [
     'fields' => [
         'id' => '#',
         'code' => 'الكود',
+        'select_farmer'=>'اختر المزارع',
         'name' => 'الاسم',
         'category' => 'الفئة',
         'unit' => 'الوحدة',

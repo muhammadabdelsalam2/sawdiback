@@ -1,11 +1,25 @@
 <div class="row g-3">
+
+    {{-- Select Farmer --}}
+    <div class="col-md-4">
+        <label class="form-label">{{ __('warehouse.fields.select_farmer') }}</label>
+        <select name="farmer_id" class="form-select" required>
+            @foreach ($farmers as $farmer)
+                <option value="{{ $farmer->id }}" @selected((int) old('farmer_id', $product->farmer_id ?? 0) === $farmer->id)>
+                    {{ $farmer->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.code') }}</label>
         <input type="text" name="code" class="form-control" value="{{ old('code', $product->code ?? '') }}">
     </div>
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.name') }}</label>
-        <input type="text" name="name" class="form-control" required value="{{ old('name', $product->name ?? '') }}">
+        <input type="text" name="name" class="form-control" required
+            value="{{ old('name', $product->name ?? '') }}">
     </div>
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.category') }}</label>
@@ -18,38 +32,39 @@
         </select>
     </div>
     <div class="col-md-4">
-    <label class="form-label">Image</label>
-    @if (!empty($product->image))
-        <div class="mb-2">
-            <img src="{{ $product->image_url }}"
-                 style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
-        </div>
-    @endif
-    <input type="file" name="image" class="form-control" accept="image/*">
-</div>
-<div class="col-md-3">
-    <label class="form-label">Price</label>
-    <input type="number" step="0.01" min="0" name="price"
-           class="form-control"
-           value="{{ old('price', $product->price ?? 0) }}">
-</div>
-<div class="col-md-3">
-    <label class="form-label">Last Price</label>
-    <input type="number" step="0.01" min="0" name="last_price"
-           class="form-control"
-           value="{{ old('last_price', $product->last_price ?? 0) }}">
-</div>
+        <label class="form-label">Image</label>
+        @if (!empty($product->image))
+            <div class="mb-2">
+                <img src="{{ $product->image_url }}"
+                    style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+        @endif
+        <input type="file" name="image" class="form-control" accept="image/*">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Price</label>
+        <input type="number" step="0.01" min="0" name="price" class="form-control"
+            value="{{ old('price', $product->price ?? 0) }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Last Price</label>
+        <input type="number" step="0.01" min="0" name="last_price" class="form-control"
+            value="{{ old('last_price', $product->last_price ?? 0) }}">
+    </div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.unit') }}</label>
-        <input type="text" name="unit" class="form-control" required value="{{ old('unit', $product->unit ?? '') }}">
+        <input type="text" name="unit" class="form-control" required
+            value="{{ old('unit', $product->unit ?? '') }}">
     </div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.tax') }}</label>
-        <input type="number" step="0.01" min="0" name="tax" class="form-control" value="{{ old('tax', $product->tax ?? 0) }}">
+        <input type="number" step="0.01" min="0" name="tax" class="form-control"
+            value="{{ old('tax', $product->tax ?? 0) }}">
     </div>
     <div class="col-md-3">
         <label class="form-label">{{ __('warehouse.fields.low_stock_threshold') }}</label>
-        <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control" value="{{ old('low_stock_threshold', $product->low_stock_threshold ?? 0) }}">
+        <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control"
+            value="{{ old('low_stock_threshold', $product->low_stock_threshold ?? 0) }}">
     </div>
     <div class="col-md-3 d-flex align-items-end">
         <div class="form-check">
@@ -69,7 +84,8 @@
         <div class="form-check">
             <input class="form-check-input" type="checkbox" name="is_best_selling" value="1" id="is_best_selling"
                 @checked((bool) old('is_best_selling', $product->is_best_selling ?? false))>
-            <label class="form-check-label text-warning fw-bold" for="is_best_selling">{{ __('warehouse.fields.best_selling') ?? 'Best Selling' }}</label>
+            <label class="form-check-label text-warning fw-bold"
+                for="is_best_selling">{{ __('warehouse.fields.best_selling') ?? 'Best Selling' }}</label>
         </div>
     </div>
     <div class="col-12">

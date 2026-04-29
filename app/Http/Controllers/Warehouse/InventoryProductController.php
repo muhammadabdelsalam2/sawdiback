@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Warehouse\InventoryProductStoreRequest;
 use App\Http\Requests\Warehouse\InventoryProductUpdateRequest;
 use App\Models\Category;
+use App\Models\Farmer;
 use App\Models\InventoryProduct;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -13,53 +14,57 @@ use Throwable;
 
 class InventoryProductController extends Controller
 {
-public function index(string $locale): View
-{
-    $rows = InventoryProduct::query()
-        ->with(['category.translation'])
-        ->orderBy('name')
-        ->paginate(15);
+    public function index(string $locale): View
+    {
+        $rows = InventoryProduct::query()
+            ->with(['category.translation'])
+            ->orderBy('name')
+            ->paginate(15);
 
-    // إحصائيات للداشبورد
-    $totalProducts = InventoryProduct::count();
-    $activeProducts = InventoryProduct::where('is_active', true)->count();
-    $lowStock = InventoryProduct::where('low_stock_threshold', '>', 0)->count();
-    $bestSelling = InventoryProduct::where('is_best_selling', true)->count();
+        // إحصائيات للداشبورد
+        $totalProducts = InventoryProduct::count();
+        $activeProducts = InventoryProduct::where('is_active', true)->count();
+        $lowStock = InventoryProduct::where('low_stock_threshold', '>', 0)->count();
+        $bestSelling = InventoryProduct::where('is_best_selling', true)->count();
 
-    return view('dashboard.warehouse.products.index', compact(
-        'rows', 'totalProducts', 'activeProducts', 'lowStock', 'bestSelling'
-    ));
-}
+        return view('dashboard.warehouse.products.index', compact(
+            'rows',
+            'totalProducts',
+            'activeProducts',
+            'lowStock',
+            'bestSelling'
+        ));
+    }
 
     public function create(string $locale): View
     {
         $categories = $this->categoriesForTenant();
+        $farmers = $this->farmersForTenant();
 
-        return view('dashboard.warehouse.products.create', compact('categories'));
+        return view('dashboard.warehouse.products.create', compact('categories', 'farmers'));
     }
 
-public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
-{
-    $data = $request->validated();
+    public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
+    {
+        $data = $request->validated();
+        $category = $this->findCategoryForTenant($data['category_id']);
+        // $data['category'] = $category->code;
+        $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
 
-    $category = $this->findCategoryForTenant($data['category_id']);
-    // $data['category'] = $category->code;
-    $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
+        $data['is_active'] = $request->boolean('is_active');
+        $data['track_expiry'] = $request->boolean('track_expiry');
+        $data['is_best_selling'] = $request->boolean('is_best_selling');
+        $data['farmer_id'] = $request->input('farmer_id');
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('inventory/products', 'public');
+        }
 
-    $data['is_active'] = $request->boolean('is_active');
-    $data['track_expiry'] = $request->boolean('track_expiry');
-    $data['is_best_selling'] = $request->boolean('is_best_selling');
+        InventoryProduct::query()->create($data);
 
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('inventory/products', 'public');
+        return redirect()
+            ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
+            ->with('success', 'Product created successfully.');
     }
-
-    InventoryProduct::query()->create($data);
-
-    return redirect()
-        ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
-        ->with('success', 'Product created successfully.');
-}
 
     public function edit(string $locale, InventoryProduct $product): View
     {
@@ -103,13 +108,20 @@ public function store(InventoryProductStoreRequest $request, string $locale): Re
             return redirect()->back()->with('error', 'Product cannot be deleted because it is in use.');
         }
     }
+    private function farmersForTenant()
+    {
+        $tenantId = $this->tenantId();
 
+        return Farmer::query()
+            ->orderBy('name')
+            ->get();
+    }
     private function categoriesForTenant()
     {
         $tenantId = $this->tenantId();
 
         return Category::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->when($tenantId, fn($q) => $q->where('tenant_id', $tenantId))
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
@@ -120,7 +132,7 @@ public function store(InventoryProductStoreRequest $request, string $locale): Re
         $tenantId = $this->tenantId();
 
         return Category::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->when($tenantId, fn($q) => $q->where('tenant_id', $tenantId))
             ->findOrFail($categoryId);
     }
 
