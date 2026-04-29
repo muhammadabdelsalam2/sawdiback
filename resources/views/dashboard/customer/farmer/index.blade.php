@@ -81,10 +81,15 @@
                                     </a>
                                 @else
                                     <div class="w-100 bg-secondary-subtle border border-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                        <a
+                                        href="{{ route('customer.farmers.show', ['locale' => $currentLocale, 'farmer' => $row->id]) }}">
+                                        </a>
                                         style="width: 50px; height: 50px;">
                                         <img class="w-100  rounded-5"
                                             src="{{ asset('assets/images/farmer/default-farmer.jpg') }}"
                                             alt="Default Farmer Image">
+                                        </a>
+
                                     </div>
                                 @endif
                             </td>
