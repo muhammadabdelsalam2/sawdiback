@@ -17,14 +17,14 @@ Route::prefix('v1/{locale}')
 
         // Search Global 
     
-       
+
 
         // Categories Routes
         Route::prefix('categories')
             ->name('categories.')
             ->controller(App\Http\Controllers\Api\CategoriesController::class)
             ->group(function () {
-            Route::get('/', 'index')->name('index');
+            Route::get('/', 'index')->name('index')->withoutMiddleware(['auth:sanctum', 'role:Client']);
         });
         Route::prefix('products')
             ->name('products.')
