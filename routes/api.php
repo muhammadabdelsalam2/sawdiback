@@ -5,12 +5,15 @@ use App\Http\Controllers\Api\Account\PasswordManagmentController;
 use App\Http\Controllers\Api\Account\VerifyAccountController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\SocialAuthController;
+use App\Http\Controllers\Api\Ecommerce\ArticleController;
 use App\Http\Controllers\Api\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/api/ecommerce.php';
 
 Route::prefix('v1/{locale}')->group(function () {
+    Route::get('articles', [ArticleController::class, 'index']);
+    Route::get('articles/{id}', [ArticleController::class, 'show']);
 
     /*
     |--------------------------------------------------------------------------

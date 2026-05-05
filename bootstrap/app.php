@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ApiErrorMiddleware;
 use App\Http\Middleware\CheckAuthorized;
+use App\Http\Middleware\EnsureFullApiAccess;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\RedirectIfAuthenticatedCustom;
@@ -60,6 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             // ✅ REQUIRED FOR FEATURE GATING
             'feature' => EnsureFeatureEnabled::class,
+            'full.access' => EnsureFullApiAccess::class,
             'authorized' => CheckAuthorized::class,
             'api.error' => ApiErrorMiddleware::class,
         ]);
