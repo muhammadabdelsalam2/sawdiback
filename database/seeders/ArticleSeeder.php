@@ -17,31 +17,31 @@ class ArticleSeeder extends Seeder
                 'title' => ['en' => 'Healthy Breakfast Ideas', 'ar' => 'أفكار فطور صحي'],
                 'description' => ['en' => 'Start your day right with organic ingredients.', 'ar' => 'ابدأ يومك بمكونات عضوية.'],
                 'category' => 'Recipes',
-                'image' => 'assets/images/product1.png',
+                'image' => 'assets/images/products/product1.png',
             ],
             [
                 'title' => ['en' => 'Fresh Farm Vegetables', 'ar' => 'خضروات طازجة من المزرعة'],
                 'description' => ['en' => 'Choose fresh vegetables packed with natural flavor.', 'ar' => 'اختر خضروات طازجة مليئة بالنكهة الطبيعية.'],
                 'category' => 'Organic',
-                'image' => 'assets/images/product2.png',
+                'image' => 'assets/images/products/product2.png',
             ],
             [
                 'title' => ['en' => 'Simple Lunch Recipes', 'ar' => 'وصفات غداء بسيطة'],
                 'description' => ['en' => 'Quick lunch meals made with wholesome products.', 'ar' => 'وجبات غداء سريعة بمكونات مفيدة.'],
                 'category' => 'Recipes',
-                'image' => 'assets/images/product3.png',
+                'image' => 'assets/images/products/product3.png',
             ],
             [
                 'title' => ['en' => 'Seasonal Fruit Guide', 'ar' => 'دليل الفواكه الموسمية'],
                 'description' => ['en' => 'Discover the best fruits for every season.', 'ar' => 'اكتشف أفضل الفواكه لكل موسم.'],
                 'category' => 'Fruits',
-                'image' => 'assets/images/product4.png',
+                'image' => 'assets/images/products/product4.png',
             ],
             [
                 'title' => ['en' => 'Nutritious Family Dinner', 'ar' => 'عشاء عائلي مغذي'],
                 'description' => ['en' => 'Balanced dinner ideas for the whole family.', 'ar' => 'أفكار عشاء متوازن لكل العائلة.'],
                 'category' => 'Meals',
-                'image' => 'assets/images/product5.png',
+                'image' => 'assets/images/products/product5.png',
             ],
         ];
 
