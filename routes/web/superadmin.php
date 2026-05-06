@@ -8,6 +8,7 @@ use App\Http\Controllers\Subscriptions\FeatureController;
 use App\Http\Controllers\Subscriptions\PlanController;
 use App\Http\Controllers\Subscriptions\SubscriptionController;
 use App\Http\Controllers\SuperAdmin\AccessManagementController;
+use App\Http\Controllers\SuperAdmin\ContentController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,9 @@ Route::prefix('{locale}')
             Route::post('subscriptions/{subscription}/reject', [SubscriptionController::class, 'reject'])
                 ->name('subscriptions.reject');
         });
+
+        // Content Management
+        Route::resource('content', ContentController::class)->except(['show']);
 
         Route::prefix('setting')
             ->name('setting.')

@@ -62,6 +62,8 @@ class ProductRepository implements ProductRepositoryInterface
         $query->when($filters['q'] ?? null, function ($q) use ($filters) {
             $q->where(function ($sub) use ($filters) {
                 $sub->where('name', 'like', '%' . $filters['q'] . '%')
+                    ->orWhere('title->en', 'like', '%' . $filters['q'] . '%')
+                    ->orWhere('title->ar', 'like', '%' . $filters['q'] . '%')
                     ->orWhere('code', 'like', '%' . $filters['q'] . '%');
             });
         });
@@ -155,6 +157,8 @@ class ProductRepository implements ProductRepositoryInterface
         return InventoryProduct::where('is_active', true)
             ->where(function ($q) use ($query) {
                 $q->where('name', 'LIKE', "%$query%")
+                    ->orWhere('title->en', 'LIKE', "%$query%")
+                    ->orWhere('title->ar', 'LIKE', "%$query%")
                     ->orWhere('code', 'LIKE', "%$query%");
             })
             ->with('movements')

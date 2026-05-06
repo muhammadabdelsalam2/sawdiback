@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\InventoryProduct;
 use App\Services\API\Ecommerce\Product\ProductService;
 use App\Support\ApiResponse;
+use App\Support\LocaleResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,8 +24,10 @@ class ProductController extends Controller
     /**
      * Get all products OR search
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, string $locale): JsonResponse
     {
+        LocaleResolver::apply($locale);
+
         $request->validate([
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:0',
@@ -53,6 +56,8 @@ class ProductController extends Controller
      */
     public function bestSelling(Request $request, string $locale): JsonResponse
     {
+        LocaleResolver::apply($locale);
+
         $request->validate([
             'limit' => 'nullable|integer|min:1|max:50',
         ]);
@@ -78,6 +83,8 @@ class ProductController extends Controller
      */
     public function byCategory(Category $category, Request $request): JsonResponse
     {
+        LocaleResolver::apply((string) $request->route('locale'));
+
         $products = $this->productService->getProductsByCategory(
             $category,
             $request->input('per_page', 15)
@@ -91,6 +98,8 @@ class ProductController extends Controller
 
     public function show($locale, InventoryProduct $product): JsonResponse
     {
+        LocaleResolver::apply($locale);
+
         $data = $this->productService->getProductDetails($product);
 
         return ApiResponse::success(
@@ -103,6 +112,8 @@ class ProductController extends Controller
     // Feature: Add to favorites
     public function addToFavorites($locale, Request $request, $product)
     {
+        LocaleResolver::apply($locale);
+
         $user = $request->user();
         $favorite = $this->productService->addToFavorites($user, $product);
         if (!$favorite['success']) {
@@ -123,6 +134,8 @@ class ProductController extends Controller
     // Feature: Remove from favorites
     public function removeFromFavorites($locale, Request $request, $product)
     {
+        LocaleResolver::apply($locale);
+
         $user = $request->user();
         $result = $this->productService->removeFromFavorites($user, $product);
         if (!$result['success']) {

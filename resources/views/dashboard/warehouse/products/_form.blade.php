@@ -22,6 +22,16 @@
             value="{{ old('name', $product->name ?? '') }}">
     </div>
     <div class="col-md-4">
+        <label class="form-label">Title (Arabic)</label>
+        <input type="text" name="title_ar" class="form-control"
+            value="{{ old('title_ar', is_array($product->title ?? null) ? ($product->title['ar'] ?? '') : '') }}">
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Title (English)</label>
+        <input type="text" name="title_en" class="form-control"
+            value="{{ old('title_en', is_array($product->title ?? null) ? ($product->title['en'] ?? '') : '') }}">
+    </div>
+    <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.category') }}</label>
         <select name="category_id" class="form-select" required>
             @foreach ($categories as $category)
@@ -91,5 +101,13 @@
     <div class="col-12">
         <label class="form-label">{{ __('warehouse.fields.notes') }}</label>
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $product->notes ?? '') }}</textarea>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Description (Arabic)</label>
+        <textarea name="description_ar" class="form-control" rows="3">{{ old('description_ar', is_array($product->description ?? null) ? ($product->description['ar'] ?? '') : '') }}</textarea>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Description (English)</label>
+        <textarea name="description_en" class="form-control" rows="3">{{ old('description_en', is_array($product->description ?? null) ? ($product->description['en'] ?? '') : '') }}</textarea>
     </div>
 </div>

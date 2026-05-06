@@ -18,6 +18,7 @@ class InventoryProduct extends Model
         'tenant_id',
         'code',
         'name',
+        'title',
         'image',
         'category',
         'farmer_id',
@@ -29,6 +30,7 @@ class InventoryProduct extends Model
         'is_active',
         'is_best_selling',
         'notes',
+        'description',
         'price',
         'last_price',
     ];
@@ -42,6 +44,8 @@ class InventoryProduct extends Model
         'tax' => 'decimal:2',
         'price' => 'decimal:2',
         'last_price' => 'decimal:2',
+        'title' => 'array',
+        'description' => 'array',
     ];
 
     protected $append = ['image_url'];
@@ -84,9 +88,52 @@ class InventoryProduct extends Model
         }
 
         // ✅ Dynamic image باسم المنتج (API جاهز)
-        $name = urlencode($this->name);
+        $name = urlencode($this->localized_title ?? $this->name);
 
         return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
+    }
+
+    public function getLocalizedTitleAttribute(): ?string
+    {
+        return $this->resolveTranslation('title', $this->name);
+    }
+
+    public function getLocalizedDescriptionAttribute(): ?string
+    {
+        return $this->resolveTranslation('description', $this->notes);
+    }
+
+    private function resolveTranslation(string $attribute, ?string $fallback = null): ?string
+    {
+        $translations = $this->getAttribute($attribute);
+        $rawTranslations = $this->getRawOriginal($attribute);
+        $locale = \App\Support\LocaleResolver::resolve();
+
+        if (is_array($translations)) {
+            return $translations[$locale]
+                ?? $translations['en']
+                ?? $translations['ar']
+                ?? $fallback;
+        }
+
+        if (is_string($translations) && $translations !== '') {
+            return $translations;
+        }
+
+        if (is_string($rawTranslations) && $rawTranslations !== '') {
+            $decodedTranslations = json_decode($rawTranslations, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedTranslations)) {
+                return $decodedTranslations[$locale]
+                    ?? $decodedTranslations['en']
+                    ?? $decodedTranslations['ar']
+                    ?? $fallback;
+            }
+
+            return $rawTranslations;
+        }
+
+        return $fallback;
     }
 
     public function favoritedBy()

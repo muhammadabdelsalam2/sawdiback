@@ -66,15 +66,19 @@
 
                 {{-- System Settings (Dropdown) --}}
                 <div
-                    class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+                    class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') ? 'open' : '' }}">
                     <a href="javascript:void(0)"
-                        class="nav-item has-dropdown {{request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') ? 'active' : '' }}">
+                        class="nav-item has-dropdown {{request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') ? 'active' : '' }}">
                         <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
                         <span class="nav-label">{{ __('dashboard.sidebar.system_settings') }}</span>
                         <i class="fa-solid fa-chevron-right ms-auto chevron"></i>
                     </a>
 
                     <div class="dropdown-container">
+                        <a href="{{ route('superadmin.content.index', ['locale' => $activeLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.content.*') ? 'active' : '' }}">
+                            <i class="bi bi-play-circle me-2"></i> {{ __('dashboard.sidebar.content') }}
+                        </a>
                         <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}"
                             class="dropdown-item {{ request()->routeIs('superadmin.setting.countries.*') ? 'active' : '' }}">
                             {{ __('dashboard.sidebar.countries') }}

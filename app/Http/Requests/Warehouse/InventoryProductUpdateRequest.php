@@ -23,6 +23,8 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
                     ->ignore($product?->id),
             ],
             'name' => ['required', 'string', 'max:255'],
+            'title_ar' => ['nullable', 'string', 'max:255'],
+            'title_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'unit' => ['required', 'string', 'max:50'],
             'tax' => ['nullable', 'numeric', 'min:0'],
@@ -31,8 +33,11 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
             'is_active' => ['nullable', 'boolean'],
             'is_best_selling' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string'],
+            'description_ar' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
             'price' => ['nullable', 'numeric', 'min:0'],
-'last_price' => ['nullable', 'numeric', 'min:0'],
+            'last_price' => ['nullable', 'numeric', 'min:0'],
+            'farmer_id' => ['nullable', 'string', 'uuid'],
         ];
     }
 }

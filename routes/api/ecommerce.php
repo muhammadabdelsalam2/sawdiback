@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Account\AccountController;
 use App\Http\Controllers\Api\Account\WalletController;
+use App\Http\Controllers\Api\Ecommerce\ContentController;
 use App\Http\Controllers\Api\Plus\PlusController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Product\ProductController;
@@ -20,6 +21,12 @@ Route::prefix('v1/{locale}')->group(function () {
 
     Route::get('products/show/{product}', [ProductController::class, 'show'])
         ->name('products.show');
+
+    Route::get('content', [ContentController::class, 'index'])
+        ->name('content.index');
+
+    Route::get('content/{content}', [ContentController::class, 'show'])
+        ->name('content.show');
 
     // =========================================
     // ✅ أي user مسجل — Cart + Favorites فقط
@@ -53,12 +60,20 @@ Route::prefix('v1/{locale}')->group(function () {
                 Route::patch('weekly-delivery', 'weeklyDelivery')->name('weekly');
                 Route::patch('address', 'setAddress')->name('address.set');
             });
+
+        Route::prefix('content')->name('content.')
+            ->controller(ContentController::class)
+            ->group(function () {
+                Route::post('/', 'store')->name('store');
+                Route::put('{content}', 'update')->name('update');
+                Route::delete('{content}', 'destroy')->name('destroy');
+            });
     });
 
     // =========================================
     // ✅ Full Access فقط — role: full-access
     // =========================================
-    Route::middleware(['auth:sanctum', 'full.api.access'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
 
         // Address Routes
         Route::prefix('addresses')->name('addresses.')

@@ -50,6 +50,7 @@ class InventoryProductController extends Controller
         $category = $this->findCategoryForTenant($data['category_id']);
         // $data['category'] = $category->code;
         $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
+        $data = $this->prepareLocalizedFields($request, $data);
 
         $data['is_active'] = $request->boolean('is_active');
         $data['track_expiry'] = $request->boolean('track_expiry');
@@ -69,8 +70,12 @@ class InventoryProductController extends Controller
     public function edit(string $locale, InventoryProduct $product): View
     {
         $categories = $this->categoriesForTenant();
+        $farmers = $this->farmersForTenant();
 
-        return view('dashboard.warehouse.products.edit', compact('product', 'categories'));
+        return view(
+            'dashboard.warehouse.products.edit',
+            compact('product', 'categories', 'farmers')
+        );
     }
 
     public function update(InventoryProductUpdateRequest $request, string $locale, InventoryProduct $product): RedirectResponse
@@ -80,6 +85,7 @@ class InventoryProductController extends Controller
         $category = $this->findCategoryForTenant($data['category_id']);
         //$data['category'] = $category->code;
         $data['tenant_id'] = $product->tenant_id ?: ($category->tenant_id ?? $this->tenantId());
+        $data = $this->prepareLocalizedFields($request, $data, $product);
 
         $data['is_active'] = $request->boolean('is_active');
         $data['track_expiry'] = $request->boolean('track_expiry');
@@ -139,5 +145,55 @@ class InventoryProductController extends Controller
     private function tenantId(): ?string
     {
         return session('tenant_id') ?? auth()->user()?->tenant_id;
+    }
+
+    private function prepareLocalizedFields($request, array $data, ?InventoryProduct $product = null): array
+    {
+        $existingTitle = $this->normalizeTranslations($product?->getRawOriginal('title'), $product?->name);
+        $existingDescription = $this->normalizeTranslations($product?->getRawOriginal('description'), $product?->notes);
+        $nameFallback = $data['name'] ?? $product?->name;
+
+        $data['title'] = [
+            'ar' => $request->input('title_ar') ?: ($existingTitle['ar'] ?? $nameFallback),
+            'en' => $request->input('title_en') ?: ($existingTitle['en'] ?? $nameFallback),
+        ];
+
+        $descriptionFallback = $data['notes']
+            ?? $product?->notes
+            ?? $existingDescription['en']
+            ?? $existingDescription['ar']
+            ?? null;
+
+        $data['description'] = [
+            'ar' => $request->input('description_ar') ?: ($existingDescription['ar'] ?? $descriptionFallback),
+            'en' => $request->input('description_en') ?: ($existingDescription['en'] ?? $descriptionFallback),
+        ];
+
+        return $data;
+    }
+
+    private function normalizeTranslations(mixed $value, ?string $fallback = null): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decodedValue = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedValue)) {
+                return $decodedValue;
+            }
+
+            return [
+                'ar' => $value,
+                'en' => $value,
+            ];
+        }
+
+        return [
+            'ar' => $fallback,
+            'en' => $fallback,
+        ];
     }
 }
