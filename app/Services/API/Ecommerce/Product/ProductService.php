@@ -154,6 +154,15 @@ class ProductService
         );
     }
 
+    public function getUserFavorites($user): array
+    {
+        $favorites = $user->favoriteProducts()->with('category')->get();
 
+        return ServiceResult::success(
+            data: ProductResource::collection($favorites),
+            message: __('ecommerce.product.favorites_fetched'),
+            code: 200
+        );
+    }
 
 }

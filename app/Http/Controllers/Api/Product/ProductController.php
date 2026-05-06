@@ -151,4 +151,19 @@ class ProductController extends Controller
         );
     }
 
+    // Feature: Get user favorites
+    public function favorites(Request $request, string $locale): JsonResponse
+    {
+        LocaleResolver::apply($locale);
+
+        $user = $request->user();
+        $favorites = $this->productService->getUserFavorites($user);
+
+        return ApiResponse::success(
+            data: $favorites['data'],
+            message: $favorites['message'],
+            code: $favorites['code']
+        );
+    }
+
 }

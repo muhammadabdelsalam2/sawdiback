@@ -15,12 +15,9 @@ class CartRepository implements CartRepositoryInterface
 {
     public function getOrCreateForUser(User $user): Cart
     {
-        $tenantId = $this->resolveTenantId($user);
-
         return Cart::query()->firstOrCreate(
             ['user_id' => $user->id],
             [
-                'tenant_id' => $tenantId,
                 'subtotal' => 0,
                 'shipping' => 0,
                 'taxes' => 0,

@@ -192,7 +192,7 @@ Route::prefix('{locale}')
             // Future routes for farmer management will go here
             Route::get('show/{farmer}', [FarmerController::class, 'show'])->name('show'); // Placeholder for showing farmer details
             Route::get('create', [FarmerController::class, 'create'])->name('create'); // Placeholder for creating a new farmer
-            Route::post('store', [FarmerController::class, 'store'])->name('store'); // Placeholder for storing a new farmer    
+            Route::post('store', [FarmerController::class, 'store'])->name('store'); // Placeholder for storing a new farmer
             Route::delete('force-delete/{farmer}', [FarmerController::class, 'force'])->name('force-delete'); // Placeholder for force deleting a farmer
         });
 

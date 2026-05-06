@@ -12,7 +12,6 @@ class Cart extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'user_address_id',
         'coupon_code',
