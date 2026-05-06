@@ -67,7 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Append API error middleware
-        $middleware->appendToGroup('api/*', [
+        $middleware->appendToGroup('api', [
             SetLocaleApi::class,
             ApiErrorMiddleware::class,
             RedirectIfAuthenticatedCustom::class,
