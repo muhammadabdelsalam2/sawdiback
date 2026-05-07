@@ -26,6 +26,7 @@ class ProductController extends Controller
      */
     public function index(Request $request, string $locale): JsonResponse
     {
+         auth()->setUser(auth('sanctum')->user());
         LocaleResolver::apply($locale);
 
         $request->validate([
@@ -56,6 +57,7 @@ class ProductController extends Controller
      */
     public function bestSelling(Request $request, string $locale): JsonResponse
     {
+         auth()->setUser(auth('sanctum')->user());
         LocaleResolver::apply($locale);
 
         $request->validate([
@@ -67,7 +69,7 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->where('is_best_selling', true)
             ->with([
-                'favoriteProducts' => function ($query) { 
+                'favoriteProducts' => function ($query) {
                     if (auth()->check()) {
                         $query->where('user_id', auth()->id());
                     }
@@ -104,6 +106,7 @@ class ProductController extends Controller
 
     public function show($locale, InventoryProduct $product): JsonResponse
     {
+         auth()->setUser(auth('sanctum')->user());
         LocaleResolver::apply($locale);
 
         $data = $this->productService->getProductDetails($product);
