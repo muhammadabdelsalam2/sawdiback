@@ -11,11 +11,19 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductRepositoryInterface
 {
+    private function favoritesEagerLoad(): array
+{
+    return ['favoriteProducts' => function ($query) {
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        }
+    }];
+}
 
 
     public function all(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = InventoryProduct::query();
+        $query = InventoryProduct::query()->with($this->favoritesEagerLoad()); ;
         // Apply Filters By Favorite, Search, Category, Price Range
 
         $this->applyFavoriteFilter($query, $filters);
@@ -128,6 +136,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function byCategory(Category $category, int $perPage = 15): LengthAwarePaginator
     {
         return InventoryProduct::where('is_active', true)
+        ->with($this->favoritesEagerLoad())
             ->where('category', 'vet_medicine')
             ->withSum([
                 'movements as total_in' => function ($q) {
@@ -161,7 +170,7 @@ class ProductRepository implements ProductRepositoryInterface
                     ->orWhere('title->ar', 'LIKE', "%$query%")
                     ->orWhere('code', 'LIKE', "%$query%");
             })
-            ->with('movements')
+            ->with(array_merge($this->favoritesEagerLoad(), ['movements']))
             ->paginate($perPage)
             ->through(function ($product) {
                 $totalIn = $product->movements->where('movement_type', 'IN')->sum('quantity');
@@ -173,7 +182,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function findWithDetails(int $id): ?InventoryProduct
     {
-        $query = InventoryProduct::query();
+        $query = InventoryProduct::query()->with($this->favoritesEagerLoad());
 
         // Stock calculations
         $this->applyStockCalculations($query);

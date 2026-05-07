@@ -63,10 +63,16 @@ class ProductController extends Controller
         ]);
 
         $limit = (int) $request->input('limit', 12);
-
         $products = InventoryProduct::query()
             ->where('is_active', true)
             ->where('is_best_selling', true)
+            ->with([
+                'favoriteProducts' => function ($query) { 
+                    if (auth()->check()) {
+                        $query->where('user_id', auth()->id());
+                    }
+                }
+            ])
             ->latest('id')
             ->take($limit)
             ->get();
