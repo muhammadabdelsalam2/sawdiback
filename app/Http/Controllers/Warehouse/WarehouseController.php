@@ -36,7 +36,7 @@ class WarehouseController extends Controller
 
     public function index(string $locale): View
     {
-        $products = InventoryProduct::query()->with(['category.translations'])->where('is_active', true)->orderBy('name')->get();
+        $products = InventoryProduct::query()->with(['categoryRelation.translations'])->where('is_active', true)->orderBy('name')->get();
         $animals = LivestockAnimal::query()->orderBy('tag_number')->get();
         $batches = InventoryBatch::query()
             ->with('product')

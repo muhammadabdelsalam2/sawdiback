@@ -54,7 +54,10 @@ class InventoryProduct extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
-
+public function categoryRelation(): BelongsTo
+{
+    return $this->belongsTo(Category::class, 'category_id');
+}
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
@@ -159,7 +162,7 @@ class InventoryProduct extends Model
     }
 
     // Scope to filter By Farmer
-    // Boot 
+    // Boot
     protected static function booted()
     {
         static::addGlobalScope(new ActiveScope);

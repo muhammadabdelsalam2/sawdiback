@@ -17,7 +17,7 @@ class InventoryProductController extends Controller
     public function index(string $locale): View
     {
         $rows = InventoryProduct::query()
-            ->with(['category.translations'])
+            ->with(['categoryRelation.translations'])
             ->orderBy('name')
             ->paginate(15);
 

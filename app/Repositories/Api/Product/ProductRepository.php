@@ -23,7 +23,7 @@ private function baseWith(): array
 {
     return array_merge(
         $this->favoritesEagerLoad(),
-        ['category.translations']
+        ['categoryRelation.translations']
     );
 }
 

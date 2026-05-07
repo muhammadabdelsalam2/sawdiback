@@ -233,7 +233,8 @@
                         @forelse($stockRows as $row)
                             <tr>
                                 <td>{{ $row['product']->name }}</td>
-                                <td>{{ $row['product']->category?->name ?? $row['product']->getRawOriginal('category') ?? '-' }}</td>
+                                <td>{{ $row['product']->categoryRelation?->translations->firstWhere('locale', substr(app()->getLocale(), 0, 2))?->name
+    ?? $row['product']->getRawOriginal('category') ?? '-' }}</td>
                                 <td>{{ number_format((float)$row['stock_on_hand'], 2) }}</td>
                                 <td>{{ number_format((float)$row['product']->low_stock_threshold, 2) }}</td>
                                 <td>{{ $row['is_low_stock'] ? __('dashboard.alerts.warning') : 'OK' }}</td>

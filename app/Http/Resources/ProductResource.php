@@ -26,23 +26,15 @@ class ProductResource extends JsonResource
             'name' => $name,
             'title' => $name,
             'image' => $this->image_url,
-     'category' => $this->relationLoaded('category') && $this->category instanceof \App\Models\Category
-    ? ($this->category->translations->firstWhere('locale', substr($locale, 0, 2))?->name
-        ?? $this->category->translations->firstWhere('locale', 'en')?->name
-        ?? $this->category->translations->firstWhere('locale', 'ar')?->name
-        ?? $this->category->notes
+'category' => $this->relationLoaded('categoryRelation') && $this->categoryRelation instanceof \App\Models\Category
+    ? ($this->categoryRelation->translations->firstWhere('locale', substr($locale, 0, 2))?->name
+        ?? $this->categoryRelation->translations->firstWhere('locale', 'en')?->name
+        ?? $this->categoryRelation->translations->firstWhere('locale', 'ar')?->name
+        ?? $this->categoryRelation->notes
         ?? $this->getRawOriginal('category'))
     : $this->getRawOriginal('category'),
-    // في ProductResource مؤقتاً
-'category_debug' => [
-    'relation_loaded' => $this->relationLoaded('category'),
-    'is_category_instance' => $this->category instanceof \App\Models\Category,
-    'translations_count' => $this->relationLoaded('category') && $this->category instanceof \App\Models\Category
-        ? $this->category->translations->count()
-        : 0,
-    'locale' => $locale,
-    'raw_category' => $this->getRawOriginal('category'),
-],
+
+
             'category_id' => $this->category_id,
             'unit' => $this->unit,
 
