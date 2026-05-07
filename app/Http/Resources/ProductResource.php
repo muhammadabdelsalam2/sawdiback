@@ -33,6 +33,16 @@ class ProductResource extends JsonResource
         ?? $this->category->notes
         ?? $this->getRawOriginal('category'))
     : $this->getRawOriginal('category'),
+    // في ProductResource مؤقتاً
+'category_debug' => [
+    'relation_loaded' => $this->relationLoaded('category'),
+    'is_category_instance' => $this->category instanceof \App\Models\Category,
+    'translations_count' => $this->relationLoaded('category') && $this->category instanceof \App\Models\Category
+        ? $this->category->translations->count()
+        : 0,
+    'locale' => $locale,
+    'raw_category' => $this->getRawOriginal('category'),
+],
             'category_id' => $this->category_id,
             'unit' => $this->unit,
 
