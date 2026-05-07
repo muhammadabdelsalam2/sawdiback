@@ -30,7 +30,7 @@ Route::prefix('v1/{locale}')->group(function () {
     | Routes for authentication and account verification for guests.
     */
     Route::prefix('auth')
-        ->middleware(['guest:sanctum', 'throttle:10,1', 'api.error'])
+        ->middleware(['api.guest:sanctum', 'throttle:10,1', 'api.error'])
         ->controller(AuthController::class)
         ->group(function () {
             Route::post('login', 'login')->name('api.auth.login');
@@ -45,7 +45,7 @@ Route::prefix('v1/{locale}')->group(function () {
         });
 
     Route::prefix('account')
-        ->middleware(['guest:sanctum', 'throttle:5,1'])
+        ->middleware(['api.guest:sanctum', 'throttle:5,1'])
         ->group(function () {
 
             Route::controller(VerifyAccountController::class)->group(function () {
@@ -64,7 +64,7 @@ Route::prefix('v1/{locale}')->group(function () {
             Route::middleware(['auth:sanctum'])->group(function () {
                 Route::post('complete-setup', [AccountController::class, 'complete'])
                     ->name('api.account.completeSetup')
-                    ->withoutMiddleware('guest:sanctum');
+                    ->withoutMiddleware('api.guest:sanctum');
             });
         });
 

@@ -51,26 +51,24 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('login.form', ['locale' => $locale]);
         });
 
-        $middleware->alias([
-
-            'set.locale' => SetLocale::class,
-            'auth' => Authenticate::class,
-            'role' => RoleMiddleware::class,
-            'permission' => PermissionMiddleware::class,
-            'role_or_permission' => RoleOrPermissionMiddleware::class,
-
-            // ✅ REQUIRED FOR FEATURE GATING
-            'feature' => EnsureFeatureEnabled::class,
-            'full.access' => EnsureFullApiAccess::class,
-            'authorized' => CheckAuthorized::class,
-            'api.error' => ApiErrorMiddleware::class,
-        ]);
+       $middleware->alias([
+    'set.locale'       => SetLocale::class,
+    'auth'             => Authenticate::class,
+    'role'             => RoleMiddleware::class,
+    'permission'       => PermissionMiddleware::class,
+    'role_or_permission' => RoleOrPermissionMiddleware::class,
+    'feature'          => EnsureFeatureEnabled::class,
+    'full.access'      => EnsureFullApiAccess::class,
+    'authorized'       => CheckAuthorized::class,
+    'api.error'        => ApiErrorMiddleware::class,
+    'api.guest'        => RedirectIfAuthenticatedCustom::class,
+]);
 
         // Append API error middleware
         $middleware->appendToGroup('api', [
             SetLocaleApi::class,
             ApiErrorMiddleware::class,
-            RedirectIfAuthenticatedCustom::class,
+        
         ]);
         $middleware->appendToGroup('web/*', [
             RedirectIfAuthenticatedCustom::class,
