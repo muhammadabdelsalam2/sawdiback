@@ -69,14 +69,13 @@
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
-                              // قبل
-{{ $row->category?->name ?? $row->getRawOriginal('category') ?? '-' }}
-
-// بعد
-{{ $row->category?->translations->firstWhere('locale', app()->getLocale())?->name
-    ?? $row->category?->translations->first()?->name
-    ?? $row->getRawOriginal('category')
-    ?? '-' }}
+                            @php
+    $categoryName = $row->relationLoaded('category') && $row->category instanceof \App\Models\Category
+        ? ($row->category->translations->firstWhere('locale', app()->getLocale())?->name
+            ?? $row->category->translations->first()?->name)
+        : ($row->getRawOriginal('category') ?? '-');
+@endphp
+{{ $categoryName ?? '-' }}
                             </td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name }}"
