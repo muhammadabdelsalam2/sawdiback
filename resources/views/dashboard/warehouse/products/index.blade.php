@@ -69,7 +69,14 @@
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
-                               {{ $row->category?->name ?? '-' }}
+                              // قبل
+{{ $row->category?->name ?? $row->getRawOriginal('category') ?? '-' }}
+
+// بعد
+{{ $row->category?->translations->firstWhere('locale', app()->getLocale())?->name
+    ?? $row->category?->translations->first()?->name
+    ?? $row->getRawOriginal('category')
+    ?? '-' }}
                             </td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name }}"
