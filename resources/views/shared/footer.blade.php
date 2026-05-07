@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row justify-content-between">
             <div class="col-md-4 mb-4">
-                <h5 class="fw-bold mb-3" style="color: var(--farm-green);">{{ __('app.footer_brand') }}</h5>
+                <h5 class="fw-bold mb-3" style="color: var(--brand-green);">{{ __('app.footer_brand') }}</h5>
                 <p class="text-muted">{{ __('app.footer_text') }}</p>
             </div>
             <div class="col-md-2 mb-4">
@@ -17,7 +17,7 @@
                 <h6 class="fw-bold">{{ __('app.footer_newsletter') }}</h6>
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="{{ __('app.footer_email_placeholder') }}">
-                    <button class="btn btn-farm">{{ __('app.footer_join_button') }}</button>
+                    <button class="btn btn-brand">{{ __('app.footer_join_button') }}</button>
                 </div>
             </div>
         </div>

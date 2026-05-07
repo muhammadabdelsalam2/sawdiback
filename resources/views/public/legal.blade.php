@@ -17,7 +17,7 @@
                     </div>
 
                     <div class="mt-5">
-                        <a href="{{ url()->previous() }}" class="btn btn-farm px-4 py-2"
+                        <a href="{{ url()->previous() }}" class="btn btn-brand px-4 py-2"
                             style="background-color: #2D5A27; color: white; border-radius: 10px;">
                             {{ app()->getLocale() == 'ar' ? 'العودة' : 'Back' }}
                         </a>

@@ -1,13 +1,23 @@
-<header class="navbar p-0 d-flex align-items-center justify-content-between">
+<header class="navbar navbar-enhanced p-0 d-flex align-items-center justify-content-between">
     @php
         $activeLocale = $currentLocale ?? app()->getLocale();
         $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
+        $user = auth()->user();
+        $avatar = $user?->avatar;
+        $avatarUrl = null;
+        if ($avatar) {
+            $avatarUrl = filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : asset('storage/' . ltrim($avatar, '/'));
+        } else {
+            $avatarUrl = asset('assets/images/user.png');
+        }
     @endphp
     <div class="navbar-left d-flex align-items-center">
-        <button id="sidebar-toggle" class="btn text-green me-2">
+        <button id="sidebar-toggle" class="btn btn-navbar-toggle text-green me-3">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <img src="{{ asset('assets/images/userLogo.png') }}" alt="Logo" class="logo">
+        <span class="brand-mark" aria-label="EL-Sawady">
+            <img src="{{ asset('assets/images/logo3.jpeg') }}" alt="EL-Sawady" class="logo logo-enhanced">
+        </span>
     </div>
     <style>
         /* =========================
@@ -93,14 +103,15 @@
             background: #f5f5f5;
         }
     </style>
-    <div class="navbar-right d-flex align-items-center">
+    <div class="navbar-right d-flex align-items-center gap-3">
         <form action="{{ route('customer.global.search', ['locale' => $activeLocale]) }}" method="GET"
-            class="search-container me-3 position-relative">
+            class="search-container search-container-enhanced me-2 position-relative">
 
+            <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
             <input type="text" name="q" id="globalSearch" autocomplete="off"
-                placeholder="{{ __('dashboard.navbar.search') }}" class="search-input">
+                placeholder="{{ __('dashboard.navbar.search_placeholder') }}" class="search-input-enhanced">
 
-            <button class="search-btn">
+            <button type="button" class="search-btn-enhanced">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
 
@@ -108,72 +119,98 @@
             <div id="searchDropdown" class="search-dropdown d-none"></div>
         </form>
 
-        <div class="navbar-icons d-flex align-items-center me-3">
+        <div class="navbar-icons-enhanced d-flex align-items-center">
 
-            <button class="nav-icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <!-- <button class="nav-icon-btn-enhanced" title="{{ __('dashboard.navbar.notifications') }}">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button> -->
 
             <!-- Settings Dropdown -->
-            <div class="dropdown me-2">
-                <button class="nav-icon-btn dropdown-toggle" type="button" id="settingsDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+            @if($isSuperAdmin)
+            <div class="dropdown">
+                <button class="nav-icon-btn-enhanced dropdown-toggle" type="button" id="settingsDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('dashboard.navbar.settings') }}">
                     <i class="fa-solid fa-gear"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
-                    @if($isSuperAdmin)
+                <ul class="dropdown-menu dropdown-menu-enhanced dropdown-menu-end" aria-labelledby="settingsDropdown">
 
-                        <li><a class="dropdown-item"
-                                href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}">{{ __('dashboard.sidebar.settings.permissionsManagement') }}</a>
-                        </li>
-                    @else
-                        <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.module') }} 1</a></li>
-                    @endif
-                    <!-- add more modules here -->
+                        <li><a class="dropdown-item" href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}">
+                            <i class="bi bi-shield-lock"></i>
+                            {{ __('dashboard.sidebar.settings.permissionsManagement') }}
+                        </a></li>
+
+                    <!-- <li><a class="dropdown-item" href="#">
+                        <i class="bi bi-gear"></i>
+                        {{ __('dashboard.navbar.system_settings') }}
+                    </a></li> -->
                 </ul>
             </div>
-
+            @endif
             <!-- Language Dropdown -->
-            <div class="dropdown me-2">
-                <button class="nav-icon-btn dropdown-toggle" type="button" id="languageDropdown"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    {{ session('locale_full', 'en-SA') }}
+            <div class="dropdown">
+                <button class="nav-icon-btn-enhanced nav-language-btn-enhanced dropdown-toggle" type="button" id="languageDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('dashboard.navbar.language') }}">
+                    <i class="bi bi-globe2"></i>
+                    <span class="lang-code">{{ app()->getLocale() == 'ar' ? 'العربية' : 'English' }}</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                <ul class="dropdown-menu dropdown-menu-enhanced dropdown-menu-end" aria-labelledby="languageDropdown">
                     <li>
                         <a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}"
                             href="{{ route('language.switch', 'en-SA') }}" title="{{ __('dashboard.navbar.english') }}">
-                            {{ __('dashboard.navbar.english') }}
+                            <i class="bi bi-check2"></i> English
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item {{ app()->getLocale() == 'ar' ? 'active' : '' }}"
                             href="{{ route('language.switch', 'ar-SA') }}" title="{{ __('dashboard.navbar.arabic') }}">
-                            {{ __('dashboard.navbar.arabic') }}
+                            <i class="bi bi-check2"></i> العربية
                         </a>
                     </li>
-
                 </ul>
             </div>
 
-            <button class="nav-icon-btn"><i class="fa-regular fa-sun"></i></button>
+            <!-- <button class="nav-icon-btn-enhanced" title="{{ __('dashboard.navbar.dark_mode') }}">
+                <i class="fa-regular fa-moon"></i>
+            </button> -->
         </div>
 
         <!-- User Profile Dropdown -->
-        <div class="user-profile dropdown">
+        <div class="user-profile-enhanced dropdown">
             <a href="#" class="d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <img src="{{ asset('assets/images/user.png') }}" alt="User" class="user-avatar">
+                aria-expanded="false" title="{{ auth()->user()->name }}">
+                <div class="user-avatar-wrapper">
+                    <img src="{{ $avatarUrl }}" alt="{{ auth()->user()->name }}" class="user-avatar-enhanced">
+                    <span class="user-status-dot"></span>
+                </div>
+                <span class="user-name-navbar">{{ auth()->user()->name }}</span>
             </a>
-            <ul class="dropdown-menu @if(in_array($activeLocale, ['ar-SA', 'ar-EG'])) dropdown-menu-end @else dropdown-menu-start @endif"
+            <ul class="dropdown-menu dropdown-menu-enhanced @if(in_array($activeLocale, ['ar-SA', 'ar-EG'])) dropdown-menu-end @else dropdown-menu-start @endif"
                 aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.profile') }}</a></li>
-                <li><a class="dropdown-item" href="#">{{ __('dashboard.navbar.settings') }}</a></li>
-                <li>
-                    <hr class="dropdown-divider">
+                <li class="dropdown-header-custom">
+                    <div class="user-info-header">
+                        <img src="{{ $avatarUrl }}" alt="{{ auth()->user()->name }}" class="user-avatar-dropdown">
+                        <div>
+                            <p class="user-name">{{ auth()->user()->name }}</p>
+                            <p class="user-email">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
                 </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('superadmin.profile.show', ['locale' => $activeLocale]) }}">
+                    <i class="bi bi-person"></i> {{ __('dashboard.navbar.profile') }}
+                </a></li>
+                <!-- <li><a class="dropdown-item" href="{{ route('superadmin.settings.show', ['locale' => $activeLocale]) }}">
+                    <i class="bi bi-sliders"></i> {{ __('dashboard.navbar.settings_link') }}
+                </a></li> -->
+                <li><a class="dropdown-item" href="{{ route('superadmin.password.show', ['locale' => $activeLocale]) }}">
+                    <i class="bi bi-key"></i> {{ __('dashboard.navbar.change_password') }}
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li>
-                    <a class="dropdown-item" href="{{ route('logout', ['locale' => $activeLocale]) }}"
+                    <a class="dropdown-item text-danger" href="{{ route('logout', ['locale' => $activeLocale]) }}"
                         onclick="event.preventDefault(); document.getElementById('navbar-logout-form').submit();">
-                        {{ __('dashboard.navbar.logout') }}
+                        <i class="bi bi-box-arrow-right"></i> {{ __('dashboard.navbar.logout') }}
                     </a>
                     <form id="navbar-logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}"
                         method="POST" class="d-none">

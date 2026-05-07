@@ -32,8 +32,8 @@ class DashboardDemoSeeder extends Seeder
         if (!$tenant) {
             $tenant = Tenant::create([
                 'id' => (string) Str::uuid(),
-                'name' => 'Al-Sawady Farm',
-                'slug' => 'al-sawady-farm',
+                'name' => 'Al-Sawady ERP',
+                'slug' => 'al-sawady-erp',
                 'status' => 'active',
             ]);
         }

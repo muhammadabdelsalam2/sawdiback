@@ -13,7 +13,7 @@ h3 {
 }
 
 /* Buttons */
-.btn-primary-farm {
+.btn-primary-brand {
     background: var(--brand-green);
     color: white;
     border-radius: 12px;
@@ -23,7 +23,7 @@ h3 {
     transition: 0.3s;
 }
 
-.btn-primary-farm:hover {
+.btn-primary-brand:hover {
     background: #1e3d1a;
     color: white;
     transform: translateY(-2px);
@@ -158,7 +158,7 @@ h3 {
 
 
 .hero-section {
-    background: url('/assets/images/farm-hero.jpg') center/cover no-repeat;
+    background: url('/assets/images/image1.png') center/cover no-repeat;
     min-height: 90vh;
     display: flex;
     align-items: center;

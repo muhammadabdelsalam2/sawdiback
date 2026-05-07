@@ -6,7 +6,7 @@
                 <p class="lead text-muted mb-5 fs-5">{{ __('app.hero_text') }}</p>
 
                 <div class="d-flex justify-content-center gap-3 mb-5">
-                    <button class="btn btn-primary-farm btn-lg">{{ __('app.start_trial') }}</button>
+                    <button class="btn btn-primary-brand btn-lg">{{ __('app.start_trial') }}</button>
                     <button class="btn btn-light btn-lg border px-4">{{ __('app.request_demo') }}</button>
                 </div>
 

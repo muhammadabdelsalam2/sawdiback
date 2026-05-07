@@ -67,4 +67,49 @@ class Tenant extends Model
     {
         return $this->hasMany(AnimalBreed::class);
     }
+
+    public function inventoryProducts()
+    {
+        return $this->hasMany(InventoryProduct::class);
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function inventoryBatches()
+    {
+        return $this->hasMany(InventoryBatch::class);
+    }
+
+    public function inventoryDeliveries()
+    {
+        return $this->hasMany(InventoryDelivery::class);
+    }
+
+    public function inventoryProductionRecords()
+    {
+        return $this->hasMany(InventoryProductionRecord::class);
+    }
+
+    public function crops()
+    {
+        return $this->hasMany(Crop::class);
+    }
+
+    public function feedTypes()
+    {
+        return $this->hasMany(FeedType::class);
+    }
+
+    public function salesOrders()
+    {
+        return $this->hasMany(\App\Models\SalesDistribution\SalesOrder::class);
+    }
 }

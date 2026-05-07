@@ -21,7 +21,6 @@ class InventoryProduct extends Model
         'title',
         'image',
         'category',
-        'farmer_id',
         'category_id',
         'unit',
         'tax',
@@ -38,7 +37,6 @@ class InventoryProduct extends Model
     protected $casts = [
         'track_expiry' => 'boolean',
         'is_active' => 'boolean',
-        'farmer_id' => 'string',
         'is_best_selling' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
         'tax' => 'decimal:2',
@@ -149,19 +147,6 @@ public function categoryRelation(): BelongsTo
         return $this->hasMany(FavoriteProduct::class, 'inventory_product_id');
     }
 
-    // Feat: Products Make it By Farmer
-    public function farmer(): BelongsTo
-    {
-        return $this->belongsTo(Farmer::class);
-    }
-
-    // Feat: Products Make it By Farmer
-    public function byFarmer($query, $farmerId)
-    {
-        return $query->where('farmer_id', $farmerId);
-    }
-
-    // Scope to filter By Farmer
     // Boot
     protected static function booted()
     {

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Warehouse\InventoryProductStoreRequest;
 use App\Http\Requests\Warehouse\InventoryProductUpdateRequest;
 use App\Models\Category;
-use App\Models\Farmer;
 use App\Models\InventoryProduct;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -39,9 +38,8 @@ class InventoryProductController extends Controller
     public function create(string $locale): View
     {
         $categories = $this->categoriesForTenant();
-        $farmers = $this->farmersForTenant();
 
-        return view('dashboard.warehouse.products.create', compact('categories', 'farmers'));
+        return view('dashboard.warehouse.products.create', compact('categories'));
     }
 
     public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
@@ -55,7 +53,6 @@ class InventoryProductController extends Controller
         $data['is_active'] = $request->boolean('is_active');
         $data['track_expiry'] = $request->boolean('track_expiry');
         $data['is_best_selling'] = $request->boolean('is_best_selling');
-        $data['farmer_id'] = $request->input('farmer_id');
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('inventory/products', 'public');
         }
@@ -70,11 +67,10 @@ class InventoryProductController extends Controller
     public function edit(string $locale, InventoryProduct $product): View
     {
         $categories = $this->categoriesForTenant();
-        $farmers = $this->farmersForTenant();
 
         return view(
             'dashboard.warehouse.products.edit',
-            compact('product', 'categories', 'farmers')
+            compact('product', 'categories')
         );
     }
 
@@ -113,14 +109,6 @@ class InventoryProductController extends Controller
         } catch (Throwable) {
             return redirect()->back()->with('error', __('warehouse.messages.error.product_in_use'));
         }
-    }
-    private function farmersForTenant()
-    {
-        $tenantId = $this->tenantId();
-
-        return Farmer::query()
-            ->orderBy('name')
-            ->get();
     }
     private function categoriesForTenant()
     {

@@ -11,13 +11,14 @@
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.rtl.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('assets/images/svg.png') }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('assets/images/logo3.jpeg') }}">
 
-    <link rel="shortcut icon" href="{{ asset('assets/images/svg.png') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('assets/images/logo3.jpeg') }}" type="image/jpeg">
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/pages/landing.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/pages/auth.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     @stack('styles')

@@ -16,7 +16,7 @@ return [
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-    'farm_name' => 'EL-SAWADY ERP',
+    'brand_name' => 'EL-SAWADY ERP',
     'hero_title' => 'Unify your business operations.',
     'hero_text' => 'Advanced resource planning for modern enterprises.',
     'system_name' => 'EL-SAWADY SaaS',

@@ -1,7 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top py-3 border-bottom border-light">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-4" href="{{route('public.home', ['locale' => $currentLocale])}}"
-            style="color: #2D5A27;">EL-Sawady</a>
+        <a class="navbar-brand landing-brand" href="{{route('public.home', ['locale' => $currentLocale])}}">
+            <span class="brand-mark">
+                <img src="{{ asset('assets/images/logo3.jpeg') }}" alt="EL-Sawady">
+            </span>
+        </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,7 +19,7 @@
                 <li class="nav-item"><a class="nav-link mx-2 fw-medium" href="#logic">{{ __('app.nav_logic') }}</a></li>
 
                 <li class="nav-item ms-lg-3 d-flex gap-2">
-                    <a class="btn btn-outline-dark px-4 rounded-pill fw-bold"
+                    <a class="btn nav-login-btn"
                         href="{{ route('login.form', ['locale' => $currentLocale]) }}">
                         {{ __('app.nav_login') }}
                     </a>

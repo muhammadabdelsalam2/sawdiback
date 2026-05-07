@@ -10,16 +10,16 @@
                 <div class="row g-0">
 
                     <!-- Left Side Overlay -->
-                    <div class="col-md-5 d-none d-md-block bg-farm-green position-relative">
+                    <div class="col-md-5 d-none d-md-block bg-brand-green position-relative">
                         <div
                             class="side-image-overlay h-100 w-100 p-5 d-flex flex-column justify-content-between text-white">
                             <div>
-                                <div class="d-flex align-items-center mb-4">
-                                    <div class="bg-white rounded p-2 me-2">
-                                       <img width="50px" src="{{ asset('assets/images/svg.png')}}" alt="This Is Main LOGO">
-                                    </div>
-                                    <span class="farm-logo-text fs-5">
-                                        {{ __('auth.farm_name') }}
+                                <div class="d-flex align-items-center mb-4 login-brand-lockup">
+                                    <span class="brand-mark">
+                                       <img src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
+                                    </span>
+                                    <span class="brand-logo-text fs-5">
+                                        {{ __('auth.brand_name') }}
                                     </span>
                                 </div>
 
@@ -39,9 +39,12 @@
                     </div>
 
                     <!-- Right Side Form -->
-                    <div class="col-md-7 bg-white p-4 p-lg-5">
+                    <div class="col-md-7 bg-white p-4 p-lg-5 login-form-panel d-flex flex-column justify-content-center">
 
-                        <div class="mb-5">
+                        <div class="mb-5 text-center text-md-start">
+                            <span class="brand-mark d-inline-flex d-md-none mb-4">
+                                <img src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
+                            </span>
                             <h3 class="fw-bold text-dark">
                                 {{ __('auth.sign_in') }}
                             </h3>
@@ -129,7 +132,7 @@
                             </div>
 
                             {{-- Submit --}}
-                            <button type="submit" class="btn btn-farm w-100 mb-3">
+                            <button type="submit" class="btn btn-brand w-100 mb-3">
                                 {{ __('auth.login_button') }}
                             </button>
                         </form>

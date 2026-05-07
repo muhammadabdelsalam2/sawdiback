@@ -3,8 +3,10 @@
 return [
     'navbar' => [
         'search' => 'Search',
+        'search_placeholder' => 'Search anything...',
         'profile' => 'Profile',
-        'settings' => 'Settings',
+        'settings_link' => 'Settings',
+        'change_password' => 'Change Password',
         'logout' => 'Logout',
         'module' => 'Module',
         'language' => 'Language',
@@ -12,6 +14,10 @@ return [
         'arabic' => 'Arabic',
         'saudi_arabia' => 'Saudi Arabia',
         'egypt' => 'Egypt',
+        'notifications' => 'Notifications',
+        'settings' => 'Settings',
+        'dark_mode' => 'Dark Mode',
+        'system_settings' => 'System Settings',
     ],
     'sidebar' => [
         'dashboard' => 'Dashboard',
@@ -70,7 +76,7 @@ return [
     ],
 
     'overview_title' => 'Dashboard Overview',
-    'overview_desc' => 'Al-Sawadi Farm Management System',
+    'overview_desc' => 'Al-Sawadi Customer ERP System',
     'last_30_days' => 'Last 30 Days',
 
     'stats' => [
@@ -307,4 +313,3 @@ return [
         'description_en' => 'Description in English',
     ],
 ];
-

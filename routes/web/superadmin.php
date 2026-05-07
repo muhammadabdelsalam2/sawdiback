@@ -8,6 +8,7 @@ use App\Http\Controllers\Subscriptions\FeatureController;
 use App\Http\Controllers\Subscriptions\PlanController;
 use App\Http\Controllers\Subscriptions\SubscriptionController;
 use App\Http\Controllers\SuperAdmin\AccessManagementController;
+use App\Http\Controllers\SuperAdmin\AccountController;
 use App\Http\Controllers\SuperAdmin\ContentController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,20 @@ Route::prefix('{locale}')
         // SuperAdmin dashboard (no permission required)
         Route::get('superadmin/dashboard', [DashboardController::class, 'superAdminIndex'])
             ->name('dashboard');
+
+        // SuperAdmin account (profile/settings/password) (no permission required)
+        Route::prefix('superadmin')
+            ->group(function () {
+                Route::get('profile', [AccountController::class, 'profile'])->name('profile.show');
+                Route::put('profile', [AccountController::class, 'updateProfile'])->name('profile.update');
+
+                Route::get('settings', [AccountController::class, 'settings'])->name('settings.show');
+                Route::put('settings', [AccountController::class, 'updateSettings'])->name('settings.update');
+
+                Route::get('password', [AccountController::class, 'password'])->name('password.show');
+                Route::put('password', [AccountController::class, 'updatePassword'])->name('password.update');
+            });
+
 
         // Anything below requires roles.manage permission
         Route::middleware(['permission:roles.manage'])

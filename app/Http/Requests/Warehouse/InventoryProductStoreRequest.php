@@ -31,8 +31,6 @@ class InventoryProductStoreRequest extends BaseWarehouseRequest
             'description_ar' => ['nullable', 'string'],
             'description_en' => ['nullable', 'string'],
             'price' => ['nullable', 'numeric', 'min:0'],
-            // Check Farmer ID uuid exists in farmers table for the same tenant
-            'farmer_id' => ['nullable', 'string', 'uuid'],
             'last_price' => ['nullable', 'numeric', 'min:0'],
         ];
     }

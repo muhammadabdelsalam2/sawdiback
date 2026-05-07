@@ -106,8 +106,8 @@ class FeedManagementController extends Controller
             ];
         });
 
-        $farmFeedProduction = (float) Crop::query()->sum('available_for_feed_tons');
-        $farmFeedNeed = (float) FeedConsumption::query()
+        $feedProduction = (float) Crop::query()->sum('available_for_feed_tons');
+        $feedNeed = (float) FeedConsumption::query()
             ->whereBetween('consumption_date', [$start->toDateString(), $end->toDateString()])
             ->sum('quantity');
 
@@ -116,8 +116,8 @@ class FeedManagementController extends Controller
             'monthlyFeedCost',
             'costPerAnimal',
             'lowStockRows',
-            'farmFeedProduction',
-            'farmFeedNeed'
+            'feedProduction',
+            'feedNeed'
         ));
     }
 }

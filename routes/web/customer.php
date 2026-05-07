@@ -41,7 +41,6 @@ use App\Http\Controllers\Customer\Procurement\QuotationController;
 use App\Http\Controllers\Customer\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Customer\Procurement\GoodsReceiptController;
 use App\Http\Controllers\Customer\Procurement\PurchaseInvoiceController;
-use App\Http\Controllers\Farmer\FarmerController;
 use App\Http\Controllers\setting\SearchController;
 
 Route::prefix('{locale}')
@@ -181,23 +180,6 @@ Route::prefix('{locale}')
             Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
             Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
         });
-
-        // =========================================================================
-        // Farmaer Management (Feature Gated) - Placeholder for future expansion ⭐
-        // =========================================================================
-        Route::prefix('farmers')
-            ->name('farmers.')
-            ->group(function () {
-            Route::get('index', [FarmerController::class, 'index'])->name('index'); // Placeholder route for farmers listing
-            // Future routes for farmer management will go here
-            Route::get('show/{farmer}', [FarmerController::class, 'show'])->name('show'); // Placeholder for showing farmer details
-            Route::get('create', [FarmerController::class, 'create'])->name('create'); // Placeholder for creating a new farmer
-            Route::post('store', [FarmerController::class, 'store'])->name('store'); // Placeholder for storing a new farmer
-            Route::delete('force-delete/{farmer}', [FarmerController::class, 'force'])->name('force-delete'); // Placeholder for force deleting a farmer
-        });
-
-
-
 
         // =========================
         // HR Management (Feature Gated)

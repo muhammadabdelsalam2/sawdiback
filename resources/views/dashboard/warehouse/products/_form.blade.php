@@ -1,16 +1,5 @@
 <div class="row g-3">
 
-    {{-- Select Farmer --}}
-    <div class="col-md-4">
-        <label class="form-label">{{ __('warehouse.fields.select_farmer') }}</label>
-        <select name="farmer_id" class="form-select" required>
-            @foreach ($farmers as $farmer)
-                <option value="{{ $farmer->id }}" @selected((int) old('farmer_id', $product->farmer_id ?? 0) === $farmer->id)>
-                    {{ $farmer->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
 
     <div class="col-md-4">
         <label class="form-label">{{ __('warehouse.fields.code') }}</label>

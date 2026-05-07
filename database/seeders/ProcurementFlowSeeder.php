@@ -185,7 +185,7 @@ class ProcurementFlowSeeder extends Seeder
                     ['email' => 'sales@feh.test'],
                     [
                         'id' => \Illuminate\Support\Str::uuid(),
-                        'name' => 'Farm Equipment Hub',
+                        'name' => 'Equipment Hub',
                         'phone' => '+966500001003',
                         'address' => 'Dammam Tech Park',
                         'is_active' => true,

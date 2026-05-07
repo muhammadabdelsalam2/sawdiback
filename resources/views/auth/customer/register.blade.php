@@ -43,7 +43,7 @@
                                     <div class="d-flex align-items-center mb-4">
                                         <div
                                             class="bg-white rounded p-2 {{ app()->getLocale() == 'ar' ? 'ms-2' : 'me-2' }}">
-                                            <img width="50px" src="{{ asset('assets/images/svg.png')}}" alt="Logo">
+                                            <img width="50px" src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
                                         </div>
                                         <span class="fs-5 fw-bold">EL-SAWADY ERP</span>
                                     </div>
@@ -143,7 +143,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-farm w-100 py-3 mb-3 shadow-sm"
+                                <button type="submit" class="btn btn-brand w-100 py-3 mb-3 shadow-sm"
                                     style="background-color: #2D5A27; color: white; border-radius: 12px; font-weight: 600;">
                                     {{ __('auth.submit_btn') }}
                                 </button>

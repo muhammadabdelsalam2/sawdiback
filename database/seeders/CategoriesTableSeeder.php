@@ -37,7 +37,7 @@ class CategoriesTableSeeder extends Seeder
             ['code' => 'FERT', 'en' => 'Fertilizers', 'ar' => 'أسمدة'],
             ['code' => 'PEST', 'en' => 'Pesticides', 'ar' => 'مبيدات'],
             ['code' => 'IRRG', 'en' => 'Irrigation', 'ar' => 'الري'],
-            ['code' => 'TOOLS', 'en' => 'Farm Tools', 'ar' => 'أدوات زراعية'],
+            ['code' => 'TOOLS', 'en' => 'Tools', 'ar' => 'أدوات'],
             ['code' => 'MACH', 'en' => 'Machinery', 'ar' => 'معدات زراعية'],
             ['code' => 'TRACT', 'en' => 'Tractors', 'ar' => 'جرارات'],
             ['code' => 'ANML', 'en' => 'Livestock', 'ar' => 'مواشي'],
@@ -54,14 +54,14 @@ class CategoriesTableSeeder extends Seeder
             ['code' => 'PACK', 'en' => 'Packaging', 'ar' => 'التعبئة والتغليف'],
             ['code' => 'ORGA', 'en' => 'Organic Products', 'ar' => 'منتجات عضوية'],
             ['code' => 'SEEDL', 'en' => 'Seedlings', 'ar' => 'شتلات'],
-            ['code' => 'FRUIT', 'en' => 'Fruit Farming', 'ar' => 'زراعة الفاكهة'],
-            ['code' => 'VEG', 'en' => 'Vegetable Farming', 'ar' => 'زراعة الخضروات'],
+            ['code' => 'FRUIT', 'en' => 'Fruit', 'ar' => 'الفاكهة'],
+            ['code' => 'VEG', 'en' => 'Vegetables', 'ar' => 'الخضروات'],
             ['code' => 'GRAIN', 'en' => 'Grains', 'ar' => 'الحبوب'],
             ['code' => 'HERB', 'en' => 'Herbs', 'ar' => 'أعشاب'],
             ['code' => 'FLOW', 'en' => 'Flowers', 'ar' => 'زهور'],
             ['code' => 'LAND', 'en' => 'Land Preparation', 'ar' => 'تجهيز الأراضي'],
-            ['code' => 'FENCE', 'en' => 'Fencing', 'ar' => 'أسوار المزارع'],
-            ['code' => 'ENER', 'en' => 'Farm Energy', 'ar' => 'طاقة المزارع'],
+            ['code' => 'FENCE', 'en' => 'Fencing', 'ar' => 'أسوار'],
+            ['code' => 'ENER', 'en' => 'Energy', 'ar' => 'الطاقة'],
         ];
 
         foreach ($categories as $index => $cat) {

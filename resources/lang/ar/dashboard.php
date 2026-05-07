@@ -3,8 +3,10 @@
 return [
     'navbar' => [
         'search' => 'بحث',
+        'search_placeholder' => 'ابحث عن أي شيء...',
         'profile' => 'الملف الشخصي',
-        'settings' => 'الإعدادات',
+        'settings_link' => 'الإعدادات',
+        'change_password' => 'تغيير كلمة المرور',
         'logout' => 'تسجيل الخروج',
         'module' => 'موديول',
         'language' => 'اللغة',
@@ -12,6 +14,10 @@ return [
         'arabic' => 'العربية',
         'saudi_arabia' => 'السعودية',
         'egypt' => 'مصر',
+        'notifications' => 'الإشعارات',
+        'settings' => 'الإعدادات',
+        'dark_mode' => 'الوضع الليلي',
+        'system_settings' => 'إعدادات النظام',
         ],
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
@@ -69,7 +75,7 @@ return [
     ],
 
     'overview_title' => 'نظرة عامة على لوحة التحكم',
-    'overview_desc' => 'نظام إدارة مزرعة السوايدي',
+    'overview_desc' => 'نظام ERP لإدارة العملاء',
     'last_30_days' => 'آخر 30 يومًا',
 
     'stats' => [
@@ -294,4 +300,3 @@ return [
         'description_en' => 'الوصف بالإنجليزية',
     ],
 ];
-

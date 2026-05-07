@@ -22,26 +22,6 @@ return [
         'description' => 'Custom roles and permission management',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Farm & Field Management
-    |--------------------------------------------------------------------------
-    */
-
-    'max_farms' => [
-        'label' => 'Max Farms',
-        'type' => 'numeric',
-        'default' => 1,
-        'description' => 'Number of farms allowed',
-    ],
-
-    'max_fields' => [
-        'label' => 'Max Fields',
-        'type' => 'numeric',
-        'default' => 5,
-        'description' => 'Number of agricultural fields',
-    ],
-
     'crop_management' => [
         'label' => 'Crop Management',
         'type' => 'boolean',
@@ -99,7 +79,7 @@ return [
         'label' => 'Expense Tracking',
         'type' => 'boolean',
         'default' => true,
-        'description' => 'Track farm expenses',
+        'description' => 'Track business expenses',
     ],
 
     'income_tracking' => [
@@ -200,18 +180,6 @@ return [
         'type' => 'boolean',
         'default' => false,
         'description' => 'Use your own domain',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | HR Management
-    |--------------------------------------------------------------------------
-    */
-    'farmer_management' => [
-        'label' => 'Farmer Management',
-        'type' => 'boolean',
-        'default' => false,
-        'description' => 'Enable farmer management features and navigation',
     ],
 
     // 'hr_management' => [

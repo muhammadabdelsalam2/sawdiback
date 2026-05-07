@@ -63,15 +63,14 @@
         }
 
         .sidebar-nav .active {
-            background: rgba(35, 76, 20, 0.15);
+            background: linear-gradient(135deg, rgba(35, 76, 20, 0.12), rgba(200, 166, 75, 0.12));
             border-left: 3px solid #234c14;
             color: #234c14;
         }
 
         .sidebar-nav a:hover {
-            background: rgba(35, 76, 20, 0.08);
-            padding-left: 18px;
-            transition: 0.3s;
+            background: linear-gradient(135deg, #eef6ea, #f8fbf7);
+            transition: 0.2s ease;
         }
     </style>
     {{-- You Can Start Get Features About Current Subscription Plan auth()->user()->planFeatures() --}}
@@ -161,23 +160,6 @@
                     class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
             </div>
         </div>
-        {{-- Farmer Management --}}
-        <div class="nav-dropdown {{ request()->routeIs('customer.farmers.*') ? 'open' : '' }}">
-            <a href="javascript:void(0)"
-                class="nav-item has-dropdown {{ request()->routeIs('customer.farmers.*') ? 'active' : '' }}">
-                {{-- <i class="fas fa-seedling fs-6"></i> --}}
-                <img src="{{ asset('assets/images/sidebar-icon-14.png') }}" alt="" class="nav-icon ">
-                <span class="nav-label">{{ __('farmer.titles.farmer_management') }}</span>
-                <i
-                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
-            </a>
-            <div class="dropdown-container">
-                <a href="{{ route('customer.farmers.index', ['locale' => $activeLocale]) }}"
-                    class="dropdown-item {{ request()->routeIs('customer.farmers.index') ? 'active' : '' }}">{{ __('farmer.titles.farmer') }}</a>
-
-            </div>
-        </div>
-
         {{-- Inventory --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
             <a href="javascript:void(0)"

@@ -37,7 +37,6 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
             'description_en' => ['nullable', 'string'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'last_price' => ['nullable', 'numeric', 'min:0'],
-            'farmer_id' => ['nullable', 'string', 'uuid'],
         ];
     }
 }

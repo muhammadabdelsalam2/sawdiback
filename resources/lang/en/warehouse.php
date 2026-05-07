@@ -40,7 +40,6 @@ return [
     'fields' => [
         'id' => '#',
         'code' => 'Code',
-        'select_farmer' => 'Select Farmer',
         'name' => 'Name',
         'category' => 'Category',
         'unit' => 'Unit',
@@ -112,4 +111,3 @@ return [
         ],
     ],
 ];
-

@@ -35,7 +35,7 @@ return [
     'business_feature_4' => '✓ Priority Support',
 
     // Features Enterprise
-    'enterprise_feature_1' => '✓ Multi-farm Management',
+    'enterprise_feature_1' => '✓ Multi-branch Management',
     'enterprise_feature_2' => '✓ API & Third-party Integrations',
     'enterprise_feature_3' => '✓ Dedicated Account Manager',
 
@@ -73,23 +73,23 @@ return [
     "yearly" => 'Yearly',
     "weekly" => 'Weekly',
 
-    'organic_badge' => '100% Organic Farm',
+    'organic_badge' => '100% Fresh Products',
 
-    'hero_title' => 'Fresh & Natural Products From Elsawady Farm',
+    'hero_title' => 'Fresh & Natural Products From Elsawady',
     'hero_text' => 'From our land to your table. We grow with passion and care.',
     'explore_products' => 'Explore Products',
     'contact_us' => 'Contact Us',
 
     'about_title' => 'Our Story',
-    'about_text' => 'Elsawady Farm has been cultivating premium crops using sustainable and natural farming methods.',
+    'about_text' => 'Elsawady delivers premium products through sustainable and natural production methods.',
     'years_experience' => 'Years of Experience',
     'natural_products' => 'Natural Products',
 
-    'why_choose_title' => 'Why Choose Elsawady Farm?',
+    'why_choose_title' => 'Why Choose Elsawady?',
     'why_choose_subtitle' => 'We believe in quality, sustainability, and trust.',
 
-    'feature_1_title' => 'Organic Farming',
-    'feature_1_text' => 'No harmful chemicals. Just natural farming methods.',
+    'feature_1_title' => 'Organic Quality',
+    'feature_1_text' => 'No harmful chemicals. Just natural production methods.',
 
     'feature_2_title' => 'Fresh Harvest',
     'feature_2_text' => 'Daily fresh harvest delivered directly.',

@@ -20,7 +20,7 @@ class ArticleSeeder extends Seeder
                 'image' => 'assets/images/products/product1.png',
             ],
             [
-                'title' => ['en' => 'Fresh Farm Vegetables', 'ar' => 'خضروات طازجة من المزرعة'],
+                'title' => ['en' => 'Fresh Vegetables', 'ar' => 'خضروات طازجة'],
                 'description' => ['en' => 'Choose fresh vegetables packed with natural flavor.', 'ar' => 'اختر خضروات طازجة مليئة بالنكهة الطبيعية.'],
                 'category' => 'Organic',
                 'image' => 'assets/images/products/product2.png',

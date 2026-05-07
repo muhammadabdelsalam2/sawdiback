@@ -33,7 +33,7 @@ return [
     'business_feature_4' => '✓ دعم أولوية',
 
     // Features Enterprise
-    'enterprise_feature_1' => '✓ إدارة متعددة للمزارع',
+    'enterprise_feature_1' => '✓ إدارة متعددة للفروع',
     'enterprise_feature_2' => '✓ تكامل API وأطراف ثالثة',
     'enterprise_feature_3' => '✓ مدير حساب مخصص',
 
@@ -55,8 +55,8 @@ return [
 
 
     // Footer Section
-    'footer_brand' => 'إل-سوايدي',
-    'footer_text' => 'تمكين الجيل القادم من الزراعة في الإمارات وما وراءها باستخدام أدوات إدارة ذكية.',
+    'footer_brand' => 'إل-سوادي',
+    'footer_text' => 'تمكين الجيل القادم من الأعمال في الإمارات وما وراءها باستخدام أدوات إدارة ذكية.',
     'footer_platform' => 'المنصة',
     'footer_dashboard' => 'لوحة التحكم',
     'footer_livestock' => 'المواشي',
@@ -70,22 +70,22 @@ return [
 
 
 
-    'organic_badge' => 'مزرعة طبيعية 100%',
+    'organic_badge' => 'منتجات طبيعية 100%',
 
-    'hero_title' => 'منتجات طازجة وطبيعية من مزرعة السعدي',
-    'hero_text' => 'من أرضنا إلى مائدتك. نزرع بشغف وجودة عالية.',
+    'hero_title' => 'منتجات طازجة وطبيعية من السوادي',
+    'hero_text' => 'منتجات مختارة بعناية وجودة عالية.',
     'explore_products' => 'استكشف المنتجات',
     'contact_us' => 'تواصل معنا',
 
     'about_title' => 'قصتنا',
-    'about_text' => 'تعمل مزرعة السعدي على زراعة محاصيل عالية الجودة باستخدام أساليب زراعة طبيعية ومستدامة.',
+    'about_text' => 'تقدم السوادي منتجات عالية الجودة باستخدام أساليب إنتاج طبيعية ومستدامة.',
     'years_experience' => 'سنوات خبرة',
     'natural_products' => 'منتجات طبيعية',
 
-    'why_choose_title' => 'لماذا تختار مزرعة السعدي؟',
+    'why_choose_title' => 'لماذا تختار السوادي؟',
     'why_choose_subtitle' => 'نؤمن بالجودة والاستدامة والثقة.',
 
-    'feature_1_title' => 'زراعة عضوية',
+    'feature_1_title' => 'جودة عضوية',
     'feature_1_text' => 'بدون مواد كيميائية ضارة.',
 
     'feature_2_title' => 'حصاد طازج',

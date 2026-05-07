@@ -18,11 +18,11 @@
         <div class="card-block mb-3">
             <div class="row g-3">
                 <div class="col-md-4"><strong>{{ __('crops_feed.fields.monthly_feed_cost') }}:</strong> {{ number_format($monthlyFeedCost, 2) }}</div>
-                <div class="col-md-4"><strong>{{ __('crops_feed.fields.farm_feed_production') }}:</strong> {{ number_format($farmFeedProduction, 2) }}</div>
-                <div class="col-md-4"><strong>{{ __('crops_feed.fields.farm_feed_need') }}:</strong> {{ number_format($farmFeedNeed, 2) }}</div>
+                <div class="col-md-4"><strong>{{ __('crops_feed.fields.feed_production') }}:</strong> {{ number_format($feedProduction, 2) }}</div>
+                <div class="col-md-4"><strong>{{ __('crops_feed.fields.feed_need') }}:</strong> {{ number_format($feedNeed, 2) }}</div>
                 <div class="col-md-4">
                     <strong>{{ __('crops_feed.fields.coverage_status') }}:</strong>
-                    {{ $farmFeedProduction >= $farmFeedNeed ? __('crops_feed.options.covered') : __('crops_feed.options.not_covered') }}
+                    {{ $feedProduction >= $feedNeed ? __('crops_feed.options.covered') : __('crops_feed.options.not_covered') }}
                 </div>
             </div>
         </div>
