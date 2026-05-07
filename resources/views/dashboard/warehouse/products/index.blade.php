@@ -69,9 +69,10 @@
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
-                            @php
+       @php
+    $locale = str_contains(app()->getLocale(), 'ar') ? 'ar' : 'en';
     $categoryName = $row->relationLoaded('category') && $row->category instanceof \App\Models\Category
-        ? ($row->category->translations->firstWhere('locale', app()->getLocale())?->name
+        ? ($row->category->translations->firstWhere('locale', $locale)?->name
             ?? $row->category->translations->first()?->name)
         : ($row->getRawOriginal('category') ?? '-');
 @endphp

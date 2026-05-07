@@ -83,9 +83,10 @@ class Category extends Model
 public function getNameAttribute(): ?string
 {
     $locale = app()->getLocale();
+    $shortLocale = substr($locale, 0, 2); // 'ar-SA' → 'ar'
 
     if ($this->relationLoaded('translations')) {
-        $translation = $this->translations->firstWhere('locale', $locale)
+        $translation = $this->translations->firstWhere('locale', $shortLocale)
             ?? $this->translations->firstWhere('locale', 'en')
             ?? $this->translations->first();
 

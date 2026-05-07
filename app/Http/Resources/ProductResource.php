@@ -26,8 +26,8 @@ class ProductResource extends JsonResource
             'name' => $name,
             'title' => $name,
             'image' => $this->image_url,
-       'category' => $this->relationLoaded('category') && $this->category instanceof \App\Models\Category
-    ? ($this->category->translations->firstWhere('locale', $locale)?->name
+     'category' => $this->relationLoaded('category') && $this->category instanceof \App\Models\Category
+    ? ($this->category->translations->firstWhere('locale', substr($locale, 0, 2))?->name
         ?? $this->category->translations->firstWhere('locale', 'en')?->name
         ?? $this->category->translations->firstWhere('locale', 'ar')?->name
         ?? $this->category->notes
