@@ -65,6 +65,7 @@ return [
         'stock_on_hand' => 'Stock On Hand',
         'actions' => 'Actions',
         'days' => 'Days',
+        'image' => 'Image',
     ],
     'options' => [
         'feed' => 'Feed',

@@ -69,37 +69,54 @@ private function baseWith(): array
     /**
      * Base filters (tenant + active + search + category + price)
      */
-    private function applyBaseFilters(Builder $query, array $filters): void
-    {
-        $query->where('is_active', true);
+   private function applyBaseFilters(Builder $query, array $filters): void
+{
+    $query->where('is_active', true);
 
-        // Search
-        $query->when($filters['q'] ?? null, function ($q) use ($filters) {
-            $q->where(function ($sub) use ($filters) {
-                $sub->where('name', 'like', '%' . $filters['q'] . '%')
-                    ->orWhere('title->en', 'like', '%' . $filters['q'] . '%')
-                    ->orWhere('title->ar', 'like', '%' . $filters['q'] . '%')
-                    ->orWhere('code', 'like', '%' . $filters['q'] . '%');
-            });
+    // Search
+    $query->when($filters['q'] ?? null, function ($q) use ($filters) {
+        $q->where(function ($sub) use ($filters) {
+            $sub->where('name', 'like', '%' . $filters['q'] . '%')
+                ->orWhere('title->en', 'like', '%' . $filters['q'] . '%')
+                ->orWhere('title->ar', 'like', '%' . $filters['q'] . '%')
+                ->orWhere('code', 'like', '%' . $filters['q'] . '%');
         });
+    });
 
-        // Category
-        $query->when($filters['category'] ?? null, function ($q) use ($filters) {
-            $q->where('category', $filters['category']);
+    // Category Filter
+    $query->when($filters['category'] ?? null, function ($q) use ($filters) {
+
+        // لو الفرونت بيرسل category_id
+        $q->where('category_id', $filters['category']);
+
+        /*
+
+
+        $q->whereHas('categoryRelation', function ($subQuery) use ($filters) {
+            $subQuery->where('slug', $filters['category'])
+                     ->orWhere('name', $filters['category']);
         });
+        */
+    });
 
-        // Sorting logic only (NO filtering)
+    // Price Filter
+ $query->when($filters['min_price'] ?? null, function ($q) use ($filters) {
+    $q->where('price', '>=', $filters['min_price']);
+});
 
-        // if max_price exists → order DESC (high → low)
-        if (isset($filters['max_price'])) {
-            $query->orderBy('last_price', 'desc');
-        }
+$query->when($filters['max_price'] ?? null, function ($q) use ($filters) {
+    $q->where('price', '<=', $filters['max_price']);
+});
 
-        // if min_price exists → order ASC (low → high)
-        if (isset($filters['min_price'])) {
-            $query->orderBy('last_price', 'asc');
-        }
+    // Sorting
+    if (($filters['sort'] ?? null) === 'price_asc') {
+        $query->orderBy('last_price', 'asc');
     }
+
+    if (($filters['sort'] ?? null) === 'price_desc') {
+        $query->orderBy('last_price', 'desc');
+    }
+}
     /**
      * Calculate total_in & total_out
      */
@@ -144,7 +161,7 @@ private function baseWith(): array
     {
         return InventoryProduct::where('is_active', true)
         ->with($this->baseWith())
-            ->where('category', 'vet_medicine')
+            ->where('category_id', $category->id)
             ->withSum([
                 'movements as total_in' => function ($q) {
                     $q->where('movement_type', 'in');

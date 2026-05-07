@@ -65,6 +65,7 @@ return [
         'stock_on_hand' => 'الرصيد الحالي',
         'actions' => 'الإجراءات',
         'days' => 'عدد الأيام',
+        'image' => 'الصورة',
     ],
     'options' => [
         'feed' => 'أعلاف',
