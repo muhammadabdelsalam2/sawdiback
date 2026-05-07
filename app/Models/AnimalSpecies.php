@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\ScopedByTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,13 +12,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AnimalSpecies extends Model
 {
     use HasFactory;
+    use HasTranslations;
     use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'code',
         'name',
+        'name_translations',
     ];
+
+    protected $casts = [
+        'name_translations' => 'array',
+    ];
+
+    public function getLocalizedNameAttribute(): ?string
+    {
+        return $this->getLocalized('name_translations', 'name');
+    }
 
     public function tenant(): BelongsTo
     {

@@ -14,7 +14,10 @@ class AnimalSpeciesController extends Controller
 {
     public function index(string $locale): View
     {
-        $rows = AnimalSpecies::query()->orderBy('name')->paginate(15);
+        $rows = AnimalSpecies::query()
+            ->orderBy('name_translations->' . $this->localeKey())
+            ->orderBy('name')
+            ->paginate(15);
         return view('dashboard.livestock.master.species.index', compact('rows'));
     }
 
@@ -25,11 +28,14 @@ class AnimalSpeciesController extends Controller
 
     public function store(AnimalSpeciesStoreRequest $request, string $locale): RedirectResponse
     {
-        AnimalSpecies::query()->create($request->validated());
+        $data = $request->validated();
+        $data['name_translations'] = [$this->localeKey() => $data['name']];
+        
+        AnimalSpecies::query()->create($data);
 
         return redirect()
             ->route('customer.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Species created successfully.');
+            ->with('success', __('livestock.messages.success.species_created'));
     }
 
     public function edit(string $locale, AnimalSpecies $species): View
@@ -39,20 +45,30 @@ class AnimalSpeciesController extends Controller
 
     public function update(AnimalSpeciesUpdateRequest $request, string $locale, AnimalSpecies $species): RedirectResponse
     {
-        $species->update($request->validated());
+        $data = $request->validated();
+        $translations = $species->name_translations ?? [];
+        $translations[$this->localeKey()] = $data['name'];
+        $data['name_translations'] = $translations;
+
+        $species->update($data);
 
         return redirect()
             ->route('customer.livestock.species.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Species updated successfully.');
+            ->with('success', __('livestock.messages.success.species_updated'));
     }
 
     public function destroy(string $locale, AnimalSpecies $species): RedirectResponse
     {
         try {
             $species->delete();
-            return redirect()->back()->with('success', 'Species deleted successfully.');
+            return redirect()->back()->with('success', __('livestock.messages.success.species_deleted'));
         } catch (Throwable $e) {
-            return redirect()->back()->with('error', 'Species cannot be deleted because it is in use.');
+            return redirect()->back()->with('error', __('livestock.messages.error.species_in_use'));
         }
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 }

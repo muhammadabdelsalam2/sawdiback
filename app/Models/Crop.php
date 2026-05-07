@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\ScopedByTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Crop extends Model
 {
     use HasFactory;
+    use HasTranslations;
     use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'name',
+        'name_translations',
         'land_area',
         'planting_date',
         'yield_tons',
@@ -30,7 +33,13 @@ class Crop extends Model
         'yield_tons' => 'decimal:2',
         'available_for_feed_tons' => 'decimal:2',
         'sale_price_per_ton' => 'decimal:2',
+        'name_translations' => 'array',
     ];
+
+    public function getLocalizedNameAttribute(): ?string
+    {
+        return $this->getLocalized('name_translations', 'name');
+    }
 
     protected $appends = [
         'total_cost',

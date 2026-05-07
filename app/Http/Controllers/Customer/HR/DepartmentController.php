@@ -34,14 +34,16 @@ class DepartmentController extends Controller
     public function store(DepartmentStoreRequest $request, string $locale): RedirectResponse
     {
         $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
+        $data = $request->validated();
+        $data['name_translations'] = [$this->localeKey() => $data['name']];
 
         $this->repo->create([
             'tenant_id' => $tenantId,
-            ...$request->validated(),
+            ...$data,
         ]);
 
         return redirect()->route('customer.hr.departments.index', ['locale' => $locale])
-            ->with('success', 'Department created.');
+            ->with('success', __('dashboard.messages.success.department_created'));
     }
 
     public function edit(string $locale, Department $department): View
@@ -54,11 +56,16 @@ class DepartmentController extends Controller
     public function update(DepartmentUpdateRequest $request, string $locale, Department $department): RedirectResponse
     {
         $this->authorizeTenant($department);
+        $data = $request->validated();
+        
+        $translations = $department->name_translations ?? [];
+        $translations[$this->localeKey()] = $data['name'];
+        $data['name_translations'] = $translations;
 
-        $this->repo->update($department, $request->validated());
+        $this->repo->update($department, $data);
 
         return redirect()->route('customer.hr.departments.index', ['locale' => $locale])
-            ->with('success', 'Department updated.');
+            ->with('success', __('dashboard.messages.success.department_updated'));
     }
 
     public function destroy(string $locale, Department $department): RedirectResponse
@@ -68,7 +75,12 @@ class DepartmentController extends Controller
         $this->repo->delete($department);
 
         return redirect()->route('customer.hr.departments.index', ['locale' => $locale])
-            ->with('success', 'Department deleted.');
+            ->with('success', __('dashboard.messages.success.department_deleted'));
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 
     private function authorizeTenant(Department $department): void

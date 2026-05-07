@@ -158,10 +158,38 @@ return [
         'concentrate' => 'Concentrate',
         'roughage' => 'Roughage',
         'supplement' => 'Supplement',
+        'CATTLE' => 'Cattle',
+        'SHEEP' => 'Sheep',
+        'GOAT' => 'Goat',
+        'CAMEL' => 'Camel',
+        'HORSE' => 'Horse',
     ],
 
     'messages' => [
         'capture_birth_event' => 'Capture birth event for born animal',
+        'success' => [
+            'animal_registered' => 'Animal registered successfully.',
+            'animal_updated' => 'Animal updated successfully.',
+            'animal_status_updated' => 'Animal status updated successfully.',
+            'species_created' => 'Species created successfully.',
+            'species_updated' => 'Species updated successfully.',
+            'species_deleted' => 'Species deleted successfully.',
+            'breed_created' => 'Breed created successfully.',
+            'breed_updated' => 'Breed updated successfully.',
+            'breed_deleted' => 'Breed deleted successfully.',
+            'vaccine_created' => 'Vaccine created successfully.',
+            'vaccine_updated' => 'Vaccine updated successfully.',
+            'vaccine_deleted' => 'Vaccine deleted successfully.',
+            'feed_type_created' => 'Feed type created successfully.',
+            'feed_type_updated' => 'Feed type updated successfully.',
+            'feed_type_deleted' => 'Feed type deleted successfully.',
+        ],
+        'error' => [
+            'species_in_use' => 'Species cannot be deleted because it is in use.',
+            'breed_in_use' => 'Breed cannot be deleted because it is in use.',
+            'vaccine_in_use' => 'Vaccine cannot be deleted because it is in use.',
+            'feed_type_in_use' => 'Feed type cannot be deleted because it is in use.',
+        ],
     ],
 
     'empty' => [

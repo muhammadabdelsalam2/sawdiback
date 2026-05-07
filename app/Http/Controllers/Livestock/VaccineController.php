@@ -14,7 +14,10 @@ class VaccineController extends Controller
 {
     public function index(string $locale): View
     {
-        $rows = Vaccine::query()->orderBy('name')->paginate(15);
+        $rows = Vaccine::query()
+            ->orderBy('name_translations->' . $this->localeKey())
+            ->orderBy('name')
+            ->paginate(15);
         return view('dashboard.livestock.master.vaccines.index', compact('rows'));
     }
 
@@ -25,11 +28,14 @@ class VaccineController extends Controller
 
     public function store(VaccineStoreRequest $request, string $locale): RedirectResponse
     {
-        Vaccine::query()->create($request->validated());
+        $data = $request->validated();
+        $data['name_translations'] = [$this->localeKey() => $data['name']];
+        
+        Vaccine::query()->create($data);
 
         return redirect()
             ->route('customer.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Vaccine created successfully.');
+            ->with('success', __('livestock.messages.success.vaccine_created'));
     }
 
     public function edit(string $locale, Vaccine $vaccine): View
@@ -39,20 +45,30 @@ class VaccineController extends Controller
 
     public function update(VaccineUpdateRequest $request, string $locale, Vaccine $vaccine): RedirectResponse
     {
-        $vaccine->update($request->validated());
+        $data = $request->validated();
+        $translations = $vaccine->name_translations ?? [];
+        $translations[$this->localeKey()] = $data['name'];
+        $data['name_translations'] = $translations;
+
+        $vaccine->update($data);
 
         return redirect()
             ->route('customer.livestock.vaccines.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Vaccine updated successfully.');
+            ->with('success', __('livestock.messages.success.vaccine_updated'));
     }
 
     public function destroy(string $locale, Vaccine $vaccine): RedirectResponse
     {
         try {
             $vaccine->delete();
-            return redirect()->back()->with('success', 'Vaccine deleted successfully.');
+            return redirect()->back()->with('success', __('livestock.messages.success.vaccine_deleted'));
         } catch (Throwable $e) {
-            return redirect()->back()->with('error', 'Vaccine cannot be deleted because it is in use.');
+            return redirect()->back()->with('error', __('livestock.messages.error.vaccine_in_use'));
         }
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 }
