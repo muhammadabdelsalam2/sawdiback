@@ -13,9 +13,10 @@ use App\Http\Controllers\LanguageController;
 // =====================
 
 // Redirect / to default locale
-Route::get('/', function () {
-    return redirect()->route('public.home', ['locale' => config('locale.default', 'en-SA')]);
-});
+// Route::get('/', function () {
+//     return redirect()->route('public.home', ['locale' => config('locale.default', 'en-SA')]);
+// });
+Route::get('/', [LandingPageController::class, 'redirectToDefault']);
 
 // Public home page
 Route::get('{locale}/home', [LandingPageController::class, 'index'])

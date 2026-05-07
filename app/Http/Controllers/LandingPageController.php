@@ -32,5 +32,8 @@ class LandingPageController extends Controller
         // Pass plans & currency to the view
         return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts'));
     }
-
+public function redirectToDefault()
+{
+    return redirect()->route('public.home', ['locale' => config('locale.default', 'en-SA')]);
+}
 }
