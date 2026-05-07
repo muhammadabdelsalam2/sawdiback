@@ -11,7 +11,7 @@ class CategoryRepository implements CategoryRepositoryInterface
 {
     public function all(): LengthAwarePaginator
     {
-        return Category::query()
+        return Category::query()->with(['translations'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
     }

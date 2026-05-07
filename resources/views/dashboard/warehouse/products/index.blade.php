@@ -69,7 +69,7 @@
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
-                                {{ $row->category?->name ?? ($row->getAttribute('category') ? __('warehouse.options.' . $row->getAttribute('category')) : '-') }}
+                               {{ $row->category?->name ?? '-' }}
                             </td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name }}"

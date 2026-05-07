@@ -31,9 +31,9 @@ class Category extends Model
     */
     protected $appends = ['name'];
 
-  
 
-  
+
+
 
     public function parent()
     {
@@ -80,14 +80,18 @@ class Category extends Model
         return $this->hasOne(CategoryTranslation::class)
             ->where('locale', app()->getLocale());
     }
-    public function getNameAttribute()
-    {
-        $locale = app()->getLocale(); // current locale, e.g., 'en', 'ar'
+public function getNameAttribute(): ?string
+{
+    $locale = app()->getLocale();
 
-        // Get translation for the current locale
-        $translation = $this->translation;
+    if ($this->relationLoaded('translations')) {
+        $translation = $this->translations->firstWhere('locale', $locale)
+            ?? $this->translations->firstWhere('locale', 'en')
+            ?? $this->translations->first();
 
-        // Fallback to default (e.g., first translation) if not found
-        return $translation?->name ?? $this->translation?->name ?? null;
+        if ($translation) return $translation->name;
     }
+
+    return $this->notes ?? $this->code;
+}
 }
