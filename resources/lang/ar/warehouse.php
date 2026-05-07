@@ -12,6 +12,12 @@ return [
         'alerts' => 'تنبيهات المخزون',
         'traceability' => 'تتبع المنتج',
     ],
+    'stats' => [
+        'total_products' => 'إجمالي المنتجات',
+        'active' => 'نشط',
+        'low_stock' => 'مخزون منخفض',
+        'best_selling' => 'الأكثر مبيعاً',
+    ],
     'sections' => [
         'receive_batch' => 'استلام دفعة',
         'manual_movement' => 'حركة مخزون يدوية',
@@ -87,5 +93,19 @@ return [
         'no_low_stock' => 'لا توجد منتجات منخفضة المخزون.',
         'no_expiring' => 'لا توجد دفعات قريبة الانتهاء.',
         'no_delivery_items' => 'لا يوجد سجل تسليم.',
+    ],
+    'messages' => [
+        'success' => [
+            'category_created' => 'تم إضافة التصنيف بنجاح.',
+            'category_updated' => 'تم تحديث التصنيف بنجاح.',
+            'category_deleted' => 'تم حذف التصنيف بنجاح.',
+            'product_created' => 'تم إضافة المنتج بنجاح.',
+            'product_updated' => 'تم تحديث المنتج بنجاح.',
+            'product_deleted' => 'تم حذف المنتج بنجاح.',
+        ],
+        'error' => [
+            'category_in_use' => 'لا يمكن حذف التصنيف لأنه مرتبط بمنتجات أخرى.',
+            'product_in_use' => 'لا يمكن حذف المنتج لأنه مرتبط بحركات مخزنية.',
+        ],
     ],
 ];

@@ -10,13 +10,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InventoryProduct extends Model
 {
-    use HasFactory;
+    use HasFactory, Concerns\HasTranslations;
     // use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'code',
         'name',
+<<<<<<< Updated upstream
+=======
+        'name_translations',
+        'title',
+>>>>>>> Stashed changes
         'image',
         'category',
         'category_id',
@@ -33,6 +38,15 @@ class InventoryProduct extends Model
         'is_active' => 'boolean',
         'is_best_selling' => 'boolean',
         'low_stock_threshold' => 'decimal:2',
+<<<<<<< Updated upstream
+=======
+        'tax' => 'decimal:2',
+        'price' => 'decimal:2',
+        'last_price' => 'decimal:2',
+        'title' => 'array',
+        'description' => 'array',
+        'name_translations' => 'array',
+>>>>>>> Stashed changes
     ];
 
     protected $append = ['image_url'];
@@ -79,4 +93,48 @@ class InventoryProduct extends Model
 
         return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
     }
+<<<<<<< Updated upstream
+=======
+
+    public function getLocalizedTitleAttribute(): ?string
+    {
+        return $this->getLocalized('title', 'name');
+    }
+
+    public function getLocalizedDescriptionAttribute(): ?string
+    {
+        return $this->getLocalized('description', 'notes');
+    }
+
+    public function favoritedBy()
+    {
+        return $this->hasMany(FavoriteProduct::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->hasMany(FavoriteProduct::class, 'inventory_product_id');
+    }
+
+    // Feat: Products Make it By Farmer
+    public function farmer(): BelongsTo
+    {
+        return $this->belongsTo(Farmer::class);
+    }
+
+    // Feat: Products Make it By Farmer
+    public function byFarmer($query, $farmerId)
+    {
+        return $query->where('farmer_id', $farmerId);
+    }
+
+    // Scope to filter By Farmer
+    // Boot
+    protected static function booted()
+    {
+        static::addGlobalScope(new ActiveScope);
+
+    }
+
+>>>>>>> Stashed changes
 }

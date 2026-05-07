@@ -12,6 +12,12 @@ return [
         'alerts' => 'Inventory Alerts',
         'traceability' => 'Product Traceability',
     ],
+    'stats' => [
+        'total_products' => 'Total Products',
+        'active' => 'Active',
+        'low_stock' => 'Low Stock',
+        'best_selling' => 'Best Selling',
+    ],
     'sections' => [
         'receive_batch' => 'Receive Batch',
         'manual_movement' => 'Manual Movement',
@@ -87,5 +93,19 @@ return [
         'no_low_stock' => 'No low stock products.',
         'no_expiring' => 'No expiring batches.',
         'no_delivery_items' => 'No delivery records found.',
+    ],
+    'messages' => [
+        'success' => [
+            'category_created' => 'Category created successfully.',
+            'category_updated' => 'Category updated successfully.',
+            'category_deleted' => 'Category deleted successfully.',
+            'product_created' => 'Product created successfully.',
+            'product_updated' => 'Product updated successfully.',
+            'product_deleted' => 'Product deleted successfully.',
+        ],
+        'error' => [
+            'category_in_use' => 'Category cannot be deleted because it is in use.',
+            'product_in_use' => 'Product cannot be deleted because it is in use.',
+        ],
     ],
 ];

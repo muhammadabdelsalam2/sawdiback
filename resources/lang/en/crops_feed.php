@@ -80,4 +80,16 @@ return [
         'no_low_stock' => 'No low stock alerts.',
         'no_cost_per_animal' => 'No feed cost per animal in selected month.',
     ],
+    'messages' => [
+        'success' => [
+            'crop_created' => 'Crop created successfully.',
+            'crop_updated' => 'Crop updated successfully.',
+            'crop_deleted' => 'Crop deleted successfully.',
+            'growth_stage_recorded' => 'Growth stage recorded successfully.',
+            'cost_item_recorded' => 'Cost item recorded successfully.',
+        ],
+        'error' => [
+            'crop_in_use' => 'Crop cannot be deleted because it is linked to other data.',
+        ],
+    ],
 ];

@@ -50,7 +50,7 @@ class InventoryProductController extends Controller
 
         return redirect()
             ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Product created successfully.');
+            ->with('success', __('warehouse.messages.success.product_created'));
     }
 
     public function edit(string $locale, InventoryProduct $product): View
@@ -80,7 +80,7 @@ class InventoryProductController extends Controller
 
         return redirect()
             ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Product updated successfully.');
+            ->with('success', __('warehouse.messages.success.product_updated'));
     }
 
     public function destroy(string $locale, InventoryProduct $product): RedirectResponse
@@ -90,9 +90,9 @@ class InventoryProductController extends Controller
 
             return redirect()
                 ->route('customer.inventory.products.index', ['locale' => session('locale_full', 'en-SA')])
-                ->with('success', 'Product deleted successfully.');
+                ->with('success', __('warehouse.messages.success.product_deleted'));
         } catch (Throwable) {
-            return redirect()->back()->with('error', 'Product cannot be deleted because it is in use.');
+            return redirect()->back()->with('error', __('warehouse.messages.error.product_in_use'));
         }
     }
 

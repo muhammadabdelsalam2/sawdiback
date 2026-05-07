@@ -20,6 +20,7 @@ class CropController extends Controller
     {
         $rows = Crop::query()
             ->withCount(['growthStages', 'costItems'])
+            ->orderBy('name_translations->' . $this->localeKey())
             ->orderByDesc('id')
             ->paginate(15);
 
@@ -33,11 +34,14 @@ class CropController extends Controller
 
     public function store(CropStoreRequest $request, string $locale): RedirectResponse
     {
-        $crop = Crop::query()->create($request->validated());
+        $data = $request->validated();
+        $data['name_translations'] = [$this->localeKey() => $data['name']];
+
+        $crop = Crop::query()->create($data);
 
         return redirect()
             ->route('customer.crops-feed.crops.show', ['locale' => session('locale_full', 'en-SA'), 'crop' => $crop->id])
-            ->with('success', 'Crop created successfully.');
+            ->with('success', __('crops_feed.messages.success.crop_created'));
     }
 
     public function show(string $locale, Crop $crop): View
@@ -58,11 +62,16 @@ class CropController extends Controller
 
     public function update(CropUpdateRequest $request, string $locale, Crop $crop): RedirectResponse
     {
-        $crop->update($request->validated());
+        $data = $request->validated();
+        $translations = $crop->name_translations ?? [];
+        $translations[$this->localeKey()] = $data['name'];
+        $data['name_translations'] = $translations;
+
+        $crop->update($data);
 
         return redirect()
             ->route('customer.crops-feed.crops.show', ['locale' => session('locale_full', 'en-SA'), 'crop' => $crop->id])
-            ->with('success', 'Crop updated successfully.');
+            ->with('success', __('crops_feed.messages.success.crop_updated'));
     }
 
     public function destroy(string $locale, Crop $crop): RedirectResponse
@@ -70,9 +79,9 @@ class CropController extends Controller
         try {
             $crop->delete();
             return redirect()->route('customer.crops-feed.crops.index', ['locale' => session('locale_full', 'en-SA')])
-                ->with('success', 'Crop deleted successfully.');
+                ->with('success', __('crops_feed.messages.success.crop_deleted'));
         } catch (Throwable $e) {
-            return redirect()->back()->with('error', 'Crop cannot be deleted because it is in use.');
+            return redirect()->back()->with('error', __('crops_feed.messages.error.crop_in_use'));
         }
     }
 
@@ -80,13 +89,18 @@ class CropController extends Controller
     {
         CropGrowthStage::query()->create($request->validated());
 
-        return redirect()->back()->with('success', 'Growth stage recorded successfully.');
+        return redirect()->back()->with('success', __('crops_feed.messages.success.growth_stage_recorded'));
     }
 
     public function storeCostItem(CropCostItemStoreRequest $request, string $locale): RedirectResponse
     {
         CropCostItem::query()->create($request->validated());
 
-        return redirect()->back()->with('success', 'Cost item recorded successfully.');
+        return redirect()->back()->with('success', __('crops_feed.messages.success.cost_item_recorded'));
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 }

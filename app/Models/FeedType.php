@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\ScopedByTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class FeedType extends Model
 {
     use HasFactory;
+    use HasTranslations;
     use ScopedByTenant;
 
     protected $fillable = [
         'tenant_id',
         'name',
+        'name_translations',
         'category',
         'unit',
         'cost_per_unit',
@@ -26,7 +29,13 @@ class FeedType extends Model
     protected $casts = [
         'cost_per_unit' => 'decimal:2',
         'low_stock_threshold' => 'decimal:2',
+        'name_translations' => 'array',
     ];
+
+    public function getLocalizedNameAttribute(): ?string
+    {
+        return $this->getLocalized('name_translations', 'name');
+    }
 
     public function tenant(): BelongsTo
     {

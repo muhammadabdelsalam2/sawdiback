@@ -249,6 +249,18 @@ return [
             'role_created' => 'Role created successfully.',
             'permission_created' => 'Permission created successfully.',
             'permissions_updated' => 'Permissions updated successfully.',
+<<<<<<< Updated upstream
+=======
+            'content_created' => 'Content created successfully.',
+            'content_updated' => 'Content updated successfully.',
+            'content_deleted' => 'Content deleted successfully.',
+            'department_created' => 'Department created successfully.',
+            'department_updated' => 'Department updated successfully.',
+            'department_deleted' => 'Department deleted successfully.',
+            'job_title_created' => 'Job title created successfully.',
+            'job_title_updated' => 'Job title updated successfully.',
+            'job_title_deleted' => 'Job title deleted successfully.',
+>>>>>>> Stashed changes
         ],
         'error' => [
             'delete_in_use' => 'Cannot be deleted because it is in use.',

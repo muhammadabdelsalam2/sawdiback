@@ -34,14 +34,16 @@ class JobTitleController extends Controller
     public function store(JobTitleStoreRequest $request, string $locale): RedirectResponse
     {
         $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
+        $data = $request->validated();
+        $data['name_translations'] = [$this->localeKey() => $data['name']];
 
         $this->repo->create([
             'tenant_id' => $tenantId,
-            ...$request->validated(),
+            ...$data,
         ]);
 
         return redirect()->route('customer.hr.job-titles.index', ['locale' => $locale])
-            ->with('success', 'Job title created.');
+            ->with('success', __('dashboard.messages.success.job_title_created'));
     }
 
     public function edit(string $locale, JobTitle $job_title): View
@@ -54,11 +56,16 @@ class JobTitleController extends Controller
     public function update(JobTitleUpdateRequest $request, string $locale, JobTitle $job_title): RedirectResponse
     {
         $this->authorizeTenant($job_title);
+        $data = $request->validated();
 
-        $this->repo->update($job_title, $request->validated());
+        $translations = $job_title->name_translations ?? [];
+        $translations[$this->localeKey()] = $data['name'];
+        $data['name_translations'] = $translations;
+
+        $this->repo->update($job_title, $data);
 
         return redirect()->route('customer.hr.job-titles.index', ['locale' => $locale])
-            ->with('success', 'Job title updated.');
+            ->with('success', __('dashboard.messages.success.job_title_updated'));
     }
 
     public function destroy(string $locale, JobTitle $job_title): RedirectResponse
@@ -68,7 +75,12 @@ class JobTitleController extends Controller
         $this->repo->delete($job_title);
 
         return redirect()->route('customer.hr.job-titles.index', ['locale' => $locale])
-            ->with('success', 'Job title deleted.');
+            ->with('success', __('dashboard.messages.success.job_title_deleted'));
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 
     private function authorizeTenant(JobTitle $jobTitle): void

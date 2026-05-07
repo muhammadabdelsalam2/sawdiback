@@ -3,14 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Tenant;
+use App\Models\User;
 use App\Observers\TenantObserver;
-use App\Repositories\Contracts\CustomerRepositoryInterface;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Auth;
-
+use App\Observers\UserObserver;
 use App\Services\PlanFeatureService;
 use App\Services\SalesDistribution\Accounting\AccountingGateway;
+<<<<<<< Updated upstream
 use App\Services\SalesDistribution\Accounting\NullAccountingGateway;
 
 // Plan Repo
@@ -33,7 +31,17 @@ use App\Repositories\LeaveRepository;
 use App\Repositories\AttendanceRepository;
 use App\Models\User;
 use App\Observers\UserObserver;
+=======
+use App\Services\Finance\Accounting\FinanceAccountingGateway;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+>>>>>>> Stashed changes
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Instagram\InstagramExtendSocialite;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,7 +52,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // ✅ SuperAdmin Bypass
+        Paginator::useBootstrapFive();
+
         Gate::before(function ($user, $ability) {
             return $user->hasRole('SuperAdmin') ? true : null;
         });
@@ -59,7 +68,6 @@ class AppServiceProvider extends ServiceProvider
                 'direction' => in_array($lang, ['ar']) ? 'rtl' : 'ltr',
             ]);
 
-            // ✅ Subscription + Features Context
             $service = app(PlanFeatureService::class);
             $ctx = $service->contextFor(Auth::user());
 
@@ -72,12 +80,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Tenant::observe(TenantObserver::class);
-       User::observe(UserObserver::class);
+        User::observe(UserObserver::class);
 
-        // ✅ Register Socialite Providers
-        \Illuminate\Support\Facades\Event::listen(
-            \SocialiteProviders\Manager\SocialiteWasCalled::class,
-            [\SocialiteProviders\Instagram\InstagramExtendSocialite::class, 'handle']
+        Event::listen(
+            SocialiteWasCalled::class,
+            [InstagramExtendSocialite::class, 'handle']
         );
     }
 }
