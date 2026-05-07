@@ -4,6 +4,7 @@ namespace App\Services\API\Ecommerce\Product;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
+use App\Models\FavoriteProduct;
 use App\Models\InventoryProduct;
 use App\Repositories\Api\Product\ProductRepository;
 use App\Repositories\Contracts\Api\ProductRepositoryInterface;
@@ -114,7 +115,9 @@ class ProductService
         }
 
         // Check if already in favorites
-        $existingFavorite = $user->favoriteProducts()->where('inventory_product_id', $productId)->first();
+        $existingFavorite = FavoriteProduct::where('user_id', $user->id)
+    ->where('inventory_product_id', $productId)
+    ->first();
         if ($existingFavorite) {
 
             return ServiceResult::error(
@@ -124,7 +127,10 @@ class ProductService
             );
         } else {
             // Add to favorites
-            $user->favoriteProducts()->attach($productId);
+           FavoriteProduct::create([
+    'user_id' => $user->id,
+    'inventory_product_id' => $productId,
+]);
             return ServiceResult::success(
                 data: new ProductResource($product),
                 message: __('ecommerce.product.favorite_added'),
@@ -136,7 +142,9 @@ class ProductService
 
     public function removeFromFavorites($user, $productId): array
     {
-        $favorite = $user->favoriteProducts()->where('inventory_product_id', $productId)->first();
+        $favorite = FavoriteProduct::where('user_id', $user->id)
+    ->where('inventory_product_id', $productId)
+    ->first();
 
         if (!$favorite) {
             return ServiceResult::error(
@@ -146,7 +154,7 @@ class ProductService
             );
         }
 
-        $user->favoriteProducts()->detach($productId);
+        $favorite->delete();
 
         return ServiceResult::success(
             message: __('ecommerce.product.favorite_removed'),
@@ -156,7 +164,9 @@ class ProductService
 
     public function getUserFavorites($user): array
     {
-        $favorites = $user->favoriteProducts()->with('category')->get();
+        $favorites =$user->favorites()->with('product.category')->get()
+    ->pluck('product')
+    ->filter();
 
         return ServiceResult::success(
             data: ProductResource::collection($favorites),

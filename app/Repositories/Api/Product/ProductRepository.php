@@ -19,11 +19,18 @@ class ProductRepository implements ProductRepositoryInterface
         }
     }];
 }
+private function baseWith(): array
+{
+    return array_merge(
+        $this->favoritesEagerLoad(),
+        ['category.translations']
+    );
+}
 
 
     public function all(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = InventoryProduct::query()->with($this->favoritesEagerLoad()); ;
+        $query = InventoryProduct::query()->with($this->baseWith()); ;
         // Apply Filters By Favorite, Search, Category, Price Range
 
         $this->applyFavoriteFilter($query, $filters);
@@ -136,7 +143,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function byCategory(Category $category, int $perPage = 15): LengthAwarePaginator
     {
         return InventoryProduct::where('is_active', true)
-        ->with($this->favoritesEagerLoad())
+        ->with($this->baseWith())
             ->where('category', 'vet_medicine')
             ->withSum([
                 'movements as total_in' => function ($q) {
@@ -170,7 +177,7 @@ class ProductRepository implements ProductRepositoryInterface
                     ->orWhere('title->ar', 'LIKE', "%$query%")
                     ->orWhere('code', 'LIKE', "%$query%");
             })
-            ->with(array_merge($this->favoritesEagerLoad(), ['movements']))
+            ->with(array_merge($this->baseWith(), ['movements']))
             ->paginate($perPage)
             ->through(function ($product) {
                 $totalIn = $product->movements->where('movement_type', 'IN')->sum('quantity');
@@ -182,7 +189,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function findWithDetails(int $id): ?InventoryProduct
     {
-        $query = InventoryProduct::query()->with($this->favoritesEagerLoad());
+        $query = InventoryProduct::query()->with($this->baseWith());
 
         // Stock calculations
         $this->applyStockCalculations($query);

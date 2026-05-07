@@ -128,7 +128,8 @@
                         <div class="col-md-6">
                             <label class="form-label">{{ __('warehouse.fields.product') }}</label>
                             <select name="inventory_product_id" class="form-select" required>
-                                @foreach($products->where('category', 'animal_product') as $product)
+                            @foreach($products->filter(fn($p) => $p->getRawOriginal('category') === 'animal_product') as $product)
+
                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                 @endforeach
                             </select>
@@ -232,7 +233,7 @@
                         @forelse($stockRows as $row)
                             <tr>
                                 <td>{{ $row['product']->name }}</td>
-                                <td>{{ __('warehouse.options.' . $row['product']->category) }}</td>
+                                <td>{{ $row['product']->category?->name ?? $row['product']->getRawOriginal('category') ?? '-' }}</td>
                                 <td>{{ number_format((float)$row['stock_on_hand'], 2) }}</td>
                                 <td>{{ number_format((float)$row['product']->low_stock_threshold, 2) }}</td>
                                 <td>{{ $row['is_low_stock'] ? __('dashboard.alerts.warning') : 'OK' }}</td>
