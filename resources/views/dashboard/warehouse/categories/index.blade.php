@@ -26,6 +26,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('warehouse.fields.id') }}</th>
+                        <th>{{ __('warehouse.fields.image') }}</th>
                         <th>{{ __('warehouse.fields.name') }}</th>
                         <th>{{ __('warehouse.fields.code') }}</th>
                         <th>{{ __('warehouse.fields.sort_order') }}</th>
@@ -37,6 +38,11 @@
                     @forelse ($rows as $row)
                         <tr>
                             <td>{{ $row->id }}</td>
+                            <td>
+                                <img src="{{ $row->image_url }}" alt="{{ $row->name ?? __('warehouse.titles.categories') }}"
+                                    class="img-thumbnail rounded shadow-sm"
+                                    style="width:48px; height:48px; object-fit:cover;">
+                            </td>
                             <td>{{ $row->name ?? '-' }}</td>
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->sort_order }}</td>
@@ -51,7 +57,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6">{{ __('warehouse.empty.no_categories') }}</td></tr>
+                        <tr><td colspan="7">{{ __('warehouse.empty.no_categories') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

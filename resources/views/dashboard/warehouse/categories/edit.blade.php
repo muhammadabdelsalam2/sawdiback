@@ -16,7 +16,7 @@
         @endif
 
         <div class="card-block">
-            <form method="POST" action="{{ route('customer.inventory.categories.update', ['locale' => $currentLocale, 'category' => $category->id]) }}">
+            <form method="POST" action="{{ route('customer.inventory.categories.update', ['locale' => $currentLocale, 'category' => $category->id]) }}" enctype="multipart/form-data">
                 @method('PUT')
                 @include('dashboard.warehouse.categories._form')
                 <div class="mt-3">

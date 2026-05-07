@@ -14,6 +14,7 @@ class Category extends Model
         'tenant_id',
         'parent_id',
         'code',
+        'image',
         'sort_order',
         'is_active',
         'notes',
@@ -29,7 +30,7 @@ class Category extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
-    protected $appends = ['name'];
+    protected $appends = ['name', 'image_url'];
 
 
 
@@ -102,5 +103,20 @@ public function getNameAttribute(): ?string
     if ($translation) return $translation->name;
 
     return $this->notes ?? $this->code;
+}
+
+public function getImageUrlAttribute(): string
+{
+    if ($this->image) {
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
+    }
+
+    $name = urlencode($this->name ?? $this->code ?? 'Category');
+
+    return "https://ui-avatars.com/api/?name={$name}&background=E5E7EB&color=374151&size=400";
 }
 }

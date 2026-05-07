@@ -8,6 +8,8 @@ use App\Http\Requests\Warehouse\InventoryCategoryUpdateRequest;
 use App\Models\Category;
 use App\Models\CategoryTranslation;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
@@ -17,7 +19,7 @@ class InventoryCategoryController extends Controller
     public function index(string $locale): View
     {
         $rows = $this->baseQuery()
-            ->with(['translation'])
+            ->with(['translations'])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->paginate(15);
@@ -33,17 +35,27 @@ class InventoryCategoryController extends Controller
     public function store(InventoryCategoryStoreRequest $request, string $locale): RedirectResponse
     {
         $data = $request->validated();
+        $imagePath = $this->storeImage($request);
 
-        $category = Category::query()->create([
-            'tenant_id' => $this->tenantId(),
-            'parent_id' => null,
-            'code' => $data['code'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
-            'is_active' => (bool) ($data['is_active'] ?? true),
-            'notes' => $data['notes'] ?? null,
-        ]);
+        try {
+            DB::transaction(function () use ($request, $data, $imagePath): void {
+                $category = Category::query()->create([
+                    'tenant_id' => $this->tenantId(),
+                    'parent_id' => null,
+                    'code' => $data['code'] ?? null,
+                    'image' => $imagePath,
+                    'sort_order' => $data['sort_order'] ?? 0,
+                    'is_active' => $request->boolean('is_active', true),
+                    'notes' => $data['notes'] ?? null,
+                ]);
 
-        $this->upsertTranslation($category->id, $data['name']);
+                $this->upsertTranslation($category->id, $data['name']);
+            });
+        } catch (Throwable $exception) {
+            $this->deleteImage($imagePath);
+
+            throw $exception;
+        }
 
         return redirect()
             ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
@@ -53,7 +65,7 @@ class InventoryCategoryController extends Controller
     public function edit(string $locale, Category $category): View
     {
         $this->assertTenant($category);
-        $category->load('translation');
+        $category->load('translations');
 
         return view('dashboard.warehouse.categories.edit', compact('category'));
     }
@@ -63,14 +75,34 @@ class InventoryCategoryController extends Controller
         $this->assertTenant($category);
         $data = $request->validated();
 
-        $category->update([
-            'code' => $data['code'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
-            'is_active' => (bool) ($data['is_active'] ?? true),
-            'notes' => $data['notes'] ?? null,
-        ]);
+        $oldImage = $category->image;
+        $newImagePath = $this->storeImage($request);
 
-        $this->upsertTranslation($category->id, $data['name']);
+        try {
+            DB::transaction(function () use ($request, $category, $data, $newImagePath): void {
+                $categoryData = [
+                    'code' => $data['code'] ?? null,
+                    'sort_order' => $data['sort_order'] ?? 0,
+                    'is_active' => $request->boolean('is_active'),
+                    'notes' => $data['notes'] ?? null,
+                ];
+
+                if ($newImagePath) {
+                    $categoryData['image'] = $newImagePath;
+                }
+
+                $category->update($categoryData);
+                $this->upsertTranslation($category->id, $data['name']);
+            });
+        } catch (Throwable $exception) {
+            $this->deleteImage($newImagePath);
+
+            throw $exception;
+        }
+
+        if ($newImagePath) {
+            $this->deleteImage($oldImage);
+        }
 
         return redirect()
             ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
@@ -81,7 +113,12 @@ class InventoryCategoryController extends Controller
     {
         $this->assertTenant($category);
         try {
-            $category->delete();
+            DB::transaction(function () use ($category): void {
+                $image = $category->image;
+
+                $category->delete();
+                $this->deleteImage($image);
+            });
 
             return redirect()
                 ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
@@ -101,7 +138,7 @@ class InventoryCategoryController extends Controller
 
     private function upsertTranslation(int $categoryId, string $name): void
     {
-        $locale = app()->getLocale();
+        $locale = $this->localeKey();
         $slug = Str::slug($name);
 
         if ($slug === '') {
@@ -116,6 +153,29 @@ class InventoryCategoryController extends Controller
                 'description' => $name,
             ]
         );
+    }
+
+    private function storeImage(InventoryCategoryStoreRequest|InventoryCategoryUpdateRequest $request): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return null;
+        }
+
+        return $request->file('image')->store('categories', 'public');
+    }
+
+    private function deleteImage(?string $image): void
+    {
+        if (! $image || filter_var($image, FILTER_VALIDATE_URL)) {
+            return;
+        }
+
+        Storage::disk('public')->delete($image);
+    }
+
+    private function localeKey(): string
+    {
+        return substr(app()->getLocale(), 0, 2);
     }
 
     private function tenantId(): ?string

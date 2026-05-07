@@ -16,7 +16,7 @@
         @endif
 
         <div class="card-block">
-            <form method="POST" action="{{ route('customer.inventory.categories.store', ['locale' => $currentLocale]) }}">
+            <form method="POST" action="{{ route('customer.inventory.categories.store', ['locale' => $currentLocale]) }}" enctype="multipart/form-data">
                 @include('dashboard.warehouse.categories._form')
                 <div class="mt-3">
                     <button class="btn btn-primary-green" type="submit">{{ __('warehouse.actions.save') }}</button>

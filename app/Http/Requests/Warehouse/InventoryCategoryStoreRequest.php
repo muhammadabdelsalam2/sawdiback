@@ -18,6 +18,7 @@ class InventoryCategoryStoreRequest extends BaseWarehouseRequest
                 'max:50',
                 Rule::unique('categories', 'code')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
             ],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string'],

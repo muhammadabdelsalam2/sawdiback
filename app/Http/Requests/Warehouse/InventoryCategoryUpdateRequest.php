@@ -23,6 +23,7 @@ class InventoryCategoryUpdateRequest extends BaseWarehouseRequest
                     ->where(fn ($q) => $q->where('tenant_id', $tenantId))
                     ->ignore($category?->id),
             ],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string'],
