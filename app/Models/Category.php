@@ -75,11 +75,12 @@ class Category extends Model
         return $this->hasMany(CategoryTranslation::class);
     }
 
-      public function translation()
-    {
-        return $this->hasOne(CategoryTranslation::class)
-            ->where('locale', app()->getLocale());
-    }
+ public function translation()
+{
+    $locale = substr(app()->getLocale(), 0, 2); // 'en-SA' → 'en'
+    return $this->hasOne(CategoryTranslation::class)
+        ->where('locale', $locale);
+}
 public function getNameAttribute(): ?string
 {
     $locale = substr(app()->getLocale(), 0, 2); // 'en-SA' → 'en', 'ar-SA' → 'ar'
