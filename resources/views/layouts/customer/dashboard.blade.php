@@ -15,15 +15,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/pages/datatables-global.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-<<<<<<< Updated upstream
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
-=======
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
-        rel="stylesheet">
-
-    {{-- Icon In Title --}}
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png">
->>>>>>> Stashed changes
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -51,13 +43,6 @@
                 @yield('content')
             </main>
 
-<<<<<<< Updated upstream
-=======
-            <x-modals.over />
-            <x-modals.basic />
-            <x-modals.notification />
-            <x-modals.toast />
->>>>>>> Stashed changes
         </div>
     </main>
 
@@ -65,12 +50,7 @@
 
     <!-- Bootstrap JS -->
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<<<<<<< Updated upstream
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-=======
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
->>>>>>> Stashed changes
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
@@ -80,16 +60,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Custom JS -->
     <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/pages/sd-export-buttons.js') }}"></script>
-
     <script>
         (function () {
             const dataTableLanguage = {
@@ -106,7 +82,6 @@
                     previous: @json(__('datatable.previous'))
                 }
             };
-
             const sdExportButtonsText = {
                 print: @json(__('sales_dist.export.buttons.print')),
                 pdf: @json(__('sales_dist.export.buttons.pdf')),
@@ -117,40 +92,14 @@
             function initGlobalDataTables() {
                 if (!window.jQuery || !jQuery.fn.DataTable) return;
 
-                const currentPath = window.location.pathname;
-
-                // Safety guard: do not auto-initialize DataTables on SuperAdmin screens.
-                // These pages have custom layouts and icons; automatic table initialization can break the UI.
-                if (
-                    currentPath.includes('/superadmin/users') ||
-                    currentPath.includes('/superadmin/access-management')
-                ) {
-                    return;
-                }
-
-                // Only initialize tables explicitly marked for DataTables.
-                // This prevents accidental frontend regressions on unrelated dashboard pages.
-                const tables = jQuery(
-                    '#content table.js-datatable, ' +
-                    '#content table.data-table, ' +
-                    '#content table.datatable, ' +
-                    '#content table.registry-table, ' +
-                    '#content table.sd-export-table'
-                ).not('.no-datatable');
+                const tables = jQuery('#content table').not('.no-datatable');
 
                 tables.each(function () {
                     if (jQuery.fn.dataTable.isDataTable(this)) return;
 
                     const $table = jQuery(this);
                     const columnCount = $table.find('thead th').length;
-<<<<<<< Updated upstream
                     const colspannedRows = $table.find('tbody tr').filter(function () {
-=======
-
-                    if (!columnCount) return;
-
-                    const colspannedRows = $table.find('tbody tr').filter(function() {
->>>>>>> Stashed changes
                         return jQuery(this).find('td[colspan], td[rowspan]').length > 0;
                     });
 
@@ -187,12 +136,7 @@
                     }
 
                     const noSortIndexes = [];
-<<<<<<< Updated upstream
                     $table.find('thead th').each(function (idx) {
-=======
-
-                    $table.find('thead th').each(function(idx) {
->>>>>>> Stashed changes
                         if (jQuery(this).hasClass('no-sort')) {
                             noSortIndexes.push(idx);
                         }
@@ -246,7 +190,6 @@
                 });
             }
 
-<<<<<<< Updated upstream
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function () {
                     function () {
@@ -256,96 +199,14 @@
                     initGlobalSelectSearch();
                 });
             } else {
-=======
-            function initDashboardPlugins() {
->>>>>>> Stashed changes
                 initGlobalDataTables();
                 initSalesDistributionExportTables();
                 initGlobalSelectSearch();
             }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initDashboardPlugins);
-            } else {
-                initDashboardPlugins();
-            }
         })();
-<<<<<<< Updated upstream
-=======
-
-        // Global loading state management for AJAX requests
-        (function() {
-            let activeRequests = 0;
-
-            function showLoading() {
-                if (activeRequests === 0) {
-                    jQuery('body').addClass('loading');
-                }
-
-                activeRequests++;
-            }
-
-            function hideLoading() {
-                activeRequests = Math.max(activeRequests - 1, 0);
-
-                if (activeRequests === 0) {
-                    jQuery('body').removeClass('loading');
-                }
-            }
-
-            jQuery(document).ajaxStart(showLoading).ajaxStop(hideLoading);
-        })();
-
-        (() => {
-            'use strict';
-
-            const forms = document.querySelectorAll('.needs-validation');
-
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-
-            if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
-                });
-
-                document.addEventListener('click', function(event) {
-                    if (window.innerWidth <= 768) {
-                        if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
-                            sidebar.classList.remove('show');
-                        }
-                    }
-                });
-
-                window.addEventListener('resize', function() {
-                    if (window.innerWidth > 768) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            }
-        });
->>>>>>> Stashed changes
     </script>
-
     @stack('scripts')
 </body>
 
-<<<<<<< Updated upstream
 </html>
 
-=======
-</html>
->>>>>>> Stashed changes

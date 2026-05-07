@@ -245,18 +245,6 @@ return [
             'role_created' => 'تم إنشاء الدور بنجاح.',
             'permission_created' => 'تم إنشاء الصلاحية بنجاح.',
             'permissions_updated' => 'تم تحديث الصلاحيات بنجاح.',
-<<<<<<< Updated upstream
-=======
-            'content_created' => 'تم إضافة المحتوى بنجاح.',
-            'content_updated' => 'تم تحديث المحتوى بنجاح.',
-            'content_deleted' => 'تم حذف المحتوى بنجاح.',
-            'department_created' => 'تم إضافة القسم بنجاح.',
-            'department_updated' => 'تم تحديث القسم بنجاح.',
-            'department_deleted' => 'تم حذف القسم بنجاح.',
-            'job_title_created' => 'تم إضافة المسمى الوظيفي بنجاح.',
-            'job_title_updated' => 'تم تحديث المسمى الوظيفي بنجاح.',
-            'job_title_deleted' => 'تم حذف المسمى الوظيفي بنجاح.',
->>>>>>> Stashed changes
         ],
         'error' => [
             'delete_in_use' => 'لا يمكن المسح لأنه مستخدم بالفعل.',

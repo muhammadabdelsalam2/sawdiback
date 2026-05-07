@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Model
 {
     //
-    use SoftDeletes, Concerns\HasTranslations;
+    use SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -17,13 +17,11 @@ class Category extends Model
         'sort_order',
         'is_active',
         'notes',
-        'name_translations',
     ];
 
 
     protected $casts = [
         'is_active' => 'boolean',
-        'name_translations' => 'array',
     ];
 
     /*
@@ -31,15 +29,11 @@ class Category extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
-<<<<<<< Updated upstream
     protected $appends = ['name'];
 
   
 
   
-=======
-    protected $appends = ['name', 'image_url'];
->>>>>>> Stashed changes
 
     public function parent()
     {
@@ -56,6 +50,11 @@ class Category extends Model
         return $this->hasMany(InventoryProduct::class);
     }
 
+    public function addAttibute($locale)
+    {
+        return 'test';
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Auto Tenant Assign
@@ -70,50 +69,25 @@ class Category extends Model
             }
         });
     }
-
-    // Relationship to translations (Keeping for compatibility)
+    // Relationship to translations
     public function translations()
     {
         return $this->hasMany(CategoryTranslation::class);
     }
 
-<<<<<<< Updated upstream
       public function translation()
     {
         return $this->hasOne(CategoryTranslation::class)
             ->where('locale', app()->getLocale());
-=======
-    public function translation()
-    {
-        $locale = substr(app()->getLocale(), 0, 2); // 'en-SA' → 'en'
-        return $this->hasOne(CategoryTranslation::class)
-            ->where('locale', $locale);
->>>>>>> Stashed changes
     }
     public function getNameAttribute()
     {
         $locale = app()->getLocale(); // current locale, e.g., 'en', 'ar'
 
-<<<<<<< Updated upstream
         // Get translation for the current locale
         $translation = $this->translation;
 
         // Fallback to default (e.g., first translation) if not found
         return $translation?->name ?? $this->translation?->name ?? null;
-=======
-    public function getNameAttribute(): ?string
-    {
-        return $this->getLocalized('name_translations', 'notes') ?? $this->code;
-    }
-
-public function getImageUrlAttribute(): string
-{
-    if ($this->image) {
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
-
-        return asset('storage/' . $this->image);
->>>>>>> Stashed changes
     }
 }
