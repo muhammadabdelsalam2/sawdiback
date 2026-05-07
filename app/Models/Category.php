@@ -82,16 +82,23 @@ class Category extends Model
     }
 public function getNameAttribute(): ?string
 {
-    $locale = app()->getLocale();
-    $shortLocale = substr($locale, 0, 2); // 'ar-SA' → 'ar'
+    $locale = substr(app()->getLocale(), 0, 2); // 'en-SA' → 'en', 'ar-SA' → 'ar'
 
     if ($this->relationLoaded('translations')) {
-        $translation = $this->translations->firstWhere('locale', $shortLocale)
+        $translation = $this->translations->firstWhere('locale', $locale)
             ?? $this->translations->firstWhere('locale', 'en')
             ?? $this->translations->first();
 
         if ($translation) return $translation->name;
     }
+
+    // Fallback: load from DB if not loaded
+    $translation = $this->translations()
+        ->where('locale', $locale)
+        ->orWhere('locale', 'en')
+        ->first();
+
+    if ($translation) return $translation->name;
 
     return $this->notes ?? $this->code;
 }
