@@ -26,7 +26,10 @@ class ProductController extends Controller
      */
     public function index(Request $request, string $locale): JsonResponse
     {
-         auth()->setUser(auth('sanctum')->user());
+        $user = auth('sanctum')->user();
+if ($user) {
+    auth()->setUser($user);
+}
         LocaleResolver::apply($locale);
 
         $request->validate([
