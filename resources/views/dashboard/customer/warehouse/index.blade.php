@@ -12,6 +12,9 @@
         <a href="{{ route('customer.warehouse-assets.create', ['locale' => app()->getLocale()]) }}" class="btn btn-primary">
             {{ __('warehouse.actions.add_asset') }}
         </a>
+        <a href="{{ route('customer.warehouse-assets.create', ['locale' => app()->getLocale()]) }}" class="btn btn-primary">
+            {{ __('warehouse.actions.add_asset') }}
+        </a>
     </div>
 
     <div class="card shadow-sm">
