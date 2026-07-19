@@ -82,6 +82,51 @@
             <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
             <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
         </a>
+           {{-- HR Management (Only if enabled in plan features) --}}
+        @if ($hrEnabled)
+            <div
+                class="nav-dropdown {{ request()->routeIs('customer.hr.*') || request()->routeIs('hr.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
+                <a href="javascript:void(0)"
+                    class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
+                    <i
+                        class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
+                </a>
+
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.hr_dashboard') }}
+                    </a>
+
+                    <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.departments') }}
+                    </a>
+
+                    <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.job_titles') }}
+                    </a>
+
+                    <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.employees') }}
+                    </a>
+
+                    <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.attendance') }}
+                    </a>
+
+                    <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">
+                        {{ __('dashboard.sidebar.leave_requests') }}
+                    </a>
+                </div>
+            </div>
+        @endif
 
         {{-- Livestock --}}
         <div
@@ -326,51 +371,7 @@
             </div>
         </div>
 
-        {{-- HR Management (Only if enabled in plan features) --}}
-        @if ($hrEnabled)
-            <div
-                class="nav-dropdown {{ request()->routeIs('customer.hr.*') || request()->routeIs('hr.*') || request()->routeIs('superadmin.access-management') ? 'open' : '' }}">
-                <a href="javascript:void(0)"
-                    class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
-                    <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{ __('dashboard.sidebar.hr_management') }}</span>
-                    <i
-                        class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
-                </a>
 
-                <div class="dropdown-container">
-                    <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.hr_dashboard') }}
-                    </a>
-
-                    <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.departments') }}
-                    </a>
-
-                    <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.job_titles') }}
-                    </a>
-
-                    <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.employees') }}
-                    </a>
-
-                    <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.attendance') }}
-                    </a>
-
-                    <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}"
-                        class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">
-                        {{ __('dashboard.sidebar.leave_requests') }}
-                    </a>
-                </div>
-            </div>
-        @endif
 
     </nav>
 
