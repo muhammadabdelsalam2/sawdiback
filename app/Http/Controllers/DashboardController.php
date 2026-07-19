@@ -11,6 +11,7 @@ use App\Models\InventoryProduct;
 use App\Models\InventoryProductionRecord;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\Finance\ProfitLossService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,76 +22,145 @@ class DashboardController extends Controller
     {
         $locale = session('locale_full', 'en-SA');
         $user = Auth::user();
+        $tenantId = (string) $user->tenant_id;
+        $profitLoss = app(ProfitLossService::class)->report($tenantId);
 
-        // 1. Stats Calculation
         $stats = [
-            'total_livestock' => LivestockAnimal::count(),
+            'total_livestock' => LivestockAnimal::where('tenant_id', $tenantId)->count(),
             'new_born_this_month' => LivestockAnimal::where('source_type', 'born')
+                ->where('tenant_id', $tenantId)
                 ->whereMonth('birth_date', now()->month)
                 ->count(),
             'daily_milk_yield' => MilkProductionLog::whereDate('production_date', now()->today())
+                ->where('tenant_id', $tenantId)
                 ->sum('quantity_liters'),
-            'milk_yield_delta' => -2, // Mock delta for UI
-            'feed_inventory' => 12, // Mock tons
-            'feed_delta' => -24, // Mock delta for UI
-            'average_profit' => 45200, // Mock profit
-            'profit_delta' => 12, // Mock delta for UI
+            'milk_yield_delta' => $this->monthDelta(
+                (float) MilkProductionLog::where('tenant_id', $tenantId)->whereBetween('production_date', [now()->startOfMonth(), now()])->sum('quantity_liters'),
+                (float) MilkProductionLog::where('tenant_id', $tenantId)->whereBetween('production_date', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])->sum('quantity_liters')
+            ),
+            'feed_inventory' => $this->feedInventoryTons($tenantId),
+            'feed_delta' => 0,
+            'average_profit' => round(($profitLoss['net_profit'] ?? 0) / max(1, now()->day), 2),
+            'profit_delta' => 0,
         ];
 
-        // 2. Production Chart Data (Last 7 days)
         $productionData = MilkProductionLog::select(
             DB::raw('DATE(production_date) as date'),
             DB::raw('SUM(quantity_liters) as total_yield')
         )
+        ->where('tenant_id', $tenantId)
         ->where('production_date', '>=', now()->subDays(7))
         ->groupBy('date')
         ->orderBy('date')
         ->get();
 
-        // 3. Herd Composition Data
         $herdComposition = LivestockAnimal::select('health_status', DB::raw('count(*) as count'))
+            ->where('tenant_id', $tenantId)
             ->groupBy('health_status')
             ->get()
             ->pluck('count', 'health_status');
 
-        // 4. Critical Alerts (Mocked for Demo based on Vaccination Overdue)
-        $alerts = $this->getDemoAlerts();
+        $alerts = $this->dashboardAlerts($tenantId);
+        $profitabilityData = [
+            'labels' => collect($profitLoss['department_profit']['rows'] ?? [])->pluck('name')->values(),
+            'revenue' => collect($profitLoss['department_profit']['rows'] ?? [])->pluck('revenue')->values(),
+            'cost' => collect($profitLoss['department_profit']['rows'] ?? [])->pluck('cost')->values(),
+        ];
 
-        return view('dashboard.index', compact('locale', 'stats', 'productionData', 'herdComposition', 'alerts'));
+        return view('dashboard.index', compact('locale', 'stats', 'productionData', 'herdComposition', 'alerts', 'profitabilityData'));
     }
 
-    private function getDemoAlerts(): array
+    private function dashboardAlerts(string $tenantId): array
     {
+        $critical = [];
+        $lowFeed = DB::table('feed_stock_movements')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('feed_type_id, SUM(CASE WHEN movement_type = "in" THEN quantity ELSE -quantity END) as stock')
+            ->groupBy('feed_type_id')
+            ->havingRaw('stock <= 0')
+            ->first();
+        if ($lowFeed) {
+            $critical[] = [
+                'title' => __('dashboard.alerts.low_feed_stock'),
+                'desc' => __('dashboard.alerts.feed_stock_depleted'),
+                'icon' => 'card-icon-3.svg',
+                'type' => 'warning',
+            ];
+        }
+
+        $overdueVaccination = AnimalVaccination::where('tenant_id', $tenantId)
+            ->whereNotNull('next_due_date')
+            ->whereDate('next_due_date', '<', now()->toDateString())
+            ->first();
+        if ($overdueVaccination) {
+            $critical[] = [
+                'title' => __('dashboard.alerts.vaccination_overdue'),
+                'desc' => __('dashboard.alerts.vaccination_overdue_real'),
+                'icon' => 'card-icon-2.svg',
+                'type' => 'urgent',
+            ];
+        }
+
+        $sales = SalesOrder::where('tenant_id', $tenantId)
+            ->whereIn('status', ['draft', 'confirmed'])
+            ->latest('order_date')
+            ->take(3)
+            ->get()
+            ->map(fn (SalesOrder $order) => [
+                'title' => $order->order_no,
+                'desc' => __('dashboard.alerts.sales_order_total', ['total' => number_format((float) $order->total, 2)]),
+                'icon' => 'card-icon-4.svg',
+            ])->all();
+
+        $operations = collect();
+        $today = now()->toDateString();
+        $operations = $operations->merge(DB::table('animal_feeding_logs')->where('tenant_id', $tenantId)->whereDate('feeding_date', $today)->take(2)->get()->map(fn () => [
+            'title' => __('dashboard.alerts.feeding_logged_today'),
+            'desc' => __('dashboard.alerts.real_operation_from_feeding'),
+            'icon' => 'card-icon-1.svg',
+        ]));
+        $operations = $operations->merge(DB::table('poultry_broiler_mortalities')->where('tenant_id', $tenantId)->whereDate('mortality_date', $today)->take(2)->get()->map(fn ($row) => [
+            'title' => __('dashboard.alerts.poultry_mortality_logged'),
+            'desc' => __('dashboard.alerts.quantity_value', ['quantity' => $row->quantity]),
+            'icon' => 'card-icon-1.svg',
+        ]));
+
         return [
-            'critical' => [
-                [
-                    'title' => __('dashboard.alerts.low_feed_stock'),
-                    'desc' => __('dashboard.alerts.warehouse_c_only_2_tons'),
-                    'icon' => 'card-icon-3.svg',
-                    'type' => 'warning'
-                ],
-                [
-                    'title' => __('dashboard.alerts.vaccination_overdue'),
-                    'desc' => __('dashboard.alerts.group_b_3_days_late'),
-                    'icon' => 'card-icon-2.svg',
-                    'type' => 'urgent'
-                ]
-            ],
-            'sales' => [
-                [
-                    'title' => __('dashboard.alerts.machinery_maintenance'),
-                    'desc' => __('dashboard.alerts.tractor_oil_filter_change'),
-                    'icon' => 'card-icon-4.svg'
-                ]
-            ],
-            'operations' => [
-                [
-                    'title' => __('dashboard.alerts.high_scc_detected'),
-                    'desc' => __('dashboard.alerts.tank2_quality_risk'),
-                    'icon' => 'card-icon-1.svg'
-                ]
-            ]
+            'critical' => $critical ?: [[
+                'title' => __('dashboard.alerts.no_critical_alerts'),
+                'desc' => __('dashboard.alerts.no_critical_alerts_desc'),
+                'icon' => 'card-icon-3.svg',
+                'type' => 'warning',
+            ]],
+            'sales' => $sales ?: [[
+                'title' => __('dashboard.alerts.no_active_sales_orders'),
+                'desc' => __('dashboard.alerts.no_active_sales_orders_desc'),
+                'icon' => 'card-icon-4.svg',
+            ]],
+            'operations' => $operations->values()->all() ?: [[
+                'title' => __('dashboard.alerts.no_operations_today'),
+                'desc' => __('dashboard.alerts.no_operations_today_desc'),
+                'icon' => 'card-icon-1.svg',
+            ]],
         ];
+    }
+
+    private function feedInventoryTons(string $tenantId): float
+    {
+        $stock = (float) FeedStockMovement::where('tenant_id', $tenantId)
+            ->selectRaw('SUM(CASE WHEN movement_type = "in" THEN quantity ELSE -quantity END) as total')
+            ->value('total');
+
+        return round($stock, 2);
+    }
+
+    private function monthDelta(float $current, float $previous): float
+    {
+        if ($previous <= 0) {
+            return $current > 0 ? 100 : 0;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 2);
     }
 
     public function superAdminIndex(Request $request)

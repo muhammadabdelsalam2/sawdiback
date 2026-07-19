@@ -197,13 +197,15 @@
                     </div>
                 </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{{ route('superadmin.profile.show', ['locale' => $activeLocale]) }}">
+                <li><a class="dropdown-item" href="{{ $isSuperAdmin ? route('superadmin.profile.show', ['locale' => $activeLocale]) : route('customer.profile.show', ['locale' => $activeLocale]) }}">
                     <i class="bi bi-person"></i> {{ __('dashboard.navbar.profile') }}
                 </a></li>
-                <!-- <li><a class="dropdown-item" href="{{ route('superadmin.settings.show', ['locale' => $activeLocale]) }}">
-                    <i class="bi bi-sliders"></i> {{ __('dashboard.navbar.settings_link') }}
-                </a></li> -->
-                <li><a class="dropdown-item" href="{{ route('superadmin.password.show', ['locale' => $activeLocale]) }}">
+                @if($isSuperAdmin)
+                    <li><a class="dropdown-item" href="{{ route('superadmin.settings.show', ['locale' => $activeLocale]) }}">
+                        <i class="bi bi-sliders"></i> {{ __('dashboard.navbar.settings_link') }}
+                    </a></li>
+                @endif
+                <li><a class="dropdown-item" href="{{ $isSuperAdmin ? route('superadmin.password.show', ['locale' => $activeLocale]) : route('customer.password.show', ['locale' => $activeLocale]) }}">
                     <i class="bi bi-key"></i> {{ __('dashboard.navbar.change_password') }}
                 </a></li>
                 <li><hr class="dropdown-divider"></li>

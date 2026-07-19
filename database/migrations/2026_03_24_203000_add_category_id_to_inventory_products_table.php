@@ -20,11 +20,7 @@ return new class extends Migration {
             });
         }
 
-        $hasIndex = collect(DB::select("SHOW INDEX FROM inventory_products"))
-            ->pluck('Key_name')
-            ->contains('inv_prod_tenant_category_id_idx');
-
-        if (! $hasIndex) {
+        if (! $this->indexExists('inventory_products', 'inv_prod_tenant_category_id_idx')) {
             Schema::table('inventory_products', function (Blueprint $table) {
                 $table->index(['tenant_id', 'category_id'], 'inv_prod_tenant_category_id_idx');
             });
@@ -110,11 +106,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        $hasIndex = collect(DB::select("SHOW INDEX FROM inventory_products"))
-            ->pluck('Key_name')
-            ->contains('inv_prod_tenant_category_id_idx');
-
-        if ($hasIndex) {
+        if ($this->indexExists('inventory_products', 'inv_prod_tenant_category_id_idx')) {
             Schema::table('inventory_products', function (Blueprint $table) {
                 $table->dropIndex('inv_prod_tenant_category_id_idx');
             });
@@ -125,5 +117,24 @@ return new class extends Migration {
                 $table->dropConstrainedForeignId('category_id');
             });
         }
+    }
+
+    /**
+     * Check whether an index exists on a table, in a way that works
+     * on both MySQL and SQLite (used in tests).
+     */
+    private function indexExists(string $table, string $indexName): bool
+    {
+        $driver = DB::getDriverName();
+
+        if ($driver === 'sqlite') {
+            return collect(DB::select("PRAGMA index_list('{$table}')"))
+                ->pluck('name')
+                ->contains($indexName);
+        }
+
+        return collect(DB::select("SHOW INDEX FROM {$table}"))
+            ->pluck('Key_name')
+            ->contains($indexName);
     }
 };

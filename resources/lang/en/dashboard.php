@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'app' => [
+        'title' => 'Sawdi ERP',
+    ],
     'navbar' => [
         'search' => 'Search',
         'search_placeholder' => 'Search anything...',
@@ -22,11 +25,13 @@ return [
     'sidebar' => [
         'dashboard' => 'Dashboard',
         'livestock' => 'Livestock Management',
+        'farms' => 'Farms & Pens',
         'animal_registry' => 'Animal Registry',
         'health_vax' => 'Health & Vax',
         'breeding_cycles' => 'Breeding Cycles',
         'production' => 'Production',
         'crops_feed' => 'Crops & Feed',
+        'poultry' => 'Poultry',
         'inventory' => 'Inventory',
         'ecommerce' => 'E-Commerce',
         'ecommerce_orders' => 'E-Commerce Orders',
@@ -35,6 +40,7 @@ return [
         'finance' => 'Finance',
         'hr_management' => 'HR Management',
         'maintenance' => 'Maintenance',
+        'contact_info' => 'Contact Info',
         'system_settings' => 'System Settings',
         'subscriptions' => 'Subscriptions ',
         'plans' => 'Plans',
@@ -60,6 +66,24 @@ return [
         'settings' => [
             'permissionsManagement' => 'Permissions Management'
         ],
+    ],
+    'contact_info' => [
+        'title' => 'Contact Info',
+        'description' => 'Manage the contact details shown on the public landing page.',
+        'phone' => 'Phone',
+        'email' => 'Email',
+        'address_ar' => 'Address Arabic',
+        'address_en' => 'Address English',
+        'working_hours_ar' => 'Working Hours Arabic',
+        'working_hours_en' => 'Working Hours English',
+        'description_ar' => 'Description Arabic',
+        'description_en' => 'Description English',
+        'whatsapp_url' => 'WhatsApp URL',
+        'facebook_url' => 'Facebook URL',
+        'instagram_url' => 'Instagram URL',
+        'x_url' => 'X URL',
+        'save' => 'Save Contact Info',
+        'updated' => 'Contact info updated successfully.',
     ],
 
     'theme' => [
@@ -119,6 +143,19 @@ return [
         'pending_approvals_processing' => 'Pending approvals & processing',
         'todays_operations' => "Today's Operations",
         'visits_maintenance_logistics' => 'Visits, Maintenance & Logistics',
+        'feed_stock_depleted' => 'A feed stock item is at or below zero quantity.',
+        'vaccination_overdue_real' => 'At least one animal vaccination is past its next due date.',
+        'sales_order_total' => 'Order total: :total',
+        'feeding_logged_today' => 'Feeding logged today',
+        'real_operation_from_feeding' => 'A livestock feeding record was created today.',
+        'poultry_mortality_logged' => 'Poultry mortality logged',
+        'quantity_value' => 'Quantity: :quantity',
+        'no_critical_alerts' => 'No critical alerts',
+        'no_critical_alerts_desc' => 'No overdue vaccinations or depleted feed stock were found.',
+        'no_active_sales_orders' => 'No active sales orders',
+        'no_active_sales_orders_desc' => 'No draft or confirmed sales orders are currently pending.',
+        'no_operations_today' => 'No operations today',
+        'no_operations_today_desc' => 'No feeding or poultry mortality records were logged today.',
     ],
 
     'buttons' => [

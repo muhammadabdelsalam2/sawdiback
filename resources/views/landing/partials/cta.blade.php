@@ -15,7 +15,7 @@
     </div>
 </section> -->
 
-<section class="py-5 bg-cream about-section">
+<section id="about" class="py-5 bg-cream about-section">
 
     <div class="container">
 
@@ -189,7 +189,6 @@
     }
 
 </style>
-
 
 
 

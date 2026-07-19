@@ -45,7 +45,7 @@ class WalletService
 
                     if (!$savedPaymentMethod) {
                         throw ValidationException::withMessages([
-                            'payment_method_id' => ['The selected payment method is invalid for this user.'],
+                            'payment_method_id' => [__('account.api.invalid_payment_method')],
                         ]);
                     }
                 }
@@ -79,8 +79,8 @@ class WalletService
             $transaction = $this->walletRepository->createTransaction($wallet, [
                 'type' => 'top_up',
                 'status' => 'completed',
-                'title' => 'Wallet Top-up',
-                'description' => 'Wallet balance increased successfully.',
+                'title' => __('account.api.wallet_top_up_title'),
+                'description' => __('account.api.wallet_top_up_description'),
                 'amount' => $amount,
                 'points' => 0,
                 'reference_type' => $savedPaymentMethod ? UserPaymentMethod::class : null,
@@ -118,7 +118,7 @@ class WalletService
 
             if ($wallet->points_balance < $points) {
                 throw ValidationException::withMessages([
-                    'points' => ['Insufficient loyalty points balance.'],
+                    'points' => [__('account.api.insufficient_points')],
                 ]);
             }
 
@@ -129,8 +129,8 @@ class WalletService
             $transaction = $this->walletRepository->createTransaction($wallet, [
                 'type' => 'points_conversion',
                 'status' => 'completed',
-                'title' => 'Points Converted',
-                'description' => "Converted {$points} loyalty points into wallet balance.",
+                'title' => __('account.api.points_converted_title'),
+                'description' => __('account.api.points_converted_description', ['points' => $points]),
                 'amount' => $amount,
                 'points' => -$points,
                 'reference_type' => null,

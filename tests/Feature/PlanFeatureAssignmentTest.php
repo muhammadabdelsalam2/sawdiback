@@ -7,6 +7,8 @@ use App\Models\Feature;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PlanFeatureAssignmentTest extends TestCase
@@ -18,6 +20,10 @@ class PlanFeatureAssignmentTest extends TestCase
         $admin = User::factory()->create([
             'email' => 'admin@elsawady.com',
         ]);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        Role::create(['name' => 'SuperAdmin', 'guard_name' => 'web']);
+        $admin->assignRole('SuperAdmin');
+
         $currency = Currency::factory()->create();
         $plan = Plan::factory()->create([
             'currency_id' => $currency->id,

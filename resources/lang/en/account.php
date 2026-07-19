@@ -6,17 +6,21 @@ return [
         'subtitle' => 'Manage your personal information and avatar.',
         'name' => 'Full name',
         'email' => 'Email address',
+        'phone' => 'Phone',
         'role' => 'Role',
         'created_at' => 'Account created',
         'avatar' => 'Profile photo',
         'avatar_hint' => 'JPG/PNG/WEBP up to 2MB.',
         'save' => 'Save changes',
+        'back' => 'Back to profile',
         'updated' => 'Profile updated successfully.',
     ],
     'settings' => [
         'title' => 'Settings',
         'subtitle' => 'Language and appearance preferences.',
         'language' => 'Language',
+        'language_en' => 'English',
+        'language_ar' => 'Arabic',
         'appearance' => 'Appearance',
         'appearance_light' => 'Light',
         'appearance_dark' => 'Dark',
@@ -36,21 +40,16 @@ return [
         'toggle_show' => 'Show',
         'toggle_hide' => 'Hide',
     ],
-];
-
-
-return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Account Language Lines
-    |--------------------------------------------------------------------------
-    |   The following language lines are used during account management for various
-    |   messages that we need to display to the user. You are free to modify
-    |   these language lines according to your application's requirements.
-    |
-    */
-
+    'api' => [
         'updated_successfully' => 'Account updated successfully.',
-
-    ];
+        'wallet_loaded' => 'Wallet loaded successfully.',
+        'wallet_topped_up' => 'Wallet topped up successfully.',
+        'points_converted' => 'Points converted successfully.',
+        'wallet_top_up_title' => 'Wallet Top-up',
+        'wallet_top_up_description' => 'Wallet balance increased successfully.',
+        'points_converted_title' => 'Points Converted',
+        'points_converted_description' => 'Converted :points loyalty points into wallet balance.',
+        'invalid_payment_method' => 'The selected payment method is invalid for this user.',
+        'insufficient_points' => 'Insufficient loyalty points balance.',
+    ],
+];

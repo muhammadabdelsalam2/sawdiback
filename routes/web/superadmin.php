@@ -9,6 +9,7 @@ use App\Http\Controllers\Subscriptions\PlanController;
 use App\Http\Controllers\Subscriptions\SubscriptionController;
 use App\Http\Controllers\SuperAdmin\AccessManagementController;
 use App\Http\Controllers\SuperAdmin\AccountController;
+use App\Http\Controllers\SuperAdmin\ContactInfoController;
 use App\Http\Controllers\SuperAdmin\ContentController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -37,56 +38,65 @@ Route::prefix('{locale}')
             });
 
 
-        // Anything below requires roles.manage permission
-        Route::middleware(['permission:roles.manage'])
-            ->prefix('superadmin')
+        Route::prefix('superadmin')
             ->group(function () {
 
             // Access Management
-            Route::get('access-management', [AccessManagementController::class, 'index'])
-                ->name('access-management');
+            Route::middleware(['permission:roles.manage'])->group(function () {
+                Route::get('access-management', [AccessManagementController::class, 'index'])
+                    ->name('access-management');
 
-            Route::post('access-management/roles', [AccessManagementController::class, 'storeRole'])
-                ->name('access-management.roles.store');
+                Route::post('access-management/roles', [AccessManagementController::class, 'storeRole'])
+                    ->name('access-management.roles.store');
 
-            Route::post('access-management/permissions', [AccessManagementController::class, 'storePermission'])
-                ->name('access-management.permissions.store');
+                Route::post('access-management/permissions', [AccessManagementController::class, 'storePermission'])
+                    ->name('access-management.permissions.store');
 
-            Route::put('access-management/roles/{role}/permissions', [AccessManagementController::class, 'updateRolePermissions'])
-                ->name('access-management.roles.permissions.update');
+                Route::put('access-management/roles/{role}/permissions', [AccessManagementController::class, 'updateRolePermissions'])
+                    ->name('access-management.roles.permissions.update');
+            });
 
             // Users CRUD
             Route::resource('users', UserManagementController::class)
                 ->except(['show'])
-                ->names('users');
+                ->names('users')
+                ->middleware(['permission:users.manage']);
 
             // Plans / Features
-            Route::resource('plans', PlanController::class)->except(['show']);
-            Route::get('plans/{plan}/features', [PlanController::class, 'editFeatures'])->name('plans.features.edit');
-            Route::put('plans/{plan}/features', [PlanController::class, 'updateFeatures'])->name('plans.features.update');
+            Route::middleware(['permission:plans.manage'])->group(function () {
+                Route::resource('plans', PlanController::class)->except(['show']);
+                Route::get('plans/{plan}/features', [PlanController::class, 'editFeatures'])->name('plans.features.edit');
+                Route::put('plans/{plan}/features', [PlanController::class, 'updateFeatures'])->name('plans.features.update');
 
-            Route::resource('features', FeatureController::class)->except(['show']);
+                Route::resource('features', FeatureController::class)->except(['show']);
+            });
 
             // Subscriptions
-            Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
-            Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('subscriptions.create');
-            Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
-            Route::get('subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
+            Route::middleware(['permission:subscriptions.manage'])->group(function () {
+                Route::get('subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+                Route::get('subscriptions/create', [SubscriptionController::class, 'create'])->name('subscriptions.create');
+                Route::post('subscriptions', [SubscriptionController::class, 'store'])->name('subscriptions.store');
+                Route::get('subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
 
-            Route::post('subscriptions/{subscription}/change-plan', [SubscriptionController::class, 'changePlan'])->name('subscriptions.change-plan');
-            Route::post('subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
-            Route::post('subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
-            Route::post('subscriptions/{subscription}/expire', [SubscriptionController::class, 'expire'])->name('subscriptions.expire');
+                Route::post('subscriptions/{subscription}/change-plan', [SubscriptionController::class, 'changePlan'])->name('subscriptions.change-plan');
+                Route::post('subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
+                Route::post('subscriptions/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+                Route::post('subscriptions/{subscription}/expire', [SubscriptionController::class, 'expire'])->name('subscriptions.expire');
 
-            Route::post('subscriptions/{subscription}/approve', [SubscriptionController::class, 'approve'])
-                ->name('subscriptions.approve');
+                Route::post('subscriptions/{subscription}/approve', [SubscriptionController::class, 'approve'])
+                    ->name('subscriptions.approve');
 
-            Route::post('subscriptions/{subscription}/reject', [SubscriptionController::class, 'reject'])
-                ->name('subscriptions.reject');
+                Route::post('subscriptions/{subscription}/reject', [SubscriptionController::class, 'reject'])
+                    ->name('subscriptions.reject');
+            });
         });
 
         // Content Management
         Route::resource('content', ContentController::class)->except(['show']);
+        Route::middleware(['permission:settings.manage'])->group(function () {
+            Route::get('superadmin/contact-info', [ContactInfoController::class, 'edit'])->name('contact-info.edit');
+            Route::put('superadmin/contact-info', [ContactInfoController::class, 'update'])->name('contact-info.update');
+        });
 
         Route::prefix('setting')
             ->name('setting.')

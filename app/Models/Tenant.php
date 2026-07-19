@@ -103,6 +103,16 @@ class Tenant extends Model
         return $this->hasMany(Crop::class);
     }
 
+    public function farms()
+    {
+        return $this->hasMany(Farm::class);
+    }
+
+    public function farmPens()
+    {
+        return $this->hasMany(FarmPen::class);
+    }
+
     public function feedTypes()
     {
         return $this->hasMany(FeedType::class);

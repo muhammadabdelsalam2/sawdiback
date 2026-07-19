@@ -49,11 +49,18 @@
 
 <div class="table-responsive">
     <table class="table" id="order-items-table">
-        <thead><tr><th>{{ __('sales_dist.orders.items.product_id') }}</th><th>{{ __('sales_dist.orders.items.qty') }}</th><th>{{ __('sales_dist.orders.items.unit_price') }}</th><th>{{ __('sales_dist.orders.items.discount') }}</th><th></th></tr></thead>
+        <thead><tr><th>{{ __('sales_dist.orders.items.product_id') }}</th><th>{{ __('sales_dist.orders.items.product_category') }}</th><th>{{ __('sales_dist.orders.items.qty') }}</th><th>{{ __('sales_dist.orders.items.unit_price') }}</th><th>{{ __('sales_dist.orders.items.discount') }}</th><th></th></tr></thead>
         <tbody>
         @foreach($items as $index => $item)
             <tr>
                 <td><input type="number" class="form-control" name="items[{{ $index }}][product_id]" value="{{ old("items.$index.product_id", $item['product_id']) }}" required></td>
+                <td>
+                    <select class="form-select" name="items[{{ $index }}][product_category]" required>
+                        @foreach(['eggs', 'chicken', 'vegetables', 'other'] as $category)
+                            <option value="{{ $category }}" @selected(old("items.$index.product_category", $item['product_category'] ?? 'other') === $category)>{{ __('sales_dist.product_categories.' . $category) }}</option>
+                        @endforeach
+                    </select>
+                </td>
                 <td><input type="number" step="0.001" class="form-control" name="items[{{ $index }}][qty]" value="{{ old("items.$index.qty", $item['qty']) }}" required></td>
                 <td><input type="number" step="0.01" class="form-control" name="items[{{ $index }}][unit_price]" value="{{ old("items.$index.unit_price", $item['unit_price']) }}" required></td>
                 <td><input type="number" step="0.01" class="form-control" name="items[{{ $index }}][discount]" value="{{ old("items.$index.discount", $item['discount']) }}"></td>
@@ -75,6 +82,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><input type="number" class="form-control" name="items[${index}][product_id]" required></td>
+            <td>
+                <select class="form-select" name="items[${index}][product_category]" required>
+                    <option value="eggs">{{ __('sales_dist.product_categories.eggs') }}</option>
+                    <option value="chicken">{{ __('sales_dist.product_categories.chicken') }}</option>
+                    <option value="vegetables">{{ __('sales_dist.product_categories.vegetables') }}</option>
+                    <option value="other" selected>{{ __('sales_dist.product_categories.other') }}</option>
+                </select>
+            </td>
             <td><input type="number" step="0.001" class="form-control" name="items[${index}][qty]" required></td>
             <td><input type="number" step="0.01" class="form-control" name="items[${index}][unit_price]" required></td>
             <td><input type="number" step="0.01" class="form-control" name="items[${index}][discount]" value="0"></td>

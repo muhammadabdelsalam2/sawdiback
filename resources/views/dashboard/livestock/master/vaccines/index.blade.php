@@ -20,13 +20,15 @@
         <div class="table-container">
             <table class="table registry-table mb-0 js-livestock-table">
                 <thead>
-                    <tr><th>{{ __('livestock.fields.id') }}</th><th>{{ __('livestock.fields.name') }}</th><th>{{ __('livestock.fields.default_interval') }}</th><th>{{ __('livestock.fields.actions') }}</th></tr>
+                    <tr><th>{{ __('livestock.fields.id') }}</th><th>{{ __('livestock.fields.name') }}</th><th>{{ __('livestock.fields.current_stock') }}</th><th>{{ __('livestock.fields.nearest_expiry_date') }}</th><th>{{ __('livestock.fields.default_interval') }}</th><th>{{ __('livestock.fields.actions') }}</th></tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
                             <td>{{ $row->id }}</td>
                             <td>{{ $row->name }}</td>
+                            <td>{{ $row->current_stock }}</td>
+                            <td>{{ $row->batches->where('quantity', '>', 0)->sortBy('expiry_date')->first()?->expiry_date?->format('Y-m-d') ?? '-' }}</td>
                             <td>{{ $row->default_interval_days ?? '-' }}</td>
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-white" href="{{ route('customer.livestock.vaccines.edit', ['locale' => $currentLocale, 'vaccine' => $row->id]) }}">{{ __('livestock.actions.edit') }}</a>
@@ -38,7 +40,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4">{{ __('livestock.empty.no_vaccines') }}</td></tr>
+                        <tr><td colspan="6">{{ __('livestock.empty.no_vaccines') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

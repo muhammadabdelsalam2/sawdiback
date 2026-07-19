@@ -16,7 +16,7 @@
                 <li class="nav-item"><a class="nav-link mx-2 fw-medium" href="#about">{{ __('app.nav_about') }}</a></li>
                 <li class="nav-item"><a class="nav-link mx-2 fw-medium" href="#contact">{{ __('app.nav_contact') }}</a>
                 </li>
-                <li class="nav-item"><a class="nav-link mx-2 fw-medium" href="#logic">{{ __('app.nav_logic') }}</a></li>
+                <li class="nav-item"><a class="nav-link mx-2 fw-medium" href="#how-it-works">{{ __('app.nav_logic') }}</a></li>
 
                 <li class="nav-item ms-lg-3 d-flex gap-2">
                     <a class="btn nav-login-btn"

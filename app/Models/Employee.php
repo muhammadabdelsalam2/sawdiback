@@ -16,17 +16,25 @@ class Employee extends Model
         'tenant_id',
         'department_id',
         'job_title_id',
+        'worker_number',
+        'profession',
+        'employment_status',
+        'operational_department',
         'full_name',
         'email',
         'phone',
         'national_id',
         'hire_date',
+        'passport_expiry_date',
+        'iqama_expiry_date',
         'salary',
         'is_active',
     ];
 
     protected $casts = [
         'hire_date' => 'date',
+        'passport_expiry_date' => 'date',
+        'iqama_expiry_date' => 'date',
         'salary' => 'decimal:2',
         'is_active' => 'boolean',
     ];
@@ -49,5 +57,10 @@ class Employee extends Model
     public function leaves(): HasMany
     {
         return $this->hasMany(LeaveRequest::class);
+    }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(EmployeeAttachment::class);
     }
 }

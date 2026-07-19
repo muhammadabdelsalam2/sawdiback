@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Feature;
 use App\Models\Plan;
 use App\Repositories\Contracts\PlanRepositoryInterface;
 use Illuminate\Support\Collection;
@@ -121,6 +122,10 @@ class PlanService
      */
     public function updateFeatures(Plan $plan, array $featuresInput): Plan
     {
+        if ($this->usesDatabaseFeatureIds($featuresInput)) {
+            return $this->updateDatabaseFeatures($plan, $featuresInput);
+        }
+
         $resolvedFeatures = [];
         $definitions = config('plan_features');
 
@@ -163,6 +168,72 @@ class PlanService
         }
 
         $plan->features = $resolvedFeatures;
+        $plan->save();
+
+        return $plan;
+    }
+
+    protected function usesDatabaseFeatureIds(array $featuresInput): bool
+    {
+        if ($featuresInput === []) {
+            return false;
+        }
+
+        foreach (array_keys($featuresInput) as $key) {
+            if (!is_numeric($key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function updateDatabaseFeatures(Plan $plan, array $featuresInput): Plan
+    {
+        $featureIds = array_map('intval', array_keys($featuresInput));
+        $features = Feature::query()
+            ->whereIn('id', $featureIds)
+            ->get()
+            ->keyBy('id');
+
+        $sync = [];
+        $featuresJson = [];
+
+        foreach ($featuresInput as $featureId => $payload) {
+            $feature = $features->get((int) $featureId);
+
+            if (!$feature) {
+                continue;
+            }
+
+            $value = $payload['value'] ?? null;
+
+            if ($feature->type === 'boolean') {
+                $value = $value === '' ? null : $value;
+            } elseif ($feature->type === 'number' && $value !== null && $value !== '' && !is_numeric($value)) {
+                throw ValidationException::withMessages([
+                    'features.' . $featureId => __('plan.messages.feature_type_mismatch', [
+                        'key' => $feature->key,
+                        'type' => __('plan.types.numeric'),
+                    ]),
+                ]);
+            }
+
+            $enabled = (bool) ($payload['enabled'] ?? false);
+
+            $sync[$feature->id] = [
+                'enabled' => $enabled,
+                'value' => $value === '' ? null : $value,
+            ];
+
+            $featuresJson[$feature->key] = [
+                'enabled' => $enabled,
+                'value' => $value === '' ? null : $value,
+            ];
+        }
+
+        $plan->featureDefinitions()->sync($sync);
+        $plan->features = $featuresJson;
         $plan->save();
 
         return $plan;

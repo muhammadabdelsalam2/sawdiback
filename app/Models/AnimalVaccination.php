@@ -15,6 +15,7 @@ class AnimalVaccination extends Model
     protected $fillable = [
         'tenant_id',
         'animal_id',
+        'pen_id',
         'vaccine_id',
         'dose_number',
         'vaccination_date',
@@ -36,6 +37,11 @@ class AnimalVaccination extends Model
     public function animal(): BelongsTo
     {
         return $this->belongsTo(LivestockAnimal::class, 'animal_id');
+    }
+
+    public function pen(): BelongsTo
+    {
+        return $this->belongsTo(FarmPen::class, 'pen_id');
     }
 
     public function vaccine(): BelongsTo

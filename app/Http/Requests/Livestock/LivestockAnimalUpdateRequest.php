@@ -22,6 +22,7 @@ class LivestockAnimalUpdateRequest extends BaseLivestockRequest
                     ->where(fn ($q) => $q->where('tenant_id', $tenantId))
                     ->ignore($animal?->id),
             ],
+            'pen_id' => ['nullable', 'integer', Rule::exists('farm_pens', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'species_id' => ['sometimes', 'integer', Rule::exists('animal_species', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'breed_id' => ['nullable', 'integer', Rule::exists('animal_breeds', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'gender' => ['sometimes', Rule::in(['male', 'female'])],

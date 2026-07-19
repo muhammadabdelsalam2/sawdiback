@@ -20,6 +20,66 @@
         @endif
 
         <div class="card-block mb-3">
+            <h5 class="section-title">{{ __('crops_feed.actions.record_seedling_stock') }}</h5>
+            <form method="POST" action="{{ route('customer.crops-feed.feed.seedling-stocks.store', ['locale' => $currentLocale]) }}" class="row g-3">
+                @csrf
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.item_type') }}</label>
+                    <select name="item_type" class="form-select" required>
+                        <option value="seed">{{ __('crops_feed.options.seed') }}</option>
+                        <option value="seedling">{{ __('crops_feed.options.seedling') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('crops_feed.fields.name') }}</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.quantity') }}</label>
+                    <input type="number" step="0.01" min="0" name="quantity" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.unit') }}</label>
+                    <input type="text" name="unit" class="form-control" value="unit" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('crops_feed.fields.low_stock_threshold') }}</label>
+                    <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control" value="0">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary-green" type="submit">{{ __('crops_feed.actions.save') }}</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container mb-3">
+            <table class="table registry-table mb-0 js-livestock-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('crops_feed.fields.item_type') }}</th>
+                        <th>{{ __('crops_feed.fields.name') }}</th>
+                        <th>{{ __('crops_feed.fields.quantity') }}</th>
+                        <th>{{ __('crops_feed.fields.low_stock_threshold') }}</th>
+                        <th>{{ __('crops_feed.fields.status') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($seedlingStocks as $row)
+                        <tr>
+                            <td>{{ __('crops_feed.options.' . $row->item_type) }}</td>
+                            <td>{{ $row->name }}</td>
+                            <td>{{ $row->quantity }} {{ $row->unit }}</td>
+                            <td>{{ $row->low_stock_threshold }}</td>
+                            <td>{{ $row->is_low_stock ? __('dashboard.alerts.warning') : __('crops_feed.options.covered') }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5">{{ __('crops_feed.empty.no_seedling_stocks') }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-block mb-3">
             <h5 class="section-title">{{ __('crops_feed.actions.record_stock_movement') }}</h5>
             <form method="POST" action="{{ route('customer.crops-feed.feed.stock-movements.store', ['locale' => $currentLocale]) }}" class="row g-3">
                 @csrf

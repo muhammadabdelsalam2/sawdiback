@@ -24,7 +24,7 @@ class WalletController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Wallet loaded successfully.',
+            'message' => __('account.api.wallet_loaded'),
             'data' => new WalletOverviewResource($wallet),
         ]);
     }
@@ -37,7 +37,7 @@ class WalletController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Wallet topped up successfully.',
+            'message' => __('account.api.wallet_topped_up'),
             'data' => array_merge($walletData, [
                 'transaction' => (new WalletTransactionResource($result['transaction']))->resolve($request),
             ]),
@@ -52,7 +52,7 @@ class WalletController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Points converted successfully.',
+            'message' => __('account.api.points_converted'),
             'data' => array_merge($walletData, [
                 'transaction' => (new WalletTransactionResource($result['transaction']))->resolve($request),
             ]),

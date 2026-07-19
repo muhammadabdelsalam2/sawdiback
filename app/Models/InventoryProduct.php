@@ -21,6 +21,9 @@ class InventoryProduct extends Model
         'title',
         'image',
         'category',
+        'asset_category',
+        'farm_location',
+        'farm_id',
         'category_id',
         'unit',
         'tax',
@@ -56,6 +59,11 @@ public function categoryRelation(): BelongsTo
 {
     return $this->belongsTo(Category::class, 'category_id');
 }
+    public function farm(): BelongsTo
+    {
+        return $this->belongsTo(Farm::class);
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

@@ -59,6 +59,7 @@ return [
         'record_health' => 'تسجيل حدث صحي',
         'record_vaccination' => 'تسجيل تطعيم',
         'record_weight' => 'تسجيل الوزن',
+        'vaccine_batches' => 'دفعات اللقاحات',
         'status_history' => 'سجل الحالات',
         'open_new_cycle' => 'فتح دورة جديدة',
         'insemination' => 'التلقيح',
@@ -66,6 +67,7 @@ return [
         'birth' => 'الولادة',
         'recent_birth_events' => 'أحداث الولادة الأخيرة',
         'upcoming_vaccinations' => 'التطعيمات القادمة (7 أيام)',
+        'expiring_vaccine_batches' => 'دفعات لقاح قاربت على الانتهاء',
     ],
 
     'fields' => [
@@ -126,6 +128,10 @@ return [
         'cost_per_unit' => 'تكلفة الوحدة',
         'low_stock_threshold' => 'حد المخزون المنخفض',
         'default_interval' => 'المدة الافتراضية',
+        'current_stock' => 'المخزون الحالي',
+        'nearest_expiry_date' => 'أقرب انتهاء',
+        'batch_number' => 'رقم الدفعة',
+        'expiry_date' => 'تاريخ الانتهاء',
     ],
 
     'options' => [
@@ -180,6 +186,7 @@ return [
             'vaccine_created' => 'تم إضافة اللقاح بنجاح.',
             'vaccine_updated' => 'تم تحديث اللقاح بنجاح.',
             'vaccine_deleted' => 'تم حذف اللقاح بنجاح.',
+            'vaccine_batch_created' => 'تم تسجيل دفعة اللقاح بنجاح.',
             'feed_type_created' => 'تم إضافة نوع العلف بنجاح.',
             'feed_type_updated' => 'تم تحديث نوع العلف بنجاح.',
             'feed_type_deleted' => 'تم حذف نوع العلف بنجاح.',
@@ -206,6 +213,8 @@ return [
         'no_breeds' => 'لا توجد سلالات.',
         'no_feed_types' => 'لا توجد أنواع أعلاف.',
         'no_vaccines' => 'لا توجد لقاحات.',
+        'no_vaccine_batches' => 'لا توجد دفعات لقاح مسجلة.',
+        'no_expiring_vaccine_batches' => 'لا توجد دفعات لقاح قاربت على الانتهاء.',
     ],
 
     'datatable' => [

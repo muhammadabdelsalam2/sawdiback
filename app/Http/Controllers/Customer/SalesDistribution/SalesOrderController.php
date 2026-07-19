@@ -68,6 +68,7 @@ class SalesOrderController extends Controller
         $order->load('items');
         $items = $order->items->map(fn ($item) => [
             'product_id' => $item->product_id,
+            'product_category' => $item->product_category,
             'qty' => $item->qty,
             'unit_price' => $item->unit_price,
             'discount' => $item->discount,

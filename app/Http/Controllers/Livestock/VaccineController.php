@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Livestock;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Livestock\VaccineBatchStoreRequest;
 use App\Http\Requests\Livestock\VaccineStoreRequest;
 use App\Http\Requests\Livestock\VaccineUpdateRequest;
 use App\Models\Vaccine;
+use App\Models\VaccineBatch;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Throwable;
@@ -15,6 +17,7 @@ class VaccineController extends Controller
     public function index(string $locale): View
     {
         $rows = Vaccine::query()
+            ->with('batches')
             ->orderBy('name_translations->' . $this->localeKey())
             ->orderBy('name')
             ->paginate(15);
@@ -40,7 +43,22 @@ class VaccineController extends Controller
 
     public function edit(string $locale, Vaccine $vaccine): View
     {
+        $vaccine->load(['batches' => fn ($q) => $q->orderBy('expiry_date')]);
+
         return view('dashboard.livestock.master.vaccines.edit', compact('vaccine'));
+    }
+
+    public function storeBatch(VaccineBatchStoreRequest $request, string $locale, Vaccine $vaccine): RedirectResponse
+    {
+        $data = $request->validated();
+        $data['vaccine_id'] = $vaccine->id;
+        $data['tenant_id'] = $vaccine->tenant_id;
+
+        VaccineBatch::query()->create($data);
+
+        return redirect()
+            ->route('customer.livestock.vaccines.edit', ['locale' => $locale, 'vaccine' => $vaccine->id])
+            ->with('success', __('livestock.messages.success.vaccine_batch_created'));
     }
 
     public function update(VaccineUpdateRequest $request, string $locale, Vaccine $vaccine): RedirectResponse

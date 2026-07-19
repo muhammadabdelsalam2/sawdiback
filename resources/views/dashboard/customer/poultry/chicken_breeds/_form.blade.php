@@ -1,0 +1,11 @@
+@csrf
+<div class="row g-3">
+    <div class="col-md-3"><label class="form-label">{{ __('poultry.fields.code') }}</label><input type="text" name="code" class="form-control" value="{{ old('code', $breed->code ?? '') }}" required></div>
+    <div class="col-md-2"><label class="form-label">{{ __('poultry.fields.pen_id') }}</label><select name="pen_id" class="form-select"><option value="">{{ __('farms.empty.no_pens') }}</option>@foreach($pens ?? [] as $pen)<option value="{{ $pen->id }}" @selected(old('pen_id', $breed->pen_id ?? '') == $pen->id)>{{ $pen->farm?->name }} - {{ $pen->pen_number }}</option>@endforeach</select></div>
+    <div class="col-md-3"><label class="form-label">{{ __('poultry.fields.breed_type') }}</label><select name="breed_type" class="form-select" required>@foreach(['local', 'improved', 'broiler', 'layer'] as $type)<option value="{{ $type }}" @selected(old('breed_type', $breed->breed_type ?? '') === $type)>{{ __('poultry.options.' . $type) }}</option>@endforeach</select></div>
+    <div class="col-md-2"><label class="form-label">{{ __('poultry.fields.purchase_amount') }}</label><input type="number" step="0.01" min="0" name="purchase_amount" class="form-control" value="{{ old('purchase_amount', $breed->purchase_amount ?? '') }}" required></div>
+    <div class="col-md-2"><label class="form-label">{{ __('poultry.fields.started_at') }}</label><input type="date" name="started_at" class="form-control" value="{{ old('started_at', isset($breed) ? $breed->started_at?->format('Y-m-d') : '') }}" required></div>
+    <div class="col-md-3"><label class="form-label">{{ __('poultry.fields.female_count') }}</label><input type="number" min="0" name="female_count" class="form-control" value="{{ old('female_count', $breed->female_count ?? '') }}" required></div>
+    <div class="col-md-3"><label class="form-label">{{ __('poultry.fields.male_count') }}</label><input type="number" min="0" name="male_count" class="form-control" value="{{ old('male_count', $breed->male_count ?? '') }}" required></div>
+    <div class="col-md-6"><label class="form-label">{{ __('poultry.fields.notes') }}</label><input type="text" name="notes" class="form-control" value="{{ old('notes', $breed->notes ?? '') }}"></div>
+</div>

@@ -19,6 +19,7 @@ class RegisterAnimalService
         return DB::transaction(function () use ($data) {
             $animal = $this->animals->create([
                 'tenant_id' => $data['tenant_id'] ?? null,
+                'pen_id' => $data['pen_id'] ?? null,
                 'tag_number' => $data['tag_number'],
                 'species_id' => $data['species_id'],
                 'breed_id' => $data['breed_id'] ?? null,

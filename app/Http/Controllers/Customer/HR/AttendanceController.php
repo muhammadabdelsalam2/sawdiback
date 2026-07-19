@@ -37,7 +37,7 @@ class AttendanceController extends Controller
         $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
         $this->repo->checkIn($tenantId, (int) $request->employee_id);
 
-        return back()->with('success', 'Checked in successfully.');
+        return back()->with('success', __('hr.messages.success.checked_in'));
     }
 
     public function checkOut(Request $request, string $locale, Attendance $attendance): RedirectResponse
@@ -50,6 +50,6 @@ class AttendanceController extends Controller
 
         $this->repo->checkOut($attendance);
 
-        return back()->with('success', 'Checked out successfully.');
+        return back()->with('success', __('hr.messages.success.checked_out'));
     }
 }

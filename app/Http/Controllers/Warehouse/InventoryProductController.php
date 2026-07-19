@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Warehouse\InventoryProductStoreRequest;
 use App\Http\Requests\Warehouse\InventoryProductUpdateRequest;
 use App\Models\Category;
+use App\Models\Farm;
 use App\Models\InventoryProduct;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -17,6 +18,7 @@ class InventoryProductController extends Controller
     {
         $rows = InventoryProduct::query()
             ->with(['categoryRelation.translations'])
+            ->with(['farm'])
             ->orderBy('name')
             ->paginate(15);
 
@@ -38,8 +40,9 @@ class InventoryProductController extends Controller
     public function create(string $locale): View
     {
         $categories = $this->categoriesForTenant();
+        $farms = $this->farmsForTenant();
 
-        return view('dashboard.warehouse.products.create', compact('categories'));
+        return view('dashboard.warehouse.products.create', compact('categories', 'farms'));
     }
 
     public function store(InventoryProductStoreRequest $request, string $locale): RedirectResponse
@@ -67,10 +70,11 @@ class InventoryProductController extends Controller
     public function edit(string $locale, InventoryProduct $product): View
     {
         $categories = $this->categoriesForTenant();
+        $farms = $this->farmsForTenant();
 
         return view(
             'dashboard.warehouse.products.edit',
-            compact('product', 'categories')
+            compact('product', 'categories', 'farms')
         );
     }
 
@@ -128,6 +132,16 @@ class InventoryProductController extends Controller
         return Category::query()
             ->when($tenantId, fn($q) => $q->where('tenant_id', $tenantId))
             ->findOrFail($categoryId);
+    }
+
+    private function farmsForTenant()
+    {
+        $tenantId = $this->tenantId();
+
+        return Farm::query()
+            ->when($tenantId, fn($q) => $q->where('tenant_id', $tenantId))
+            ->orderBy('name')
+            ->get();
     }
 
     private function tenantId(): ?string

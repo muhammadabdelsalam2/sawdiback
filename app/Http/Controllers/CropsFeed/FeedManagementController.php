@@ -4,10 +4,12 @@ namespace App\Http\Controllers\CropsFeed;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CropsFeed\CropFeedAllocationStoreRequest;
+use App\Http\Requests\CropsFeed\CropSeedlingStockStoreRequest;
 use App\Http\Requests\CropsFeed\FeedConsumptionStoreRequest;
 use App\Http\Requests\CropsFeed\FeedReportRequest;
 use App\Http\Requests\CropsFeed\FeedStockMovementStoreRequest;
 use App\Models\Crop;
+use App\Models\CropSeedlingStock;
 use App\Models\FeedConsumption;
 use App\Models\FeedType;
 use App\Services\CropsFeed\AllocateCropToFeedService;
@@ -34,6 +36,7 @@ class FeedManagementController extends Controller
         $crops = Crop::query()->orderByDesc('id')->get();
         $animals = \App\Models\LivestockAnimal::query()->orderBy('tag_number')->get();
         $recentConsumptions = FeedConsumption::query()->with(['feedType', 'animal'])->orderByDesc('id')->limit(20)->get();
+        $seedlingStocks = CropSeedlingStock::query()->orderBy('name')->get();
 
         $stocks = $feedTypes->map(function (FeedType $feedType) {
             $onHand = $this->feedStockService->stockOnHand($feedType->id);
@@ -44,14 +47,14 @@ class FeedManagementController extends Controller
             ];
         });
 
-        return view('dashboard.crops_feed.feed.index', compact('feedTypes', 'stocks', 'recentConsumptions', 'animals', 'crops'));
+        return view('dashboard.crops_feed.feed.index', compact('feedTypes', 'stocks', 'recentConsumptions', 'animals', 'crops', 'seedlingStocks'));
     }
 
     public function storeStockMovement(FeedStockMovementStoreRequest $request, string $locale): RedirectResponse
     {
         try {
             $this->recordFeedStockMovementService->execute($request->validated());
-            return redirect()->back()->with('success', 'Feed stock movement recorded successfully.');
+            return redirect()->back()->with('success', __('crops_feed.messages.success.feed_stock_movement_recorded'));
         } catch (RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -61,7 +64,7 @@ class FeedManagementController extends Controller
     {
         try {
             $this->recordFeedConsumptionService->execute($request->validated());
-            return redirect()->back()->with('success', 'Feed consumption recorded successfully.');
+            return redirect()->back()->with('success', __('crops_feed.messages.success.feed_consumption_recorded'));
         } catch (RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -71,10 +74,20 @@ class FeedManagementController extends Controller
     {
         try {
             $this->allocateCropToFeedService->execute($request->validated());
-            return redirect()->back()->with('success', 'Crop has been allocated to feed stock successfully.');
+            return redirect()->back()->with('success', __('crops_feed.messages.success.crop_allocated_to_feed'));
         } catch (RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function storeSeedlingStock(CropSeedlingStockStoreRequest $request, string $locale): RedirectResponse
+    {
+        $data = $request->validated();
+        $data['low_stock_threshold'] = $data['low_stock_threshold'] ?? 0;
+
+        CropSeedlingStock::query()->create($data);
+
+        return redirect()->back()->with('success', __('crops_feed.messages.success.seedling_stock_recorded'));
     }
 
     public function reports(FeedReportRequest $request, string $locale): View

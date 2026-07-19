@@ -55,6 +55,8 @@
                         <th>{{ __('warehouse.fields.code') }}</th>
                         <th>{{ __('warehouse.fields.name') }}</th>
                         <th>{{ __('warehouse.fields.category') }}</th>
+                        <th>{{ __('warehouse.fields.asset_category') }}</th>
+                        <th>{{ __('warehouse.fields.farm_location') }}</th>
                         <th>{{ __('warehouse.fields.image') }}</th>
                         <th>{{ __('warehouse.fields.unit') }}</th>
                         <th>{{ __('warehouse.fields.tax') }}</th>
@@ -74,6 +76,8 @@
     ?? $row->getRawOriginal('category') ?? '-' }}
 
                             </td>
+                            <td>{{ $row->asset_category ? __('warehouse.asset_categories.' . $row->asset_category) : '-' }}</td>
+                            <td>{{ $row->farm?->name ?? '-' }}{{ $row->farm_location ? ' - ' . $row->farm_location : '' }}</td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name }}"
                                     style="width:48px; height:48px; border-radius:8px; object-fit:cover;">
@@ -95,7 +99,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8">{{ __('warehouse.empty.no_products') }}</td>
+                            <td colspan="10">{{ __('warehouse.empty.no_products') }}</td>
                         </tr>
                     @endforelse
 

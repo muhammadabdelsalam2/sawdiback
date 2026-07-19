@@ -486,7 +486,7 @@ class AccountService
         if ((int) $address->user_id !== (int) $user->id) {
             return [
                 'success' => false,
-                'message' => 'Address not found.',
+                'message' => __('ecommerce.address.not_found'),
                 'data' => null,
                 'code' => 404,
             ];
@@ -550,7 +550,7 @@ class AccountService
         if ((int) $address->user_id !== (int) $user->id) {
             return [
                 'success' => false,
-                'message' => 'Address not found.',
+                'message' => __('ecommerce.address.not_found'),
                 'data' => null,
                 'code' => 404,
             ];

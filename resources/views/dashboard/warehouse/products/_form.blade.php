@@ -31,6 +31,16 @@
         </select>
     </div>
     <div class="col-md-4">
+        <label class="form-label">{{ __('warehouse.fields.asset_category') }}</label>
+        <select name="asset_category" class="form-select" required>
+            @foreach(['feed', 'seed', 'equipment', 'other'] as $assetCategory)
+                <option value="{{ $assetCategory }}" @selected(old('asset_category', $product->asset_category ?? 'other') === $assetCategory)>
+                    {{ __('warehouse.asset_categories.' . $assetCategory) }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-4">
         <label class="form-label">Image</label>
         @if (!empty($product->image))
             <div class="mb-2">
@@ -64,6 +74,20 @@
         <label class="form-label">{{ __('warehouse.fields.low_stock_threshold') }}</label>
         <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control"
             value="{{ old('low_stock_threshold', $product->low_stock_threshold ?? 0) }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ __('warehouse.fields.farm') }}</label>
+        <select name="farm_id" class="form-select">
+            <option value="">{{ __('warehouse.fields.select_farm') }}</option>
+            @foreach($farms ?? [] as $farm)
+                <option value="{{ $farm->id }}" @selected((int) old('farm_id', $product->farm_id ?? 0) === $farm->id)>{{ $farm->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">{{ __('warehouse.fields.farm_location') }}</label>
+        <input type="text" name="farm_location" class="form-control"
+            value="{{ old('farm_location', $product->farm_location ?? '') }}">
     </div>
     <div class="col-md-3 d-flex align-items-end">
         <div class="form-check">

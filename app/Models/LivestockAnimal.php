@@ -15,6 +15,7 @@ class LivestockAnimal extends Model
 
     protected $fillable = [
         'tenant_id',
+        'pen_id',
         'tag_number',
         'species_id',
         'breed_id',
@@ -39,6 +40,11 @@ class LivestockAnimal extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function pen(): BelongsTo
+    {
+        return $this->belongsTo(FarmPen::class, 'pen_id');
     }
 
     public function species(): BelongsTo

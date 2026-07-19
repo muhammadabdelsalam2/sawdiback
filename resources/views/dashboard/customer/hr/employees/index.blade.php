@@ -3,11 +3,17 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Employees</h3>
-        <a class="btn btn-primary"
-           href="{{ route('customer.hr.employees.create', ['locale' => request()->route('locale')]) }}">
-            Add Employee
-        </a>
+        <h3 class="mb-0">{{ __('hr.titles.employees') }}</h3>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-warning"
+               href="{{ route('customer.hr.employees.document-alerts', ['locale' => request()->route('locale')]) }}">
+                {{ __('hr.actions.document_alerts') }}
+            </a>
+            <a class="btn btn-primary"
+               href="{{ route('customer.hr.employees.create', ['locale' => request()->route('locale')]) }}">
+                {{ __('hr.actions.add_employee') }}
+            </a>
+        </div>
     </div>
 
     @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif
@@ -25,12 +31,14 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th style="width:80px">#</th>
-                        <th>Name</th>
-                        <th>Department</th>
-                        <th>Job Title</th>
-                        <th style="width:140px">Active</th>
-                        <th class="text-end" style="width:220px">Actions</th>
+                        <th style="width:80px">{{ __('hr.fields.id') }}</th>
+                        <th>{{ __('hr.fields.full_name') }}</th>
+                        <th>{{ __('hr.fields.worker_number') }}</th>
+                        <th>{{ __('hr.fields.operational_department') }}</th>
+                        <th>{{ __('hr.fields.profession') }}</th>
+                        <th>{{ __('hr.fields.iqama_expiry_date') }}</th>
+                        <th>{{ __('hr.fields.employment_status') }}</th>
+                        <th class="text-end" style="width:220px">{{ __('hr.fields.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,37 +49,37 @@
                                 <div class="fw-semibold">{{ $e->full_name }}</div>
                                 <div class="text-muted small">{{ $e->email ?? '-' }}</div>
                             </td>
-                            <td>{{ $e->department?->name ?? '-' }}</td>
-                            <td>{{ $e->jobTitle?->name ?? '-' }}</td>
-                            <td>
-                                @if($e->is_active)
-                                    <span class="badge bg-success">Yes</span>
-                                @else
-                                    <span class="badge bg-secondary">No</span>
-                                @endif
-                            </td>
+                            <td>{{ $e->worker_number ?? '-' }}</td>
+                            <td>{{ $e->operational_department ? __('hr.options.' . $e->operational_department) : '-' }}</td>
+                            <td>{{ $e->profession ?? $e->jobTitle?->name ?? '-' }}</td>
+                            <td>{{ $e->iqama_expiry_date?->format('Y-m-d') ?? '-' }}</td>
+                            <td>{{ __('hr.options.' . $e->employment_status) }}</td>
                             <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="{{ route('customer.hr.employees.show', ['locale' => request()->route('locale'), 'employee' => $e->id]) }}">
+                                    {{ __('hr.actions.view') }}
+                                </a>
                                 <a class="btn btn-sm btn-outline-secondary"
                                    href="{{ route('customer.hr.employees.edit', ['locale' => request()->route('locale'), 'employee' => $e->id]) }}">
-                                    Edit
+                                    {{ __('hr.actions.edit') }}
                                 </a>
 
                                 <form class="d-inline"
                                       method="POST"
-                                      action="{{ route('customer.hr.employees.destroy', ['locale' => request()->route('locale'), 'employee' => $e->id]) }}">
+                                      action="{{ route('customer.hr.employees.destroy', ['locale' => request()->route('locale'), 'employee' => $e->id]) }}"
+                                      onsubmit="return confirm('{{ __('hr.messages.confirm_delete_employee') }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Delete this employee?')">
-                                        Delete
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        {{ __('hr.actions.delete') }}
                                     </button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
-                                No employees yet.
+                            <td colspan="8" class="text-center text-muted py-4">
+                                {{ __('hr.empty.no_employees') }}
                             </td>
                         </tr>
                     @endforelse

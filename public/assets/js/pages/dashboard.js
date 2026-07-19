@@ -3,12 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const productionCanvas = document.getElementById('productionChart');
     if (productionCanvas) {
         const productionCtx = productionCanvas.getContext('2d');
-        const labels = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.labels.length > 0)
-            ? window.dashboardData.production.labels
-            : ['1', '2', '3', '4', '5', '6'];
-        const data = (window.dashboardData && window.dashboardData.production && window.dashboardData.production.data.length > 0)
-            ? window.dashboardData.production.data
-            : [20, 15, 25, 40, 50, 20];
+        const labels = (window.dashboardData && window.dashboardData.production) ? window.dashboardData.production.labels : [];
+        const data = (window.dashboardData && window.dashboardData.production) ? window.dashboardData.production.data : [];
 
         new Chart(productionCtx, {
             type: 'line',
@@ -74,12 +70,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const herdCanvas = document.getElementById('herdChart');
     if (herdCanvas) {
         const herdCtx = herdCanvas.getContext('2d');
-        const labels = (window.dashboardData && window.dashboardData.herd && window.dashboardData.herd.labels.length > 0)
-            ? window.dashboardData.herd.labels
-            : ['Lactating', 'Dry', 'Pregnant'];
-        const data = (window.dashboardData && window.dashboardData.herd && window.dashboardData.herd.data.length > 0)
-            ? window.dashboardData.herd.data
-            : [50, 15, 35];
+        const labels = (window.dashboardData && window.dashboardData.herd) ? window.dashboardData.herd.labels : [];
+        const data = (window.dashboardData && window.dashboardData.herd) ? window.dashboardData.herd.data : [];
 
         new Chart(herdCtx, {
             type: 'doughnut',
@@ -114,20 +106,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const profitCanvas = document.getElementById('profitabilityChart');
     if (profitCanvas) {
         const profitCtx = profitCanvas.getContext('2d');
+        const profitability = (window.dashboardData && window.dashboardData.profitability) || { labels: [], revenue: [], cost: [] };
         new Chart(profitCtx, {
             type: 'bar',
             data: {
-                labels: ['Milk Production', 'Livestock Sales', 'Crops Trading', 'Poltery'],
+                labels: profitability.labels,
                 datasets: [
                     {
                         label: 'Revenue',
-                        data: [40, 50, 45, 55],
+                        data: profitability.revenue,
                         backgroundColor: '#30914C',
                         borderRadius: 4
                     },
                     {
                         label: 'Cost',
-                        data: [20, 30, 25, 35], // Positive values for grouping beside revenue
+                        data: profitability.cost,
                         backgroundColor: '#C87B00',
                         borderRadius: 4
                     }

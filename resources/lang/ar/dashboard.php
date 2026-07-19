@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'app' => [
+        'title' => 'نظام السوادي ERP',
+    ],
     'navbar' => [
         'search' => 'بحث',
         'search_placeholder' => 'ابحث عن أي شيء...',
@@ -22,11 +25,13 @@ return [
     'sidebar' => [
         'dashboard' => 'لوحة التحكم',
         'livestock' => 'إدارة الماشية',
+        'farms' => 'المزارع والحظائر',
         'animal_registry' => 'سجل الحيوانات',
         'health_vax' => 'الصحة والتطعيمات',
         'breeding_cycles' => 'دورات التربية',
         'production' => 'الإنتاج',
         'crops_feed' => 'المحاصيل والأعلاف',
+        'poultry' => 'الدواجن',
         'inventory' => 'المخزون',
         'ecommerce' => 'التجارة الإلكترونية',
         'ecommerce_orders' => 'طلبات التجارة الإلكترونية',
@@ -35,6 +40,7 @@ return [
         'finance' => 'المالية',
         'hr_management' => 'إدارة الموارد البشرية',
         'maintenance' => 'الصيانة',
+        'contact_info' => 'بيانات التواصل',
         'system_settings' => 'إعدادات النظام',
         'subscriptions' => 'الاشتراكات ',
         'plans' => 'الباقات',
@@ -59,6 +65,24 @@ return [
         'settings' => [
             'permissionsManagement' => 'إدارة الصلاحيات'
         ],
+    ],
+    'contact_info' => [
+        'title' => 'بيانات التواصل',
+        'description' => 'إدارة بيانات التواصل المعروضة في الصفحة العامة.',
+        'phone' => 'رقم الهاتف',
+        'email' => 'البريد الإلكتروني',
+        'address_ar' => 'العنوان بالعربية',
+        'address_en' => 'العنوان بالإنجليزية',
+        'working_hours_ar' => 'ساعات العمل بالعربية',
+        'working_hours_en' => 'ساعات العمل بالإنجليزية',
+        'description_ar' => 'الوصف بالعربية',
+        'description_en' => 'الوصف بالإنجليزية',
+        'whatsapp_url' => 'رابط واتساب',
+        'facebook_url' => 'رابط فيسبوك',
+        'instagram_url' => 'رابط إنستجرام',
+        'x_url' => 'رابط X',
+        'save' => 'حفظ بيانات التواصل',
+        'updated' => 'تم تحديث بيانات التواصل بنجاح.',
     ],
 
     'theme' => [
@@ -118,6 +142,19 @@ return [
         'pending_approvals_processing' => 'في انتظار الموافقات والمعالجة',
         'todays_operations' => 'عمليات اليوم',
         'visits_maintenance_logistics' => 'الزيارات والصيانة واللوجستيات',
+        'feed_stock_depleted' => 'يوجد صنف علف رصيده صفر أو أقل.',
+        'vaccination_overdue_real' => 'يوجد تطعيم حيوان تجاوز تاريخ الاستحقاق التالي.',
+        'sales_order_total' => 'إجمالي الطلب: :total',
+        'feeding_logged_today' => 'تم تسجيل تغذية اليوم',
+        'real_operation_from_feeding' => 'تم إنشاء سجل تغذية مواشي اليوم.',
+        'poultry_mortality_logged' => 'تم تسجيل نفوق دواجن',
+        'quantity_value' => 'الكمية: :quantity',
+        'no_critical_alerts' => 'لا توجد تنبيهات حرجة',
+        'no_critical_alerts_desc' => 'لا توجد تطعيمات متأخرة أو أرصدة علف منتهية.',
+        'no_active_sales_orders' => 'لا توجد طلبات مبيعات نشطة',
+        'no_active_sales_orders_desc' => 'لا توجد طلبات مبيعات مسودة أو مؤكدة قيد المتابعة.',
+        'no_operations_today' => 'لا توجد عمليات اليوم',
+        'no_operations_today_desc' => 'لم يتم تسجيل تغذية أو نفوق دواجن اليوم.',
     ],
 
     'buttons' => [

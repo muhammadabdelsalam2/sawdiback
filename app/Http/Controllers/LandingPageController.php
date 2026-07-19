@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
+use App\Models\ContactInfo;
 use App\Models\InventoryProduct;
 use Illuminate\Http\Request;
 use App\Repositories\PlanRepository;
@@ -29,8 +30,9 @@ class LandingPageController extends Controller
         // Get all active plans with currency
         $products = InventoryProduct::where('is_active', true)->get();
         $bestSellingProducts = InventoryProduct::where('is_active', true)->where('is_best_selling', true)->get();
+        $contactInfo = ContactInfo::query()->first() ?? new ContactInfo(ContactInfo::defaults());
         // Pass plans & currency to the view
-        return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts'));
+        return view('landing.index', compact('products', 'currencyId', 'bestSellingProducts', 'contactInfo'));
     }
 public function redirectToDefault()
 {

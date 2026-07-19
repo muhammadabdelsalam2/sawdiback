@@ -25,9 +25,12 @@
                     <tr>
                         <th>{{ __('crops_feed.fields.id') }}</th>
                         <th>{{ __('crops_feed.fields.name') }}</th>
+                        <th>{{ __('crops_feed.fields.farm') }}</th>
                         <th>{{ __('crops_feed.fields.land_area') }}</th>
                         <th>{{ __('crops_feed.fields.planting_date') }}</th>
+                        <th>{{ __('crops_feed.fields.expected_harvest_date') }}</th>
                         <th>{{ __('crops_feed.fields.yield_tons') }}</th>
+                        <th>{{ __('crops_feed.fields.loss_rate') }}</th>
                         <th>{{ __('crops_feed.fields.total_cost') }}</th>
                         <th>{{ __('crops_feed.fields.profit_or_loss') }}</th>
                         <th class="no-sort">{{ __('crops_feed.fields.actions') }}</th>
@@ -38,9 +41,12 @@
                         <tr>
                             <td>{{ $row->id }}</td>
                             <td>{{ $row->name }}</td>
+                            <td>{{ $row->farm?->name ?? '-' }}</td>
                             <td>{{ $row->land_area }}</td>
                             <td>{{ $row->planting_date?->format('Y-m-d') }}</td>
+                            <td>{{ $row->expected_harvest_date?->format('Y-m-d') ?? '-' }}</td>
                             <td>{{ $row->yield_tons ?? '-' }}</td>
+                            <td>{{ $row->loss_rate }}%</td>
                             <td>{{ $row->total_cost }}</td>
                             <td>{{ $row->profit_or_loss ?? '-' }}</td>
                             <td class="d-flex gap-2">
@@ -54,7 +60,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8">{{ __('crops_feed.empty.no_crops') }}</td></tr>
+                        <tr><td colspan="11">{{ __('crops_feed.empty.no_crops') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

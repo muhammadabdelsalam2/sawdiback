@@ -3,6 +3,7 @@
 namespace App\Services\Livestock;
 
 use App\Models\AnimalVaccination;
+use App\Models\LivestockAnimal;
 use App\Models\Vaccine;
 use Carbon\Carbon;
 
@@ -11,6 +12,7 @@ class RecordVaccinationService
     public function execute(array $data): AnimalVaccination
     {
         $vaccine = Vaccine::query()->findOrFail($data['vaccine_id']);
+        $animal = LivestockAnimal::query()->findOrFail($data['animal_id']);
         $vaccinationDate = Carbon::parse($data['vaccination_date']);
         $nextDueDate = $data['next_due_date'] ?? null;
 
@@ -20,7 +22,8 @@ class RecordVaccinationService
 
         return AnimalVaccination::query()->create([
             'tenant_id' => $data['tenant_id'] ?? null,
-            'animal_id' => $data['animal_id'],
+            'animal_id' => $animal->id,
+            'pen_id' => $animal->pen_id,
             'vaccine_id' => $vaccine->id,
             'dose_number' => $data['dose_number'],
             'vaccination_date' => $vaccinationDate->toDateString(),

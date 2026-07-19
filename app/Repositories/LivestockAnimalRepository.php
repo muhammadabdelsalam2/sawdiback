@@ -10,7 +10,7 @@ class LivestockAnimalRepository
     public function paginateWithRelations(int $perPage = 15): LengthAwarePaginator
     {
         return LivestockAnimal::query()
-            ->with(['species', 'breed', 'mother', 'father'])
+            ->with(['species', 'breed', 'mother', 'father', 'pen.farm'])
             ->orderByDesc('id')
             ->paginate($perPage);
     }

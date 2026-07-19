@@ -24,10 +24,19 @@
 
         <div class="card-block mb-3">
             <div class="row g-3">
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.farm') }}:</strong> {{ $crop->farm?->name ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.greenhouse_type') }}:</strong> {{ $crop->greenhouse_type ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.greenhouse_location') }}:</strong> {{ $crop->greenhouse_location ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.irrigation_type') }}:</strong> {{ $crop->irrigation_type ? __('crops_feed.options.' . $crop->irrigation_type) : '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.land_area') }}:</strong> {{ $crop->land_area }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.planting_date') }}:</strong> {{ $crop->planting_date?->format('Y-m-d') }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.expected_harvest_date') }}:</strong> {{ $crop->expected_harvest_date?->format('Y-m-d') ?? '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.yield_tons') }}:</strong> {{ $crop->yield_tons ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.wasted_tons') }}:</strong> {{ $crop->wasted_tons ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.loss_rate') }}:</strong> {{ $crop->loss_rate }}%</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.available_for_feed_tons') }}:</strong> {{ $crop->available_for_feed_tons }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.water_cost') }}:</strong> {{ $crop->water_cost }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.labor_cost') }}:</strong> {{ $crop->labor_cost }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.total_cost') }}:</strong> {{ $crop->total_cost }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.cost_per_ton') }}:</strong> {{ $crop->cost_per_ton ?? '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.profit_or_loss') }}:</strong> {{ $crop->profit_or_loss ?? '-' }}</div>
@@ -126,6 +135,72 @@
                             </tr>
                         @empty
                             <tr><td colspan="4">{{ __('crops_feed.empty.no_cost_items') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-block mt-3">
+            <h5 class="section-title">{{ __('crops_feed.actions.add_material_usage') }}</h5>
+            <form method="POST" action="{{ route('customer.crops-feed.crops.material-usages.store', ['locale' => $currentLocale]) }}" class="row g-3">
+                @csrf
+                <input type="hidden" name="crop_id" value="{{ $crop->id }}">
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.material_type') }}</label>
+                    <select name="material_type" class="form-select" required>
+                        @foreach(['fertilizer', 'vitamins', 'pesticide', 'other'] as $type)
+                            <option value="{{ $type }}">{{ __('crops_feed.options.' . $type) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.name') }}</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.quantity') }}</label>
+                    <input type="number" step="0.01" min="0" name="quantity" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.unit') }}</label>
+                    <input type="text" name="unit" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.amount') }}</label>
+                    <input type="number" step="0.01" min="0" name="amount" class="form-control" value="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ __('crops_feed.fields.used_on') }}</label>
+                    <input type="date" name="used_on" class="form-control" required>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary-green" type="submit">{{ __('crops_feed.actions.save') }}</button>
+                </div>
+            </form>
+
+            <div class="table-container mt-3">
+                <table class="table registry-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ __('crops_feed.fields.material_type') }}</th>
+                            <th>{{ __('crops_feed.fields.name') }}</th>
+                            <th>{{ __('crops_feed.fields.quantity') }}</th>
+                            <th>{{ __('crops_feed.fields.amount') }}</th>
+                            <th>{{ __('crops_feed.fields.used_on') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($crop->materialUsages as $row)
+                            <tr>
+                                <td>{{ __('crops_feed.options.' . $row->material_type) }}</td>
+                                <td>{{ $row->name }}</td>
+                                <td>{{ $row->quantity ?? '-' }} {{ $row->unit }}</td>
+                                <td>{{ $row->amount }}</td>
+                                <td>{{ $row->used_on?->format('Y-m-d') }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5">{{ __('crops_feed.empty.no_material_usages') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>

@@ -47,6 +47,8 @@
                         <th>{{ __('livestock.fields.tag') }}</th>
                         <th>{{ __('livestock.fields.species') }}</th>
                         <th>{{ __('livestock.fields.breed') }}</th>
+                        <th>{{ __('farms.fields.farm') }}</th>
+                        <th>{{ __('farms.fields.pen') }}</th>
                         <th>{{ __('livestock.fields.gender') }}</th>
                         <th>{{ __('livestock.fields.status') }}</th>
                         <th>{{ __('livestock.fields.health') }}</th>
@@ -60,6 +62,8 @@
                             <td>{{ $animal->tag_number }}</td>
                             <td>{{ $animal->species->name ?? '-' }}</td>
                             <td>{{ $animal->breed->name ?? '-' }}</td>
+                            <td>{{ $animal->pen?->farm?->name ?? '-' }}</td>
+                            <td>{{ $animal->pen?->pen_number ?? '-' }}</td>
                             <td>{{ __('livestock.options.' . $animal->gender) }}</td>
                             <td>{{ __('livestock.options.' . $animal->status) }}</td>
                             <td>{{ __('livestock.options.' . $animal->health_status) }}</td>
@@ -76,7 +80,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8">{{ __('livestock.empty.no_animals') }}</td>
+                            <td colspan="10">{{ __('livestock.empty.no_animals') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

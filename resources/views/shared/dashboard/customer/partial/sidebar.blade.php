@@ -111,6 +111,23 @@
             </div>
         </div>
 
+        @can('farms.view')
+            <div class="nav-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'open' : '' }}">
+                <a href="javascript:void(0)"
+                    class="nav-item has-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.farms') }}</span>
+                    <i class="fa-solid fa-chevron-right chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.farms.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.farms.*') ? 'active' : '' }}">{{ __('farms.titles.farms') }}</a>
+                    <a href="{{ route('customer.farm-pens.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">{{ __('farms.titles.pens') }}</a>
+                </div>
+            </div>
+        @endcan
+
         {{-- Production Dropdown (Contains Subscriptions/Plans) --}}
         <div
             class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
@@ -160,6 +177,32 @@
                     class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
             </div>
         </div>
+        {{-- Poultry --}}
+        @can('poultry.view')
+            <div class="nav-dropdown {{ request()->routeIs('customer.poultry.*') ? 'open' : '' }}">
+                <a href="javascript:void(0)"
+                    class="nav-item has-dropdown {{ request()->routeIs('customer.poultry.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-4.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.poultry') }}</span>
+                    <i
+                        class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.poultry.broiler-cycles.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.broiler-cycles.*') ? 'active' : '' }}">{{ __('poultry.titles.broiler_cycles') }}</a>
+                    <a href="{{ route('customer.poultry.layer-flocks.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.layer-flocks.*') ? 'active' : '' }}">{{ __('poultry.titles.layer_flocks') }}</a>
+                    <a href="{{ route('customer.poultry.hatchery-machines.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-machines.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_machines') }}</a>
+                    <a href="{{ route('customer.poultry.hatchery-batches.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-batches.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_batches') }}</a>
+                    <a href="{{ route('customer.poultry.chicken-breeds.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.chicken-breeds.*') ? 'active' : '' }}">{{ __('poultry.titles.chicken_breeds') }}</a>
+                    <a href="{{ route('customer.poultry.alerts.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.poultry.alerts.*') ? 'active' : '' }}">{{ __('poultry.titles.alerts') }}</a>
+                </div>
+            </div>
+        @endcan
         {{-- Inventory --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') ? 'open' : '' }}">
             <a href="javascript:void(0)"
@@ -180,6 +223,14 @@
                     class="dropdown-item {{ request()->routeIs('customer.inventory.alerts.*') ? 'active' : '' }}">{{ __('warehouse.titles.alerts') }}</a>
                 <a href="{{ route('customer.inventory.traceability.index', ['locale' => $activeLocale]) }}"
                     class="dropdown-item {{ request()->routeIs('customer.inventory.traceability.*') ? 'active' : '' }}">{{ __('warehouse.titles.traceability') }}</a>
+                @can('warehouse.view')
+                    <a href="{{ route('customer.warehouse-assets.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.warehouse-assets.*') ? 'active' : '' }}">{{ __('warehouse.title') }}</a>
+                @endcan
+                @can('analytics.view')
+                    <a href="{{ route('customer.analytics.index', ['locale' => $activeLocale]) }}"
+                        class="dropdown-item {{ request()->routeIs('customer.analytics.*') ? 'active' : '' }}">{{ __('analytics.title') }}</a>
+                @endcan
             </div>
         </div>
 
@@ -321,16 +372,6 @@
             </div>
         @endif
 
-        {{-- Maintenance --}}
-        <div class="nav-dropdown">
-            <a href="#" class="nav-item">
-                <img src="{{ asset('assets/images/sidebar-icon-10.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.maintenance') }}</span>
-                <i
-                    class="fa-solid fa-chevron-right  chevron m-1 {{ $currentLang == 'en' ? 'me-auto' : 'ms-auto' }}"></i>
-            </a>
-        </div>
-
     </nav>
 
     {{-- Bottom Section --}}
@@ -364,6 +405,13 @@
                         class="dropdown-item {{ request()->routeIs('settings.theme.*') ? 'active' : '' }}">
                         {{ __('dashboard.sidebar.theme') }}
                     </a>
+
+                    @can('settings.manage')
+                        <a href="{{ route('superadmin.contact-info.edit', ['locale' => $activeLocale]) }}"
+                            class="dropdown-item {{ request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">
+                            {{ __('dashboard.sidebar.contact_info') }}
+                        </a>
+                    @endcan
 
                     @if ($isSuperAdmin)
                         <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}"

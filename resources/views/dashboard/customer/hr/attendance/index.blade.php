@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Attendance</h3>
+        <h3 class="mb-0">{{ __('hr.titles.attendance') }}</h3>
         <a class="btn btn-outline-secondary"
            href="{{ route('customer.hr.employees.index', ['locale' => request()->route('locale')]) }}">
-            Employees
+            {{ __('hr.titles.employees') }}
         </a>
     </div>
 
@@ -27,16 +27,16 @@
                   class="row g-2 align-items-end">
                 @csrf
                 <div class="col-md-6">
-                    <label class="form-label">Employee *</label>
+                    <label class="form-label">{{ __('hr.fields.employee') }} *</label>
                     <select name="employee_id" class="form-select" required>
-                        <option value="">-- Select Employee --</option>
+                        <option value="">{{ __('hr.options.select_employee') }}</option>
                         @foreach($employees as $e)
                             <option value="{{ $e->id }}">{{ $e->full_name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-6 text-end">
-                    <button class="btn btn-primary">Check In</button>
+                    <button class="btn btn-primary">{{ __('hr.actions.check_in') }}</button>
                 </div>
             </form>
         </div>
@@ -47,11 +47,11 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>Day</th>
-                        <th>Employee</th>
-                        <th>Check In</th>
-                        <th>Check Out</th>
-                        <th class="text-end">Action</th>
+                        <th>{{ __('hr.fields.day') }}</th>
+                        <th>{{ __('hr.fields.employee') }}</th>
+                        <th>{{ __('hr.fields.check_in') }}</th>
+                        <th>{{ __('hr.fields.check_out') }}</th>
+                        <th class="text-end">{{ __('hr.fields.action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,19 +67,19 @@
                                           action="{{ route('customer.hr.attendance.checkout', ['locale' => request()->route('locale'), 'attendance' => $a->id]) }}">
                                         @csrf
                                         <button class="btn btn-sm btn-outline-success"
-                                                onclick="return confirm('Check out now?')">
-                                            Check Out
+                                                onclick="return confirm('{{ __('hr.messages.confirm_check_out') }}')">
+                                            {{ __('hr.actions.check_out') }}
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-muted small">Done</span>
+                                    <span class="text-muted small">{{ __('hr.options.done') }}</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="text-center text-muted py-4">
-                                No attendance records.
+                                {{ __('hr.empty.no_attendance_records') }}
                             </td>
                         </tr>
                     @endforelse

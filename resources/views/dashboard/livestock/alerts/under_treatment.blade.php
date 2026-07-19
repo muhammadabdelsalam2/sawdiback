@@ -63,5 +63,33 @@
                 </tbody>
             </table>
         </div>
+
+        <h4 class="mb-2 mt-4">{{ __('livestock.sections.expiring_vaccine_batches') }}</h4>
+        <div class="table-container">
+            <table class="table registry-table mb-0 js-livestock-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('livestock.fields.vaccine') }}</th>
+                        <th>{{ __('livestock.fields.batch_number') }}</th>
+                        <th>{{ __('livestock.fields.quantity') }}</th>
+                        <th>{{ __('livestock.fields.expiry_date') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($expiringVaccineBatches as $batch)
+                        <tr>
+                            <td>{{ $batch->vaccine?->name ?? __('livestock.options.no_data') }}</td>
+                            <td>{{ $batch->batch_number ?? __('livestock.options.no_data') }}</td>
+                            <td>{{ $batch->quantity }}</td>
+                            <td>{{ $batch->expiry_date?->format('Y-m-d') ?? __('livestock.options.no_data') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">{{ __('livestock.empty.no_expiring_vaccine_batches') }}</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection

@@ -6,6 +6,8 @@ use App\Models\Currency;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PlanCrudTest extends TestCase
@@ -17,6 +19,10 @@ class PlanCrudTest extends TestCase
         $admin = User::factory()->create([
             'email' => 'admin@elsawady.com',
         ]);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        Role::create(['name' => 'SuperAdmin', 'guard_name' => 'web']);
+        $admin->assignRole('SuperAdmin');
+
         $currency = Currency::factory()->create([
             'code' => 'SAR',
             'symbol' => 'SR',

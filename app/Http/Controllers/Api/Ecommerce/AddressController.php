@@ -53,12 +53,12 @@ class AddressController extends Controller
     public function show(Request $request, string $locale, UserAddress $address): JsonResponse
     {
         if ($address->user_id !== $request->user()->id) {
-            return ApiResponse::error('Address not found.', 404);
+            return ApiResponse::error(__('ecommerce.address.not_found'), 404);
         }
 
         return ApiResponse::success(
             data: new \App\Http\Resources\UserAddressResource($address),
-            message: 'Address loaded successfully.',
+            message: __('ecommerce.address.loaded'),
             code: 200
         );
     }
@@ -93,13 +93,13 @@ class AddressController extends Controller
             return ApiResponse::error($result['message'], $result['code'], $result['data'] ?? []);
         }
 
-        return ApiResponse::success($result['data'], 'Default address updated.', 200);
+        return ApiResponse::success($result['data'], __('ecommerce.address.default_updated'), 200);
     }
 
     public function selectForCheckout(Request $request, string $locale, UserAddress $address): JsonResponse
     {
         if ($address->user_id !== $request->user()->id) {
-            return ApiResponse::error('Address not found.', 404);
+            return ApiResponse::error(__('ecommerce.address.not_found'), 404);
         }
 
         $result = $this->cartService->setAddress($request->user(), $address->id);

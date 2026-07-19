@@ -21,7 +21,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus overview loaded successfully.',
+            'message' => __('plus.api.overview_loaded'),
             'data' => $this->plusService->overview($request->user()),
         ]);
     }
@@ -30,7 +30,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus setup data loaded successfully.',
+            'message' => __('plus.api.setup_loaded'),
             'data' => $this->plusService->setup($request->user()),
         ]);
     }
@@ -39,7 +39,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus subscription created successfully.',
+            'message' => __('plus.api.subscription_created'),
             'data' => $this->plusService->subscribe($request->user(), $request->validated()),
         ], 201);
     }
@@ -48,7 +48,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus management data loaded successfully.',
+            'message' => __('plus.api.management_loaded'),
             'data' => $this->plusService->manage($request->user()),
         ]);
     }
@@ -57,7 +57,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus subscription settings loaded successfully.',
+            'message' => __('plus.api.settings_loaded'),
             'data' => $this->plusService->manageSubscription($request->user()),
         ]);
     }
@@ -66,7 +66,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus subscription settings updated successfully.',
+            'message' => __('plus.api.settings_updated'),
             'data' => $this->plusService->updateManageSubscription($request->user(), $request->validated()),
         ]);
     }
@@ -75,7 +75,7 @@ class PlusController extends Controller
     {
         return response()->json([
             'status' => true,
-            'message' => 'Plus subscription delivery settings updated successfully.',
+            'message' => __('plus.api.delivery_settings_updated'),
             'data' => $this->plusService->skip($request->user(), $request->validated()),
         ]);
     }

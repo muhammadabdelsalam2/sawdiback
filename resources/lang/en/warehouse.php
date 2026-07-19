@@ -34,6 +34,8 @@ return [
         'filter' => 'Filter',
         'add_product' => 'Add Product',
         'add_category' => 'Add Category',
+        'add_asset' => 'Add Asset',
+        'edit_asset' => 'Edit Asset',
         'edit' => 'Edit',
         'delete' => 'Delete',
     ],
@@ -71,6 +73,11 @@ return [
         'actions' => 'Actions',
         'days' => 'Days',
         'image' => 'Image',
+        'storage_location' => 'Storage Location',
+        'quantity_or_status' => 'Quantity / Status',
+        'farm' => 'Farm',
+        'select_farm' => 'Select Farm',
+        'attachments' => 'Attachments',
     ],
     'options' => [
         'feed' => 'Feed',
@@ -95,6 +102,7 @@ return [
         'no_low_stock' => 'No low stock products.',
         'no_expiring' => 'No expiring batches.',
         'no_delivery_items' => 'No delivery records found.',
+        'no_assets' => 'No warehouse assets recorded yet.',
     ],
     'messages' => [
         'success' => [
@@ -104,10 +112,21 @@ return [
             'product_created' => 'Product created successfully.',
             'product_updated' => 'Product updated successfully.',
             'product_deleted' => 'Product deleted successfully.',
+            'asset_created' => 'Warehouse asset created successfully.',
+            'asset_updated' => 'Warehouse asset updated successfully.',
+            'asset_deleted' => 'Warehouse asset deleted successfully.',
         ],
         'error' => [
             'category_in_use' => 'Category cannot be deleted because it is in use.',
             'product_in_use' => 'Product cannot be deleted because it is in use.',
         ],
+    ],
+    'title' => 'Warehouse Assets',
+    'description' => 'Track equipment, irrigation pipes, metal stock and other farm assets.',
+    'types' => [
+        'equipment' => 'Equipment',
+        'water_pipes' => 'Water Pipes',
+        'iron' => 'Iron',
+        'other' => 'Other',
     ],
 ];

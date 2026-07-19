@@ -97,7 +97,7 @@
                                         {{ __('auth.password_label') }}
                                     </label>
 
-                                    <a href="#"
+                                    <a href="{{ route('password.request', ['locale' => session('locale_full', 'en-SA')]) }}"
                                         class="text-decoration-none small fw-bold text-success">
                                         {{ __('auth.forgot_password') }}
                                     </a>

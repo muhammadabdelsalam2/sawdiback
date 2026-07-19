@@ -59,6 +59,7 @@ return [
         'record_health' => 'Record Health Event',
         'record_vaccination' => 'Record Vaccination',
         'record_weight' => 'Record Weight',
+        'vaccine_batches' => 'Vaccine Batches',
         'status_history' => 'Status History',
         'open_new_cycle' => 'Open New Cycle',
         'insemination' => 'Insemination',
@@ -66,6 +67,7 @@ return [
         'birth' => 'Birth',
         'recent_birth_events' => 'Recent Birth Events',
         'upcoming_vaccinations' => 'Upcoming Vaccinations (7 days)',
+        'expiring_vaccine_batches' => 'Expiring Vaccine Batches',
     ],
 
     'fields' => [
@@ -126,6 +128,10 @@ return [
         'cost_per_unit' => 'Cost Per Unit',
         'low_stock_threshold' => 'Low Stock Threshold',
         'default_interval' => 'Default Interval',
+        'current_stock' => 'Current Stock',
+        'nearest_expiry_date' => 'Nearest Expiry',
+        'batch_number' => 'Batch Number',
+        'expiry_date' => 'Expiry Date',
     ],
 
     'options' => [
@@ -180,6 +186,7 @@ return [
             'vaccine_created' => 'Vaccine created successfully.',
             'vaccine_updated' => 'Vaccine updated successfully.',
             'vaccine_deleted' => 'Vaccine deleted successfully.',
+            'vaccine_batch_created' => 'Vaccine batch recorded successfully.',
             'feed_type_created' => 'Feed type created successfully.',
             'feed_type_updated' => 'Feed type updated successfully.',
             'feed_type_deleted' => 'Feed type deleted successfully.',
@@ -206,6 +213,8 @@ return [
         'no_breeds' => 'No breeds found.',
         'no_feed_types' => 'No feed types found.',
         'no_vaccines' => 'No vaccines found.',
+        'no_vaccine_batches' => 'No vaccine batches recorded.',
+        'no_expiring_vaccine_batches' => 'No vaccine batches expiring soon.',
     ],
 
     'datatable' => [

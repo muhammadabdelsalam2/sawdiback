@@ -21,5 +21,57 @@
                 </div>
             </form>
         </div>
+
+        <div class="card-block mt-3">
+            <h5>{{ __('livestock.sections.vaccine_batches') }}</h5>
+            <form method="POST" action="{{ route('customer.livestock.vaccines.batches.store', ['locale' => $currentLocale, 'vaccine' => $vaccine->id]) }}" class="row g-3">
+                @csrf
+                <input type="hidden" name="vaccine_id" value="{{ $vaccine->id }}">
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('livestock.fields.batch_number') }}</label>
+                    <input type="text" name="batch_number" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('livestock.fields.quantity') }}</label>
+                    <input type="number" step="0.01" min="0" name="quantity" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('livestock.fields.expiry_date') }}</label>
+                    <input type="date" name="expiry_date" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ __('livestock.fields.notes') }}</label>
+                    <input type="text" name="notes" class="form-control">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary-green" type="submit">{{ __('livestock.actions.save') }}</button>
+                </div>
+            </form>
+
+            <div class="table-container mt-3">
+                <table class="table registry-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ __('livestock.fields.batch_number') }}</th>
+                            <th>{{ __('livestock.fields.quantity') }}</th>
+                            <th>{{ __('livestock.fields.expiry_date') }}</th>
+                            <th>{{ __('livestock.fields.notes') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($vaccine->batches as $batch)
+                            <tr>
+                                <td>{{ $batch->batch_number ?? '-' }}</td>
+                                <td>{{ $batch->quantity }}</td>
+                                <td>{{ $batch->expiry_date?->format('Y-m-d') }}</td>
+                                <td>{{ $batch->notes ?? '-' }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4">{{ __('livestock.empty.no_vaccine_batches') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 @endsection

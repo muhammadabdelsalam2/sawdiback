@@ -10,6 +10,7 @@ return [
     'product' => [
         'success' => 'Products Returned Successfully',
         'message' => 'Product details fetched successfully',
+        'best_selling_loaded' => 'Best selling products fetched successfully.',
         'favorite_added' => 'Product added to favorites successfully.',
         'favorite_failed' => 'Failed to add product to favorites.',
         'already_favorite' => 'Product already in favorites.',
@@ -33,6 +34,11 @@ return [
         'details' => 'Order details loaded successfully.',
         'tracking' => 'Order tracking loaded successfully.',
         'not_found' => 'Order not found.',
+    ],
+    'address' => [
+        'not_found' => 'Address not found.',
+        'loaded' => 'Address loaded successfully.',
+        'default_updated' => 'Default address updated.',
     ],
 
     'review' => [

@@ -23,18 +23,19 @@
         <table class="table align-middle no-datatable sd-export-table"
             data-export-title="{{ $orderItemsExportTitle }}"
             data-pdf-orientation="portrait" data-pdf-page-size="A4">
-            <thead><tr><th>{{ __('sales_dist.orders.items.product_id') }}</th><th>{{ __('sales_dist.orders.items.qty') }}</th><th>{{ __('sales_dist.orders.items.unit_price') }}</th><th>{{ __('sales_dist.orders.items.discount') }}</th><th>{{ __('sales_dist.orders.items.line_total') }}</th></tr></thead>
+            <thead><tr><th>{{ __('sales_dist.orders.items.product_id') }}</th><th>{{ __('sales_dist.orders.items.product_category') }}</th><th>{{ __('sales_dist.orders.items.qty') }}</th><th>{{ __('sales_dist.orders.items.unit_price') }}</th><th>{{ __('sales_dist.orders.items.discount') }}</th><th>{{ __('sales_dist.orders.items.line_total') }}</th></tr></thead>
             <tbody>
                 @forelse($order->items as $item)
                 <tr>
                     <td>{{ $item->product_id }}</td>
+                    <td>{{ __('sales_dist.product_categories.' . ($item->product_category ?? 'other')) }}</td>
                     <td>{{ number_format($item->qty, 2) }}</td>
                     <td>{{ number_format($item->unit_price, 2) }}</td>
                     <td>{{ number_format($item->discount, 2) }}</td>
                     <td>{{ number_format($item->line_total, 2) }}</td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="text-center text-muted">{{ __('sales_dist.orders.items.empty') }}</td></tr>
+                <tr><td colspan="6" class="text-center text-muted">{{ __('sales_dist.orders.items.empty') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

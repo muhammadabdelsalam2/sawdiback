@@ -17,6 +17,7 @@ class LivestockAnimalStoreRequest extends BaseLivestockRequest
                 'max:255',
                 Rule::unique('livestock_animals', 'tag_number')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
             ],
+            'pen_id' => ['nullable', 'integer', Rule::exists('farm_pens', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'species_id' => ['required', 'integer', Rule::exists('animal_species', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'breed_id' => ['nullable', 'integer', Rule::exists('animal_breeds', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'gender' => ['required', Rule::in(['male', 'female'])],

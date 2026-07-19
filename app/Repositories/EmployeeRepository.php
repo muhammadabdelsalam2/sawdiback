@@ -12,7 +12,7 @@ class EmployeeRepository implements EmployeeRepositoryInterface
     {
         return Employee::query()
             ->where('tenant_id', $tenantId)
-            ->with(['department', 'jobTitle'])
+            ->with(['department', 'jobTitle', 'attachments'])
             ->orderBy('id', 'desc')
             ->paginate($perPage);
     }

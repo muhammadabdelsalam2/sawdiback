@@ -4,6 +4,7 @@ use App\Http\Controllers\Public\PageController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\LanguageController;
@@ -30,6 +31,10 @@ Route::prefix('{locale}')
     ->group(function () {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login.form');
         Route::post('login', [LoginController::class, 'login'])->name('login.submit');
+        Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
         Route::get('register', [LoginController::class, 'showRegister'])->name('showRegister');
         Route::post('store', [LoginController::class, 'register'])->name('auth.register');
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
@@ -57,4 +62,3 @@ Route::prefix('{locale}')
         // One dashboard route for both roles
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     });
-

@@ -41,4 +41,18 @@ class Vaccine extends Model
     {
         return $this->hasMany(AnimalVaccination::class, 'vaccine_id');
     }
+
+    public function batches(): HasMany
+    {
+        return $this->hasMany(VaccineBatch::class);
+    }
+
+    public function getCurrentStockAttribute(): string
+    {
+        $value = $this->relationLoaded('batches')
+            ? $this->batches->sum('quantity')
+            : (float) $this->batches()->sum('quantity');
+
+        return number_format((float) $value, 2, '.', '');
+    }
 }

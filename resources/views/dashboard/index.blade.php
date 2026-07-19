@@ -219,7 +219,7 @@
                     </div>
                     <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                         <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
-                        <span class="badge-count">72</span>
+                        <span class="badge-count">{{ count($alerts['critical']) }}</span>
                     </button>
                 </div>
             </div>
@@ -254,7 +254,7 @@
                     </div>
                     <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                         <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
-                        <span class="badge-count">12</span>
+                        <span class="badge-count">{{ count($alerts['sales']) }}</span>
                     </button>
                 </div>
             </div>
@@ -289,7 +289,7 @@
                     </div>
                     <button class="btn btn-view-all mt-3 d-flex align-items-center justify-content-center ms-auto">
                         <span class="me-2">{{ __('dashboard.buttons.view_all') }}</span>
-                        <span class="badge-count">5</span>
+                        <span class="badge-count">{{ count($alerts['operations']) }}</span>
                     </button>
                 </div>
             </div>
@@ -308,6 +308,11 @@
             herd: {
                 labels: {!! json_encode($herdComposition->keys()) !!},
                 data: {!! json_encode($herdComposition->values()) !!}
+            },
+            profitability: {
+                labels: {!! json_encode($profitabilityData['labels']) !!},
+                revenue: {!! json_encode($profitabilityData['revenue']) !!},
+                cost: {!! json_encode($profitabilityData['cost']) !!}
             }
         };
     </script>

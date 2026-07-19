@@ -24,12 +24,16 @@ return new class extends Migration {
 
         // Safe backfill (if any legacy subscriptions exist)
         if (Schema::hasColumn('subscriptions', 'tenant_id')) {
-            DB::statement("
-                UPDATE subscriptions s
-                JOIN users u ON u.id = s.customer_id
-                SET s.tenant_id = u.tenant_id
-                WHERE s.tenant_id IS NULL AND u.tenant_id IS NOT NULL
-            ");
+          DB::statement("
+    UPDATE subscriptions
+    SET tenant_id = (
+        SELECT tenant_id FROM users WHERE users.id = subscriptions.customer_id
+    )
+    WHERE tenant_id IS NULL
+    AND customer_id IN (
+        SELECT id FROM users WHERE tenant_id IS NOT NULL
+    )
+");
         }
     }
 

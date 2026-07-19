@@ -84,7 +84,7 @@ if ($user) {
 
         return ApiResponse::success(
             data: ProductResource::collection($products),
-            message: 'Best selling products fetched successfully.',
+            message: __('ecommerce.product.best_selling_loaded'),
             code: 200
         );
     }
@@ -158,7 +158,7 @@ if ($user) {
         }
 
         return ApiResponse::success(
-            message: 'Product removed from favorites successfully.',
+            message: __('ecommerce.product.favorite_removed'),
             code: 200
         );
     }

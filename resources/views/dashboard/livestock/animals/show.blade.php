@@ -34,12 +34,16 @@
             <div class="row">
                 <div class="col-md-3"><strong>{{ __('livestock.fields.species') }}:</strong> {{ $animal->species->name ?? __('livestock.options.no_data') }}</div>
                 <div class="col-md-3"><strong>{{ __('livestock.fields.breed') }}:</strong> {{ $animal->breed->name ?? __('livestock.options.no_data') }}</div>
-                <div class="col-md-3"><strong>{{ __('livestock.fields.gender') }}:</strong> {{ __('livestock.options.' . $animal->gender) }}</div>
-                <div class="col-md-3"><strong>{{ __('livestock.fields.status') }}:</strong> {{ __('livestock.options.' . $animal->status) }}</div>
+                <div class="col-md-3"><strong>{{ __('farms.fields.farm') }}:</strong> {{ $animal->pen?->farm?->name ?? __('livestock.options.no_data') }}</div>
+                <div class="col-md-3"><strong>{{ __('farms.fields.pen') }}:</strong> {{ $animal->pen?->pen_number ?? __('livestock.options.no_data') }}</div>
             </div>
             <div class="row mt-2">
+                <div class="col-md-3"><strong>{{ __('livestock.fields.gender') }}:</strong> {{ __('livestock.options.' . $animal->gender) }}</div>
+                <div class="col-md-3"><strong>{{ __('livestock.fields.status') }}:</strong> {{ __('livestock.options.' . $animal->status) }}</div>
                 <div class="col-md-3"><strong>{{ __('livestock.fields.health') }}:</strong> {{ __('livestock.options.' . $animal->health_status) }}</div>
                 <div class="col-md-3"><strong>{{ __('livestock.fields.birth_date') }}:</strong> {{ optional($animal->birth_date)->toDateString() ?? __('livestock.options.no_data') }}</div>
+            </div>
+            <div class="row mt-2">
                 <div class="col-md-3"><strong>{{ __('livestock.fields.mother') }}:</strong> {{ $animal->mother->tag_number ?? __('livestock.options.no_data') }}</div>
                 <div class="col-md-3"><strong>{{ __('livestock.fields.father') }}:</strong> {{ $animal->father->tag_number ?? __('livestock.options.no_data') }}</div>
             </div>

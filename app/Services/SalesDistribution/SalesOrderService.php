@@ -68,6 +68,7 @@ class SalesOrderService
 
                 return [
                     'product_id' => (int) $item['product_id'],
+                    'product_category' => $item['product_category'] ?? 'other',
                     'qty' => $qty,
                     'unit_price' => $unitPrice,
                     'discount' => $discount,

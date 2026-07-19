@@ -5,6 +5,7 @@ namespace App\Services\Livestock;
 use App\Models\AnimalVaccination;
 use App\Models\LivestockAnimal;
 use App\Models\ReproductionCycle;
+use App\Models\VaccineBatch;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -51,6 +52,19 @@ class LivestockAlertService
             ->with(['species', 'breed'])
             ->where('health_status', 'under_treatment')
             ->orderByDesc('updated_at')
+            ->get();
+    }
+
+    public function expiringVaccineBatches(int $days): Collection
+    {
+        $endDate = Carbon::today()->addDays(max($days, 0))->toDateString();
+
+        return VaccineBatch::query()
+            ->with('vaccine')
+            ->where('quantity', '>', 0)
+            ->whereDate('expiry_date', '>=', Carbon::today()->toDateString())
+            ->whereDate('expiry_date', '<=', $endDate)
+            ->orderBy('expiry_date')
             ->get();
     }
 }

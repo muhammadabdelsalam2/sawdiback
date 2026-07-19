@@ -8,6 +8,7 @@ use App\Http\Requests\Livestock\LivestockAnimalStoreRequest;
 use App\Http\Requests\Livestock\LivestockAnimalUpdateRequest;
 use App\Models\AnimalBreed;
 use App\Models\AnimalSpecies;
+use App\Models\FarmPen;
 use App\Models\FeedType;
 use App\Models\LivestockAnimal;
 use App\Models\Vaccine;
@@ -39,8 +40,9 @@ class LivestockAnimalController extends Controller
         $species = AnimalSpecies::query()->orderBy('name')->get();
         $breeds = AnimalBreed::query()->orderBy('name')->get();
         $animals = LivestockAnimal::query()->orderBy('tag_number')->get();
+        $pens = FarmPen::query()->with('farm')->whereIn('type', ['livestock', 'mixed'])->orderBy('pen_number')->get();
 
-        return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals'));
+        return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals', 'pens'));
     }
 
     public function store(LivestockAnimalStoreRequest $request, string $locale): RedirectResponse
@@ -59,6 +61,7 @@ class LivestockAnimalController extends Controller
             'breed',
             'mother',
             'father',
+            'pen.farm',
             'healthRecords',
             'vaccinations.vaccine',
             'reproductionCyclesAsFemale',
@@ -79,8 +82,9 @@ class LivestockAnimalController extends Controller
         $species = AnimalSpecies::query()->orderBy('name')->get();
         $breeds = AnimalBreed::query()->orderBy('name')->get();
         $animals = LivestockAnimal::query()->whereKeyNot($animal->id)->orderBy('tag_number')->get();
+        $pens = FarmPen::query()->with('farm')->whereIn('type', ['livestock', 'mixed'])->orderBy('pen_number')->get();
 
-        return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals'));
+        return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals', 'pens'));
     }
 
     public function update(LivestockAnimalUpdateRequest $request, string $locale, LivestockAnimal $animal): RedirectResponse

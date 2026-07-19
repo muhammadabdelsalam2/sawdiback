@@ -146,7 +146,8 @@ class LivestockOperationsController extends Controller
             ->orderBy('next_due_date')
             ->limit(20)
             ->get();
+        $expiringVaccineBatches = $this->alerts->expiringVaccineBatches(30);
 
-        return view('dashboard.livestock.alerts.under_treatment', compact('rows', 'vaccinationsDue'));
+        return view('dashboard.livestock.alerts.under_treatment', compact('rows', 'vaccinationsDue', 'expiringVaccineBatches'));
     }
 }

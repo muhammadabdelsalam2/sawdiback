@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             DemoDataSeeder::class,
+            FarmSeeder::class,
             FinanceAccountsSeeder::class,
             ProcurementFlowSeeder::class,
             LivestockManagementSeeder::class,

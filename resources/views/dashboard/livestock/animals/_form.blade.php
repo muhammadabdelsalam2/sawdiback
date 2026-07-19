@@ -26,6 +26,17 @@
             @endforeach
         </select>
     </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ __('farms.fields.pen') }}</label>
+        <select name="pen_id" class="form-select">
+            <option value="">{{ __('farms.empty.no_pens') }}</option>
+            @foreach ($pens ?? [] as $pen)
+                <option value="{{ $pen->id }}" @selected(old('pen_id', $animal->pen_id ?? '') == $pen->id)>
+                    {{ $pen->farm?->name }} - {{ $pen->pen_number }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
     <div class="col-md-3">
         <label class="form-label">{{ __('livestock.fields.gender') }}</label>
