@@ -15,7 +15,7 @@ use App\Http\Controllers\SuperAdmin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('{locale}')
-    ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
+    ->where(['locale' => '[a-z]{2}(?:-[A-Z]{2})?'])
     ->middleware(['set.locale', 'auth', 'role:SuperAdmin'])
     ->name('superadmin.')
     ->group(function () {

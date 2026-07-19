@@ -21,12 +21,12 @@ Route::get('/', [LandingPageController::class, 'redirectToDefault']);
 
 // Public home page
 Route::get('{locale}/home', [LandingPageController::class, 'index'])
-    ->where('locale', '[a-z]{2}-[A-Z]{2}')
+    ->where('locale', '[a-z]{2}(?:-[A-Z]{2})?')
     ->middleware(['set.locale'])
     ->name('public.home');
 
 Route::prefix('{locale}')
-    ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
+    ->where(['locale' => '[a-z]{2}(?:-[A-Z]{2})?'])
     ->middleware('set.locale')
     ->group(function () {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login.form');
@@ -56,7 +56,7 @@ Route::get('/switch-language/{locale}', [LanguageController::class, 'switch'])
 // Authenticated Shared Routes
 // =====================
 Route::prefix('{locale}')
-    ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
+    ->where(['locale' => '[a-z]{2}(?:-[A-Z]{2})?'])
     ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
     ->group(function () {
         // One dashboard route for both roles

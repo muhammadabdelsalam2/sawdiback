@@ -55,7 +55,7 @@ use App\Http\Controllers\Customer\Account\AccountController;
 use App\Http\Controllers\setting\SearchController;
 
 Route::prefix('{locale}')
-    ->where(['locale' => '[a-z]{2}-[A-Z]{2}'])
+    ->where(['locale' => '[a-z]{2}(?:-[A-Z]{2})?'])
     ->middleware(['set.locale', 'auth', 'role:Customer|SuperAdmin'])
     ->name('customer.')
     ->group(function () {
