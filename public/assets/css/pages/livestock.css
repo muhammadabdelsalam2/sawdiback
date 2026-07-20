@@ -1,3 +1,16 @@
+.livestock-page {
+    padding-bottom: 96px;
+}
+
+body {
+    overflow-y: auto;
+}
+
+#content {
+    min-height: calc(100vh - var(--dashboard-navbar-height));
+    overflow: visible;
+}
+
 .livestock-page .page-head {
     display: flex;
     align-items: center;
@@ -35,6 +48,7 @@
     background: #fff;
     box-shadow: var(--card-shadow);
     padding: 14px 16px;
+    overflow-x: auto;
 }
 
 .livestock-page .registry-table tbody td {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Category extends Model
 {
@@ -94,28 +95,56 @@ public function getNameAttribute(): ?string
         if ($translation) return $translation->name;
     }
 
-    // Fallback: load from DB if not loaded
     $translation = $this->translations()
-        ->where('locale', $locale)
-        ->orWhere('locale', 'en')
+        ->whereIn('locale', [$locale, 'en'])
+        ->orderByRaw('CASE WHEN locale = ? THEN 0 WHEN locale = ? THEN 1 ELSE 2 END', [$locale, 'en'])
         ->first();
 
     if ($translation) return $translation->name;
 
-    return $this->notes ?? $this->code;
+    return $this->code ?? $this->notes;
 }
 
 public function getImageUrlAttribute(): string
 {
-    if ($this->image) {
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
-
-        return asset('storage/' . $this->image);
+    if ($this->image && filter_var($this->image, FILTER_VALIDATE_URL)) {
+        return $this->image;
     }
 
-    $name = urlencode($this->name ?? $this->code ?? 'Category');
+    $image = $this->normalizePublicStoragePath($this->image);
+
+    if ($image && Storage::disk('public')->exists($image)) {
+        return asset(Storage::url($image));
+    }
+
+    return $this->placeholderImageUrl($this->name ?? $this->code ?? 'Category');
+}
+
+public function getPlaceholderImageUrlAttribute(): string
+{
+    return $this->placeholderImageUrl($this->name ?? $this->code ?? 'Category');
+}
+
+private function normalizePublicStoragePath(?string $path): ?string
+{
+    if (! is_string($path) || trim($path) === '') {
+        return null;
+    }
+
+    $path = ltrim($path, '/');
+
+    foreach (['public/', 'storage/'] as $prefix) {
+        if (str_starts_with($path, $prefix)) {
+            $path = substr($path, strlen($prefix));
+        }
+    }
+
+    return $path;
+}
+
+private function placeholderImageUrl(string $name): string
+{
+    $name = urlencode($name);
 
     return "https://ui-avatars.com/api/?name={$name}&background=E5E7EB&color=374151&size=400";
 }

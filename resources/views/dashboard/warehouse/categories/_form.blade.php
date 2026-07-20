@@ -18,10 +18,11 @@
         <div class="d-flex align-items-center gap-3 mb-2">
             <img id="category-image-preview" src="{{ $categoryImageUrl }}"
                 alt="{{ old('name', $category->name ?? __('warehouse.titles.categories')) }}"
+                onerror="this.onerror=null;this.src='{{ isset($category) ? $category->placeholder_image_url : 'https://ui-avatars.com/api/?name=Category&background=E5E7EB&color=374151&size=400' }}';"
                 class="img-thumbnail rounded shadow-sm"
                 style="width:96px; height:96px; object-fit:cover;">
             <div class="text-muted small">
-                JPG, JPEG, PNG, WEBP - Max 2MB
+                {{ __('warehouse.help.image_upload') }}
             </div>
         </div>
         <input type="file" name="image" id="category-image-input" class="form-control" accept="image/jpeg,image/png,image/webp">

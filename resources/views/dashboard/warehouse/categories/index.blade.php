@@ -40,6 +40,7 @@
                             <td>{{ $row->id }}</td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name ?? __('warehouse.titles.categories') }}"
+                                    onerror="this.onerror=null;this.src='{{ $row->placeholder_image_url }}';"
                                     class="img-thumbnail rounded shadow-sm"
                                     style="width:48px; height:48px; object-fit:cover;">
                             </td>

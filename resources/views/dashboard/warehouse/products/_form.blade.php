@@ -11,12 +11,12 @@
             value="{{ old('name', $product->name ?? '') }}">
     </div>
     <div class="col-md-4">
-        <label class="form-label">Title (Arabic)</label>
+        <label class="form-label">{{ __('warehouse.fields.title_ar') }}</label>
         <input type="text" name="title_ar" class="form-control"
             value="{{ old('title_ar', is_array($product->title ?? null) ? ($product->title['ar'] ?? '') : '') }}">
     </div>
     <div class="col-md-4">
-        <label class="form-label">Title (English)</label>
+        <label class="form-label">{{ __('warehouse.fields.title_en') }}</label>
         <input type="text" name="title_en" class="form-control"
             value="{{ old('title_en', is_array($product->title ?? null) ? ($product->title['en'] ?? '') : '') }}">
     </div>
@@ -41,22 +41,23 @@
         </select>
     </div>
     <div class="col-md-4">
-        <label class="form-label">Image</label>
+        <label class="form-label">{{ __('warehouse.fields.image') }}</label>
         @if (!empty($product->image))
             <div class="mb-2">
                 <img src="{{ $product->image_url }}"
+                    onerror="this.onerror=null;this.src='{{ $product->placeholder_image_url }}';"
                     style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
             </div>
         @endif
         <input type="file" name="image" class="form-control" accept="image/*">
     </div>
     <div class="col-md-3">
-        <label class="form-label">Price</label>
+        <label class="form-label">{{ __('warehouse.fields.price') }}</label>
         <input type="number" step="0.01" min="0" name="price" class="form-control"
             value="{{ old('price', $product->price ?? 0) }}">
     </div>
     <div class="col-md-3">
-        <label class="form-label">Last Price</label>
+        <label class="form-label">{{ __('warehouse.fields.last_price') }}</label>
         <input type="number" step="0.01" min="0" name="last_price" class="form-control"
             value="{{ old('last_price', $product->last_price ?? 0) }}">
     </div>
@@ -108,7 +109,7 @@
             <input class="form-check-input" type="checkbox" name="is_best_selling" value="1" id="is_best_selling"
                 @checked((bool) old('is_best_selling', $product->is_best_selling ?? false))>
             <label class="form-check-label text-warning fw-bold"
-                for="is_best_selling">{{ __('warehouse.fields.best_selling') ?? 'Best Selling' }}</label>
+                for="is_best_selling">{{ __('warehouse.fields.best_selling') }}</label>
         </div>
     </div>
     <div class="col-12">
@@ -116,11 +117,11 @@
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $product->notes ?? '') }}</textarea>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Description (Arabic)</label>
+        <label class="form-label">{{ __('warehouse.fields.description_ar') }}</label>
         <textarea name="description_ar" class="form-control" rows="3">{{ old('description_ar', is_array($product->description ?? null) ? ($product->description['ar'] ?? '') : '') }}</textarea>
     </div>
     <div class="col-md-6">
-        <label class="form-label">Description (English)</label>
+        <label class="form-label">{{ __('warehouse.fields.description_en') }}</label>
         <textarea name="description_en" class="form-control" rows="3">{{ old('description_en', is_array($product->description ?? null) ? ($product->description['en'] ?? '') : '') }}</textarea>
     </div>
 </div>

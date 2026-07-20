@@ -24,25 +24,25 @@
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <div class="card text-center p-3">
-                    <div style="font-size:13px; color:gray;">Total Products</div>
+                    <div style="font-size:13px; color:gray;">{{ __('warehouse.stats.total_products') }}</div>
                     <div style="font-size:24px; font-weight:600;">{{ $totalProducts }}</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center p-3">
-                    <div style="font-size:13px; color:gray;">Active</div>
+                    <div style="font-size:13px; color:gray;">{{ __('warehouse.stats.active') }}</div>
                     <div style="font-size:24px; font-weight:600; color:green;">{{ $activeProducts }}</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center p-3">
-                    <div style="font-size:13px; color:gray;">Low Stock</div>
+                    <div style="font-size:13px; color:gray;">{{ __('warehouse.stats.low_stock') }}</div>
                     <div style="font-size:24px; font-weight:600; color:red;">{{ $lowStock }}</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center p-3">
-                    <div style="font-size:13px; color:gray;">Best Selling</div>
+                    <div style="font-size:13px; color:gray;">{{ __('warehouse.stats.best_selling') }}</div>
                     <div style="font-size:24px; font-weight:600; color:orange;">{{ $bestSelling }}</div>
                 </div>
             </div>
@@ -71,15 +71,24 @@
                             <td>{{ $row->code ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>
-     {{ $row->categoryRelation?->translations->firstWhere('locale', substr(app()->getLocale(), 0, 2))?->name
-    ?? $row->categoryRelation?->translations->first()?->name
-    ?? $row->getRawOriginal('category') ?? '-' }}
-
+                                @php
+                                    $legacyCategory = $row->getRawOriginal('category');
+                                    $legacyCategoryText = $legacyCategory && \Illuminate\Support\Facades\Lang::has($legacyCategory)
+                                        ? __($legacyCategory)
+                                        : ($legacyCategory && ! str_contains($legacyCategory, '.') ? $legacyCategory : null);
+                                @endphp
+                                {{ $row->categoryRelation?->name ?? $legacyCategoryText ?? '-' }}
                             </td>
-                            <td>{{ $row->asset_category ? __('warehouse.asset_categories.' . $row->asset_category) : '-' }}</td>
+                            <td>
+                                @php
+                                    $assetCategoryKey = 'warehouse.asset_categories.' . $row->asset_category;
+                                @endphp
+                                {{ $row->asset_category ? (\Illuminate\Support\Facades\Lang::has($assetCategoryKey) ? __($assetCategoryKey) : $row->asset_category) : '-' }}
+                            </td>
                             <td>{{ $row->farm?->name ?? '-' }}{{ $row->farm_location ? ' - ' . $row->farm_location : '' }}</td>
                             <td>
                                 <img src="{{ $row->image_url }}" alt="{{ $row->name }}"
+                                    onerror="this.onerror=null;this.src='{{ $row->placeholder_image_url }}';"
                                     style="width:48px; height:48px; border-radius:8px; object-fit:cover;">
                             </td>
                             <td>{{ $row->unit }}</td>
@@ -99,7 +108,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10">{{ __('warehouse.empty.no_products') }}</td>
+                            <td colspan="11">{{ __('warehouse.empty.no_products') }}</td>
                         </tr>
                     @endforelse
 

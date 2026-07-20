@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ScopedByTenant;
 use App\Scopes\ActiveScope;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,7 +50,7 @@ class InventoryProduct extends Model
         'description' => 'array',
     ];
 
-    protected $append = ['image_url'];
+    protected $appends = ['image_url'];
 
     public function tenant(): BelongsTo
     {
@@ -91,13 +92,44 @@ public function categoryRelation(): BelongsTo
 
     public function getImageUrlAttribute(): string
     {
-        // لو فيه صورة مرفوعة
-        if ($this->image) {
-            return asset('storage/' . $this->image);
+        if ($this->image && filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
         }
 
-        // ✅ Dynamic image باسم المنتج (API جاهز)
-        $name = urlencode($this->localized_title ?? $this->name);
+        $image = $this->normalizePublicStoragePath($this->image);
+
+        if ($image && Storage::disk('public')->exists($image)) {
+            return asset(Storage::url($image));
+        }
+
+        return $this->placeholderImageUrl($this->localized_title ?? $this->name ?? 'Product');
+    }
+
+    public function getPlaceholderImageUrlAttribute(): string
+    {
+        return $this->placeholderImageUrl($this->localized_title ?? $this->name ?? 'Product');
+    }
+
+    private function normalizePublicStoragePath(?string $path): ?string
+    {
+        if (! is_string($path) || trim($path) === '') {
+            return null;
+        }
+
+        $path = ltrim($path, '/');
+
+        foreach (['public/', 'storage/'] as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                $path = substr($path, strlen($prefix));
+            }
+        }
+
+        return $path;
+    }
+
+    private function placeholderImageUrl(string $name): string
+    {
+        $name = urlencode($name);
 
         return "https://ui-avatars.com/api/?name={$name}&background=0D8ABC&color=fff&size=400";
     }

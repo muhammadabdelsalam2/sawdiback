@@ -59,7 +59,7 @@ class InventoryCategoryController extends Controller
 
         return redirect()
             ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Category created successfully.');
+            ->with('success', __('warehouse.messages.success.category_created'));
     }
 
     public function edit(string $locale, Category $category): View
@@ -106,7 +106,7 @@ class InventoryCategoryController extends Controller
 
         return redirect()
             ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
-            ->with('success', 'Category updated successfully.');
+            ->with('success', __('warehouse.messages.success.category_updated'));
     }
 
     public function destroy(string $locale, Category $category): RedirectResponse
@@ -122,9 +122,9 @@ class InventoryCategoryController extends Controller
 
             return redirect()
                 ->route('customer.inventory.categories.index', ['locale' => session('locale_full', 'en-SA')])
-                ->with('success', 'Category deleted successfully.');
+                ->with('success', __('warehouse.messages.success.category_deleted'));
         } catch (Throwable) {
-            return redirect()->back()->with('error', 'Category cannot be deleted because it is in use.');
+            return redirect()->back()->with('error', __('warehouse.messages.error.category_in_use'));
         }
     }
 
