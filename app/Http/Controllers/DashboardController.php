@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LivestockAnimal;
+use App\Models\Farm;
 use App\Models\MilkProductionLog;
 use App\Models\FeedStockMovement;
 use App\Models\SalesDistribution\SalesOrder;
@@ -15,6 +16,7 @@ use App\Services\Finance\ProfitLossService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -22,6 +24,7 @@ class DashboardController extends Controller
     {
         $locale = session('locale_full', 'en-SA');
         $user = Auth::user();
+
         $tenantId = (string) $user->tenant_id;
         $profitLoss = app(ProfitLossService::class)->report($tenantId);
 
@@ -166,223 +169,511 @@ class DashboardController extends Controller
     public function superAdminIndex(Request $request)
     {
         $locale = session('locale_full', 'en-SA');
-        $growthStart = now()->startOfMonth()->subMonths(5);
-
-        $summary = [
-            'customers' => User::query()
-                ->whereHas('roles', fn ($query) => $query->where('name', 'Customer'))
-                ->count(),
-            'orders' => Order::withoutGlobalScopes()->count(),
-            'products' => InventoryProduct::withoutGlobalScopes()->count(),
-            'revenue' => Order::withoutGlobalScopes()->sum('total'),
-            'analytics' => Order::withoutGlobalScopes()->distinct('status')->count('status'),
-            'farms' => DB::table('farms')->whereNull('deleted_at')->count(),
-        ];
-
-        $revenueTrend = Order::withoutGlobalScopes()
-            ->selectRaw('DATE(created_at) as date, SUM(total) as total')
-            ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        $ordersByStatus = Order::withoutGlobalScopes()
-            ->selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->get()
-            ->pluck('count', 'status');
-
-        $customers = User::query()
-            ->whereHas('roles', fn ($query) => $query->where('name', 'Customer'))
-            ->with(['orders' => fn ($query) => $query->with('items')->latest()])
-            ->latest()
-            ->get();
-
-        $growthMonths = collect(range(0, 5))
-            ->map(fn (int $index) => $growthStart->copy()->addMonths($index));
-
-        $maxCustomerRevenue = max(
-            1,
-            (float) $customers->map(fn (User $customer) => $customer->orders->sum('total'))->max()
-        );
-
-        $maxCustomerOrders = max(
-            1,
-            (int) $customers->map(fn (User $customer) => $customer->orders->count())->max()
-        );
-
-        $customerInsightCards = $customers
-            ->map(function (User $customer) use ($maxCustomerRevenue, $maxCustomerOrders, $growthMonths) {
-                $orders = $customer->orders;
-                $ordersCount = $orders->count();
-                $totalRevenue = (float) $orders->sum('total');
-                $productsCount = $orders
-                    ->flatMap(fn (Order $order) => $order->items)
-                    ->pluck('inventory_product_id')
-                    ->filter()
-                    ->unique()
-                    ->count();
-                $lastActivity = $orders->first()?->created_at ?? $customer->updated_at ?? $customer->created_at;
-                $revenueScore = ($totalRevenue / $maxCustomerRevenue) * 70;
-                $ordersScore = ($ordersCount / $maxCustomerOrders) * 30;
-                $activityPercent = min(100, (int) round($revenueScore + $ordersScore));
-                $sparkline = $growthMonths
-                    ->map(function ($month) use ($orders) {
-                        $monthKey = $month->format('Y-m');
-
-                        return (float) $orders
-                            ->filter(fn (Order $order) => $order->created_at?->format('Y-m') === $monthKey)
-                            ->sum('total');
-                    })
-                    ->values()
-                    ->all();
-
-                return [
-                    'name' => $customer->name,
-                    'email' => $customer->email,
-                    'orders_count' => $ordersCount,
-                    'total_revenue' => $totalRevenue,
-                    'products_count' => $productsCount,
-                    'status' => $ordersCount > 0 ? 'active' : 'inactive',
-                    'last_activity' => $lastActivity,
-                    'last_order_date' => $orders->first()?->created_at,
-                    'activity_percent' => $activityPercent,
-                    'sparkline' => $sparkline,
-                ];
-            })
-            ->sortByDesc('total_revenue')
-            ->take(9)
-            ->values();
-
-        $topCustomers = $customerInsightCards
-            ->take(3)
-            ->values();
-
-        $growthOrders = Order::withoutGlobalScopes()
-            ->where('created_at', '>=', $growthStart)
-            ->get(['id', 'user_id', 'total', 'created_at']);
-
-        $growthUsers = User::query()
-            ->whereHas('roles', fn ($query) => $query->where('name', 'Customer'))
-            ->where('created_at', '>=', $growthStart)
-            ->get(['id', 'created_at']);
-
-        $customerGrowth = $growthMonths->map(function ($month) use ($growthOrders, $growthUsers) {
-            $monthKey = $month->format('Y-m');
-            $monthOrders = $growthOrders->filter(fn (Order $order) => $order->created_at?->format('Y-m') === $monthKey);
-
-            return [
-                'label' => $month->format('M'),
-                'customers' => $growthUsers->filter(fn (User $user) => $user->created_at?->format('Y-m') === $monthKey)->count(),
-                'orders' => $monthOrders->count(),
-                'revenue' => (float) $monthOrders->sum('total'),
-                'activity' => $monthOrders->pluck('user_id')->filter()->unique()->count(),
-            ];
-        })->values();
-
-        $currentMonthCustomers = (int) ($customerGrowth->last()['customers'] ?? 0);
-        $previousMonthCustomers = (int) ($customerGrowth->slice(-2, 1)->first()['customers'] ?? 0);
-        $monthlyGrowth = $previousMonthCustomers > 0
-            ? (int) round((($currentMonthCustomers - $previousMonthCustomers) / $previousMonthCustomers) * 100)
-            : ($currentMonthCustomers > 0 ? 100 : 0);
-
-        $returningCustomers = $customers
-            ->filter(fn (User $customer) => $customer->orders->count() > 1)
-            ->count();
-
-        $analyticsCards = [
-            [
-                'label' => __('superadmin.customer_insights.top_customer'),
-                'value' => $topCustomers->first()['name'] ?? __('superadmin.messages.no_data'),
-                'meta' => number_format((float) ($topCustomers->first()['total_revenue'] ?? 0), 2) . ' SAR',
-                'icon' => 'bi-trophy',
-                'tone' => 'success',
-            ],
-            [
-                'label' => __('superadmin.customer_insights.highest_revenue'),
-                'value' => number_format((float) ($topCustomers->first()['total_revenue'] ?? 0), 2) . ' SAR',
-                'meta' => $topCustomers->first()['name'] ?? '-',
-                'icon' => 'bi-cash-stack',
-                'tone' => 'info',
-            ],
-            [
-                'label' => __('superadmin.customer_insights.most_orders'),
-                'value' => number_format((int) ($customerInsightCards->sortByDesc('orders_count')->first()['orders_count'] ?? 0)),
-                'meta' => $customerInsightCards->sortByDesc('orders_count')->first()['name'] ?? '-',
-                'icon' => 'bi-cart-check',
-                'tone' => 'warning',
-            ],
-            [
-                'label' => __('superadmin.customer_insights.active_customers'),
-                'value' => number_format($customerInsightCards->where('status', 'active')->count()),
-                'meta' => __('superadmin.customer_insights.active_now'),
-                'icon' => 'bi-activity',
-                'tone' => 'success',
-            ],
-            [
-                'label' => __('superadmin.customer_insights.monthly_growth'),
-                'value' => ($monthlyGrowth > 0 ? '+' : '') . $monthlyGrowth . '%',
-                'meta' => __('superadmin.customer_insights.current_month'),
-                'icon' => 'bi-graph-up-arrow',
-                'tone' => 'primary',
-            ],
-            [
-                'label' => __('superadmin.customer_insights.returning_customers'),
-                'value' => number_format($returningCustomers),
-                'meta' => __('superadmin.customer_insights.repeat_orders'),
-                'icon' => 'bi-arrow-repeat',
-                'tone' => 'secondary',
-            ],
-        ];
-
-        $farmSummaryCards = DB::table('farms')
-            ->whereNull('deleted_at')
+        $farms = Farm::withoutGlobalScopes()
+            ->withCount('pens')
             ->orderBy('id')
-            ->get(['id', 'name', 'type', 'location'])
-            ->map(function ($farm) {
-                $pensCount = DB::table('farm_pens')
-                    ->where('farm_id', $farm->id)
-                    ->whereNull('deleted_at')
-                    ->count();
+            ->take(4)
+            ->get()
+            ->map(fn (Farm $farm) => $this->farmCardData($farm));
 
-                $animalsCount = DB::table('livestock_animals')
-                    ->join('farm_pens', 'livestock_animals.pen_id', '=', 'farm_pens.id')
-                    ->where('farm_pens.farm_id', $farm->id)
-                    ->whereNull('farm_pens.deleted_at')
-                    ->count();
+        return view('dashboard.superadmin', compact('locale', 'farms'));
+    }
 
-                $poultryGroupsCount = collect([
-                    'poultry_broiler_cycles',
-                    'poultry_layer_flocks',
-                    'poultry_chicken_breeds',
-                ])->sum(fn (string $table) => DB::table($table)
+    public function superAdminFarmDashboard(Request $request, string $locale, int $farm)
+    {
+        $farm = Farm::withoutGlobalScopes()
+            ->with(['pens' => fn ($query) => $query->withCount('animals')])
+            ->findOrFail($farm);
+
+        $dashboard = $this->farmDashboardData($farm);
+
+        return view('dashboard.superadmin-farm', compact('locale', 'farm', 'dashboard'));
+    }
+
+    private function farmCardData(Farm $farm): array
+    {
+        $penIds = $this->farmPenIds($farm->id);
+        $tenantId = (string) $farm->tenant_id;
+
+        return [
+            'id' => $farm->id,
+            'name' => $farm->name,
+            'type' => $farm->type,
+            'location' => $farm->location,
+            'status' => $farm->is_active ? 'active' : 'inactive',
+            'image_url' => $this->farmImageUrl($farm->id),
+            'animals_count' => $this->countTable('livestock_animals', fn ($query) => $query->whereIn('pen_id', $penIds)),
+            'workers_count' => $this->farmLinkedCount('employees', $farm->id, $penIds),
+            'pens_count' => count($penIds),
+            'products_count' => $this->countTable('inventory_products', fn ($query) => $query->where('farm_id', $farm->id)),
+            'orders_count' => $this->farmOrdersCount($farm->id),
+            'milk_total' => $this->farmMilkTotal($tenantId, $penIds),
+            'poultry_groups_count' => $this->farmPoultryGroupsCount($farm->id),
+            'inventory_stock' => $this->farmInventoryStock($farm->id),
+        ];
+    }
+
+    private function farmDashboardData(Farm $farm): array
+    {
+        $penIds = $this->farmPenIds($farm->id);
+        $tenantId = (string) $farm->tenant_id;
+        $financials = $this->farmFinancials($farm->id, $penIds);
+
+        return [
+            'card' => $this->farmCardData($farm),
+            'stats' => [
+                'reports' => $this->farmReportsCount($farm->id, $penIds),
+                'workers' => $this->farmLinkedCount('employees', $farm->id, $penIds),
+                'attendance_today' => $this->farmAttendanceToday($farm->id, $penIds),
+                'animals' => $this->countTable('livestock_animals', fn ($query) => $query->whereIn('pen_id', $penIds)),
+                'pens' => count($penIds),
+                'dairy_products' => $this->countTable('inventory_products', fn ($query) => $query->where('farm_id', $farm->id)->where('category', 'animal_product')),
+                'products' => $this->countTable('inventory_products', fn ($query) => $query->where('farm_id', $farm->id)),
+                'inventory' => $this->farmInventoryStock($farm->id),
+                'orders' => $this->farmOrdersCount($farm->id),
+                'customers' => $this->farmCustomersCount($farm->id),
+                'revenue' => $financials['revenue'],
+                'expenses' => $financials['expenses'],
+                'milk_total' => $this->farmMilkTotal($tenantId, $penIds),
+                'alerts' => count($this->farmAlerts($farm->id, $tenantId, $penIds)),
+            ],
+            'pens' => DB::table('farm_pens')
+                ->whereIn('id', $penIds)
+                ->orderBy('pen_number')
+                ->get(),
+            'workers' => $this->farmWorkers($farm->id, $penIds),
+            'attendance' => $this->farmAttendance($farm->id, $penIds),
+            'animals' => $this->farmAnimals($penIds),
+            'products' => $this->farmProducts($farm->id),
+            'orders' => $this->farmOrders($farm->id),
+            'customers' => $this->farmCustomers($farm->id),
+            'reports' => $this->farmReports($farm->id, $penIds),
+            'activities' => $this->farmActivities($farm->id, $penIds),
+            'alerts' => $this->farmAlerts($farm->id, $tenantId, $penIds),
+            'charts' => [
+                'milk' => $this->farmMilkChart($tenantId, $penIds),
+                'orders' => $this->farmOrdersChart($farm->id),
+                'animals' => $this->farmAnimalStatusChart($penIds),
+                'finance' => $this->farmFinanceChart($farm->id, $penIds),
+            ],
+            'notes' => [
+                'workers' => $this->hasFarmLink('employees') ? null : __('superadmin.farm_dashboard.not_linked_to_farm'),
+                'attendance' => $this->hasFarmLink('employees') ? null : __('superadmin.farm_dashboard.not_linked_to_farm'),
+            ],
+        ];
+    }
+
+    private function farmPenIds(int $farmId): array
+    {
+        if (! Schema::hasTable('farm_pens')) {
+            return [];
+        }
+
+        return DB::table('farm_pens')
+            ->where('farm_id', $farmId)
+            ->whereNull('deleted_at')
+            ->pluck('id')
+            ->all();
+    }
+
+    private function countTable(string $table, callable $scope): int
+    {
+        if (! Schema::hasTable($table)) {
+            return 0;
+        }
+
+        return (int) $scope(DB::table($table))->count();
+    }
+
+    private function sumTable(string $table, string $column, callable $scope): float
+    {
+        if (! Schema::hasTable($table) || ! Schema::hasColumn($table, $column)) {
+            return 0.0;
+        }
+
+        return (float) $scope(DB::table($table))->sum($column);
+    }
+
+    private function hasFarmLink(string $table): bool
+    {
+        return Schema::hasTable($table) && Schema::hasColumn($table, 'farm_id');
+    }
+
+    private function farmLinkedCount(string $table, int $farmId, array $penIds): int
+    {
+        if (! Schema::hasTable($table)) {
+            return 0;
+        }
+
+        if (Schema::hasColumn($table, 'farm_id')) {
+            return (int) DB::table($table)->where('farm_id', $farmId)->count();
+        }
+
+        if (Schema::hasColumn($table, 'pen_id')) {
+            return (int) DB::table($table)->whereIn('pen_id', $penIds)->count();
+        }
+
+        return 0;
+    }
+
+    private function farmImageUrl(int $farmId): ?string
+    {
+        if (
+            ! Schema::hasTable('warehouse_assets')
+            || ! Schema::hasTable('warehouse_asset_attachments')
+            || ! Schema::hasColumn('warehouse_asset_attachments', 'path')
+        ) {
+            return null;
+        }
+
+        $path = DB::table('warehouse_asset_attachments')
+            ->join('warehouse_assets', 'warehouse_asset_attachments.warehouse_asset_id', '=', 'warehouse_assets.id')
+            ->where('warehouse_assets.farm_id', $farmId)
+            ->orderByDesc('warehouse_asset_attachments.id')
+            ->value('warehouse_asset_attachments.path');
+
+        return $path ? asset('storage/' . ltrim((string) $path, '/')) : null;
+    }
+
+    private function farmMilkTotal(string $tenantId, array $penIds): float
+    {
+        if (! Schema::hasTable('milk_production_logs') || ! Schema::hasTable('livestock_animals')) {
+            return 0.0;
+        }
+
+        return (float) DB::table('milk_production_logs')
+            ->join('livestock_animals', 'milk_production_logs.animal_id', '=', 'livestock_animals.id')
+            ->where('milk_production_logs.tenant_id', $tenantId)
+            ->whereIn('livestock_animals.pen_id', $penIds)
+            ->sum('milk_production_logs.quantity_liters');
+    }
+
+    private function farmPoultryGroupsCount(int $farmId): int
+    {
+        if (! Schema::hasTable('farm_pens')) {
+            return 0;
+        }
+
+        return collect(['poultry_broiler_cycles', 'poultry_layer_flocks', 'poultry_chicken_breeds'])
+            ->sum(function (string $table) use ($farmId) {
+                if (! Schema::hasTable($table)) {
+                    return 0;
+                }
+
+                $query = DB::table($table)
                     ->join('farm_pens', "{$table}.pen_id", '=', 'farm_pens.id')
-                    ->where('farm_pens.farm_id', $farm->id)
-                    ->whereNull('farm_pens.deleted_at')
-                    ->whereNull("{$table}.deleted_at")
-                    ->count());
+                    ->where('farm_pens.farm_id', $farmId)
+                    ->whereNull('farm_pens.deleted_at');
 
-                return [
-                    'name' => $farm->name,
-                    'type' => $farm->type,
-                    'location' => $farm->location,
-                    'pens_count' => $pensCount,
-                    'animals_count' => $animalsCount,
-                    'poultry_groups_count' => $poultryGroupsCount,
-                ];
+                if (Schema::hasColumn($table, 'deleted_at')) {
+                    $query->whereNull("{$table}.deleted_at");
+                }
+
+                return (int) $query->count();
             });
+    }
 
-        return view('dashboard.superadmin', compact(
-            'locale',
-            'summary',
-            'revenueTrend',
-            'ordersByStatus',
-            'topCustomers',
-            'customerGrowth',
-            'customerInsightCards',
-            'analyticsCards',
-            'farmSummaryCards'
-        ));
+    private function farmInventoryStock(int $farmId): float
+    {
+        if (! Schema::hasTable('inventory_batches') || ! Schema::hasTable('inventory_products')) {
+            return 0.0;
+        }
+
+        return (float) DB::table('inventory_batches')
+            ->join('inventory_products', 'inventory_batches.inventory_product_id', '=', 'inventory_products.id')
+            ->where('inventory_products.farm_id', $farmId)
+            ->sum('inventory_batches.quantity_available');
+    }
+
+    private function farmOrdersCount(int $farmId): int
+    {
+        return $this->farmEcommerceOrders($farmId)->count() + $this->farmSalesOrders($farmId)->count();
+    }
+
+    private function farmEcommerceOrders(int $farmId)
+    {
+        if (! Schema::hasTable('orders') || ! Schema::hasTable('order_items') || ! Schema::hasTable('inventory_products')) {
+            return collect();
+        }
+
+        return DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
+            ->where('inventory_products.farm_id', $farmId)
+            ->select('orders.id', 'orders.order_no', 'orders.status', 'orders.created_at', DB::raw('SUM(order_items.line_total) as total'))
+            ->groupBy('orders.id', 'orders.order_no', 'orders.status', 'orders.created_at')
+            ->orderByDesc('orders.created_at')
+            ->get();
+    }
+
+    private function farmSalesOrders(int $farmId)
+    {
+        if (! Schema::hasTable('sales_orders') || ! Schema::hasTable('sales_order_items') || ! Schema::hasTable('inventory_products')) {
+            return collect();
+        }
+
+        return DB::table('sales_orders')
+            ->join('sales_order_items', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
+            ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
+            ->where('inventory_products.farm_id', $farmId)
+            ->whereNull('sales_orders.deleted_at')
+            ->select('sales_orders.id', 'sales_orders.order_no', 'sales_orders.status', 'sales_orders.order_date as created_at', DB::raw('SUM(sales_order_items.line_total) as total'))
+            ->groupBy('sales_orders.id', 'sales_orders.order_no', 'sales_orders.status', 'sales_orders.order_date')
+            ->orderByDesc('sales_orders.order_date')
+            ->get();
+    }
+
+    private function farmOrders(int $farmId)
+    {
+        return $this->farmEcommerceOrders($farmId)
+            ->map(fn ($order) => (object) array_merge((array) $order, ['source' => 'ecommerce']))
+            ->merge($this->farmSalesOrders($farmId)->map(fn ($order) => (object) array_merge((array) $order, ['source' => 'sales'])))
+            ->sortByDesc('created_at')
+            ->take(8)
+            ->values();
+    }
+
+    private function farmCustomersCount(int $farmId): int
+    {
+        return $this->farmCustomers($farmId)->count();
+    }
+
+    private function farmCustomers(int $farmId)
+    {
+        $customers = collect();
+
+        if (Schema::hasTable('orders') && Schema::hasTable('users') && Schema::hasTable('order_items') && Schema::hasTable('inventory_products')) {
+            $customers = $customers->merge(DB::table('users')
+                ->join('orders', 'users.id', '=', 'orders.user_id')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
+                ->where('inventory_products.farm_id', $farmId)
+                ->select('users.name', 'users.email')
+                ->distinct()
+                ->get());
+        }
+
+        if (Schema::hasTable('sales_customers') && Schema::hasTable('sales_orders') && Schema::hasTable('sales_order_items') && Schema::hasTable('inventory_products')) {
+            $customers = $customers->merge(DB::table('sales_customers')
+                ->join('sales_orders', 'sales_customers.id', '=', 'sales_orders.customer_id')
+                ->join('sales_order_items', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
+                ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
+                ->where('inventory_products.farm_id', $farmId)
+                ->whereNull('sales_customers.deleted_at')
+                ->whereNull('sales_orders.deleted_at')
+                ->select('sales_customers.name', DB::raw('NULL as email'))
+                ->distinct()
+                ->get());
+        }
+
+        return $customers->unique(fn ($customer) => $customer->name . '|' . $customer->email)->values();
+    }
+
+    private function farmFinancials(int $farmId, array $penIds): array
+    {
+        $orderRevenue = (float) $this->farmEcommerceOrders($farmId)->sum('total') + (float) $this->farmSalesOrders($farmId)->sum('total');
+        $penRevenue = $this->sumTable('livestock_pen_financial_entries', 'amount', fn ($query) => $query->whereIn('pen_id', $penIds)->where('type', 'sale'));
+        $penExpenses = $this->sumTable('livestock_pen_financial_entries', 'amount', fn ($query) => $query->whereIn('pen_id', $penIds)->where('type', 'slaughter_packaging'));
+        $cropExpenses = $this->sumTable('crop_cost_items', 'amount', fn ($query) => $query
+            ->join('crops', 'crop_cost_items.crop_id', '=', 'crops.id')
+            ->where('crops.farm_id', $farmId));
+        $feedingExpenses = $this->sumTable('animal_feeding_logs', 'total_cost', fn ($query) => $query
+            ->join('livestock_animals', 'animal_feeding_logs.animal_id', '=', 'livestock_animals.id')
+            ->whereIn('livestock_animals.pen_id', $penIds));
+
+        return [
+            'revenue' => round($orderRevenue + $penRevenue, 2),
+            'expenses' => round($penExpenses + $cropExpenses + $feedingExpenses, 2),
+        ];
+    }
+
+    private function farmAttendanceToday(int $farmId, array $penIds): int
+    {
+        if (! Schema::hasTable('attendances') || ! Schema::hasTable('employees')) {
+            return 0;
+        }
+
+        $query = DB::table('attendances')->join('employees', 'attendances.employee_id', '=', 'employees.id')->whereDate('attendances.day', now()->toDateString());
+
+        if (Schema::hasColumn('employees', 'farm_id')) {
+            $query->where('employees.farm_id', $farmId);
+        } elseif (Schema::hasColumn('employees', 'pen_id')) {
+            $query->whereIn('employees.pen_id', $penIds);
+        } else {
+            return 0;
+        }
+
+        return (int) $query->count();
+    }
+
+    private function farmWorkers(int $farmId, array $penIds)
+    {
+        if (! Schema::hasTable('employees') || ! $this->hasFarmLink('employees')) {
+            return collect();
+        }
+
+        return DB::table('employees')
+            ->where('farm_id', $farmId)
+            ->whereNull('deleted_at')
+            ->latest()
+            ->take(8)
+            ->get();
+    }
+
+    private function farmAttendance(int $farmId, array $penIds)
+    {
+        if (! Schema::hasTable('attendances') || ! Schema::hasTable('employees') || ! $this->hasFarmLink('employees')) {
+            return collect();
+        }
+
+        return DB::table('attendances')
+            ->join('employees', 'attendances.employee_id', '=', 'employees.id')
+            ->where('employees.farm_id', $farmId)
+            ->select('attendances.*', 'employees.full_name')
+            ->orderByDesc('attendances.day')
+            ->take(8)
+            ->get();
+    }
+
+    private function farmAnimals(array $penIds)
+    {
+        if (! Schema::hasTable('livestock_animals')) {
+            return collect();
+        }
+
+        return DB::table('livestock_animals')
+            ->whereIn('pen_id', $penIds)
+            ->orderByDesc('created_at')
+            ->take(8)
+            ->get();
+    }
+
+    private function farmProducts(int $farmId)
+    {
+        if (! Schema::hasTable('inventory_products')) {
+            return collect();
+        }
+
+        return InventoryProduct::withoutGlobalScopes()
+            ->where('farm_id', $farmId)
+            ->latest()
+            ->take(8)
+            ->get();
+    }
+
+    private function farmReportsCount(int $farmId, array $penIds): int
+    {
+        return $this->farmReports($farmId, $penIds)->count();
+    }
+
+    private function farmReports(int $farmId, array $penIds)
+    {
+        $reports = collect();
+
+        if (Schema::hasTable('animal_health_records') && Schema::hasTable('livestock_animals')) {
+            $reports = $reports->merge(DB::table('animal_health_records')
+                ->join('livestock_animals', 'animal_health_records.animal_id', '=', 'livestock_animals.id')
+                ->whereIn('livestock_animals.pen_id', $penIds)
+                ->select('animal_health_records.created_at', 'animal_health_records.record_type as title', 'animal_health_records.diagnosis as desc')
+                ->latest('animal_health_records.created_at')
+                ->take(5)
+                ->get());
+        }
+
+        if (Schema::hasTable('crop_growth_stages') && Schema::hasTable('crops')) {
+            $reports = $reports->merge(DB::table('crop_growth_stages')
+                ->join('crops', 'crop_growth_stages.crop_id', '=', 'crops.id')
+                ->where('crops.farm_id', $farmId)
+                ->select('crop_growth_stages.created_at', 'crop_growth_stages.stage_name as title', 'crop_growth_stages.notes as desc')
+                ->latest('crop_growth_stages.created_at')
+                ->take(5)
+                ->get());
+        }
+
+        return $reports->sortByDesc('created_at')->take(8)->values();
+    }
+
+    private function farmActivities(int $farmId, array $penIds)
+    {
+        return collect()
+            ->merge($this->farmAnimals($penIds)->map(fn ($row) => ['title' => __('superadmin.farm_dashboard.animal_registered'), 'desc' => $row->tag_number ?? '-', 'date' => $row->created_at ?? null]))
+            ->merge($this->farmOrders($farmId)->map(fn ($row) => ['title' => __('superadmin.farm_dashboard.order_created'), 'desc' => $row->order_no ?? '-', 'date' => $row->created_at ?? null]))
+            ->merge($this->farmProducts($farmId)->map(fn ($row) => ['title' => __('superadmin.farm_dashboard.product_added'), 'desc' => $row->localized_title ?? $row->name ?? '-', 'date' => $row->created_at ?? null]))
+            ->sortByDesc('date')
+            ->take(10)
+            ->values();
+    }
+
+    private function farmAlerts(int $farmId, string $tenantId, array $penIds): array
+    {
+        $alerts = [];
+
+        if (Schema::hasTable('animal_vaccinations') && Schema::hasColumn('animal_vaccinations', 'pen_id')) {
+            $overdue = DB::table('animal_vaccinations')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('pen_id', $penIds)
+                ->whereNotNull('next_due_date')
+                ->whereDate('next_due_date', '<', now()->toDateString())
+                ->count();
+
+            if ($overdue > 0) {
+                $alerts[] = ['type' => 'danger', 'title' => __('dashboard.alerts.vaccination_overdue'), 'desc' => __('superadmin.farm_dashboard.overdue_vaccinations', ['count' => $overdue])];
+            }
+        }
+
+        if ($this->farmInventoryStock($farmId) <= 0) {
+            $alerts[] = ['type' => 'warning', 'title' => __('dashboard.alerts.low_feed_stock'), 'desc' => __('superadmin.farm_dashboard.no_inventory_stock')];
+        }
+
+        return $alerts ?: [['type' => 'success', 'title' => __('dashboard.alerts.no_critical_alerts'), 'desc' => __('dashboard.alerts.no_critical_alerts_desc')]];
+    }
+
+    private function farmMilkChart(string $tenantId, array $penIds)
+    {
+        if (! Schema::hasTable('milk_production_logs') || ! Schema::hasTable('livestock_animals')) {
+            return collect();
+        }
+
+        return DB::table('milk_production_logs')
+            ->join('livestock_animals', 'milk_production_logs.animal_id', '=', 'livestock_animals.id')
+            ->where('milk_production_logs.tenant_id', $tenantId)
+            ->whereIn('livestock_animals.pen_id', $penIds)
+            ->where('milk_production_logs.production_date', '>=', now()->subDays(7)->toDateString())
+            ->selectRaw('milk_production_logs.production_date as label, SUM(milk_production_logs.quantity_liters) as value')
+            ->groupBy('milk_production_logs.production_date')
+            ->orderBy('milk_production_logs.production_date')
+            ->get();
+    }
+
+    private function farmOrdersChart(int $farmId)
+    {
+        return $this->farmOrders($farmId)
+            ->groupBy(fn ($order) => \Illuminate\Support\Carbon::parse($order->created_at)->format('M'))
+            ->map(fn ($orders, $label) => ['label' => $label, 'value' => $orders->count()])
+            ->values();
+    }
+
+    private function farmAnimalStatusChart(array $penIds)
+    {
+        if (! Schema::hasTable('livestock_animals')) {
+            return collect();
+        }
+
+        return DB::table('livestock_animals')
+            ->whereIn('pen_id', $penIds)
+            ->selectRaw('health_status as label, COUNT(*) as value')
+            ->groupBy('health_status')
+            ->get();
+    }
+
+    private function farmFinanceChart(int $farmId, array $penIds)
+    {
+        $financials = $this->farmFinancials($farmId, $penIds);
+
+        return collect([
+            ['label' => __('superadmin.farm_dashboard.revenue'), 'value' => $financials['revenue']],
+            ['label' => __('superadmin.farm_dashboard.expenses'), 'value' => $financials['expenses']],
+        ]);
     }
 
     public function accessManagement(Request $request)

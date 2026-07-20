@@ -102,6 +102,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('{{ __('warehouse.messages.confirm_delete_product') }}')"
                                         type="submit">{{ __('warehouse.actions.delete') }}</button>
                                 </form>
                             </td>

@@ -49,6 +49,10 @@ class LoginController extends Controller
         // Prevent session fixation
         $request->session()->regenerate();
 
+        if ($user->hasRole('SuperAdmin')) {
+            return redirect()->route('superadmin.dashboard', ['locale' => $locale]);
+        }
+
         // Redirect
         return redirect()->intended(
             $authService->redirectPath($user, $locale)

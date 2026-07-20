@@ -23,6 +23,9 @@ Route::prefix('{locale}')
         // SuperAdmin dashboard (no permission required)
         Route::get('superadmin/dashboard', [DashboardController::class, 'superAdminIndex'])
             ->name('dashboard');
+        Route::get('superadmin/farms/{farm}/dashboard', [DashboardController::class, 'superAdminFarmDashboard'])
+            ->whereNumber('farm')
+            ->name('farms.dashboard');
 
         // SuperAdmin account (profile/settings/password) (no permission required)
         Route::prefix('superadmin')

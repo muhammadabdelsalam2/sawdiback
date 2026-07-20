@@ -71,6 +71,10 @@ class SocialAuthController extends Controller
 
         Auth::login($user);
 
+        if (method_exists($user, 'hasRole') && $user->hasRole('SuperAdmin')) {
+            return redirect()->route('superadmin.dashboard', ['locale' => $locale]);
+        }
+
         return redirect()->route('dashboard', ['locale' => $locale]);
     }
 }
