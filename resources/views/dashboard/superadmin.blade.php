@@ -12,6 +12,7 @@
         $summaryProducts  = $summary['products'] ?? 0;
         $summaryRevenue   = $summary['revenue'] ?? 0;
         $summaryAnalytics = $summary['analytics'] ?? 0;
+        $summaryFarms     = $summary['farms'] ?? 0;
 
         $activityGrowth = $summaryOrders > 0
             ? round((($summaryOrders - ($summaryOrders * 0.84)) / ($summaryOrders ?: 1)) * 100, 1)
@@ -81,6 +82,10 @@
                         <small>{{ __('superadmin.statistics.customer_orders') }}</small>
                         <strong>{{ number_format($summaryOrders) }}</strong>
                     </div>
+                    <div class="hero-stat-card">
+                        <small>{{ __('superadmin.statistics.total_farms') }}</small>
+                        <strong>{{ number_format($summaryFarms) }}</strong>
+                    </div>
                 </div>
                 <div class="hero-trend-chart-wrapper">
                     <canvas id="heroTrendChart"></canvas>
@@ -132,6 +137,47 @@
                         <strong>{{ number_format($summaryAnalytics) }}</strong>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="global-stats-section mb-4">
+            <div class="section-header">
+                <div>
+                    <h2>{{ __('superadmin.farms.title') }}</h2>
+                    <p>{{ __('superadmin.farms.desc') }}</p>
+                </div>
+            </div>
+
+            <div class="row g-3 stats-grid">
+                @foreach ($farmSummaryCards as $farm)
+                    <div class="col-lg-6 col-xl-3">
+                        <article class="enterprise-card farm-summary-card farm-summary-card-{{ ($loop->index % 4) + 1 }} h-100">
+                            <div class="farm-summary-head">
+                                <span class="enterprise-icon bg-soft-success"><i class="bi bi-house-heart"></i></span>
+                                <span class="farm-type-pill">{{ __('farms.options.' . $farm['type']) }}</span>
+                            </div>
+                            <div class="farm-summary-title">
+                                <h3>{{ $farm['name'] }}</h3>
+                                <p>{{ $farm['location'] ?: __('superadmin.farms.no_location') }}</p>
+                            </div>
+
+                            <div class="farm-summary-metrics">
+                                <div>
+                                    <span>{{ __('superadmin.farms.pens') }}</span>
+                                    <strong>{{ number_format($farm['pens_count']) }}</strong>
+                                </div>
+                                <div>
+                                    <span>{{ __('superadmin.farms.animals') }}</span>
+                                    <strong>{{ number_format($farm['animals_count']) }}</strong>
+                                </div>
+                                <div>
+                                    <span>{{ __('superadmin.farms.poultry_groups') }}</span>
+                                    <strong>{{ number_format($farm['poultry_groups_count']) }}</strong>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                @endforeach
             </div>
         </section>
 

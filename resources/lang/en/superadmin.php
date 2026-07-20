@@ -16,8 +16,18 @@ return [
         'customer_orders' => 'Customer Orders',
         'total_products' => 'Total Products',
         'warehouses' => 'Warehouses',
+        'total_farms' => 'Total Farms',
         'total_revenue' => 'Total Revenue',
         'analytics' => 'Analytics',
+    ],
+
+    'farms' => [
+        'title' => 'Farm Summary',
+        'desc' => 'Live farm, pen, livestock, and poultry counts from the farm registry.',
+        'pens' => 'Pens',
+        'animals' => 'Animals',
+        'poultry_groups' => 'Poultry cycles/flocks',
+        'no_location' => 'No location',
     ],
 
     'analytics' => [

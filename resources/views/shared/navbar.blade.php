@@ -2,7 +2,7 @@
     <div class="container">
         <a class="navbar-brand landing-brand" href="{{route('public.home', ['locale' => $currentLocale])}}">
             <span class="brand-mark">
-                <img src="{{ asset('assets/images/logo3.jpeg') }}" alt="EL-Sawady">
+                <img src="{{ asset('assets/images/logo-full.png') }}" alt="EL-Sawady">
             </span>
         </a>
 

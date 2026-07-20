@@ -79,6 +79,10 @@ return [
         'select_farm' => 'اختر مزرعة',
         'attachments' => 'المرفقات',
         'type' => 'النوع',
+        'save' => 'حفظ',
+        'cancel' => 'إلغاء',
+        'edit' => 'تعديل',
+        'delete' => 'حذف',
     ],
     'options' => [
         'feed' => 'أعلاف',

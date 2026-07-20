@@ -28,7 +28,7 @@
 
                     <div class="about-image-wrapper">
 
-                        <img src="{{ asset('assets/images/logo3.jpeg') }}"
+                        <img src="{{ asset('assets/images/logo-full.png') }}"
                              class="about-image"
                              alt="EL-Sawady">
 
@@ -189,7 +189,6 @@
     }
 
 </style>
-
 
 
 

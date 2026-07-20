@@ -10,7 +10,7 @@
                     <div class="bg-white p-4 p-lg-5">
                         <div class="mb-4 text-center">
                             <span class="brand-mark d-inline-flex mb-4">
-                                <img src="{{ asset('assets/images/logo3.jpeg') }}" alt="{{ __('auth.brand_name') }}">
+                                <img src="{{ asset('assets/images/logo-full.png') }}" alt="{{ __('auth.brand_name') }}">
                             </span>
                             <h3 class="fw-bold text-dark">{{ __('auth.set_new_password_title') }}</h3>
                             <p class="text-muted">{{ __('auth.set_new_password_subtitle') }}</p>

@@ -188,6 +188,7 @@ html[dir="rtl"] #content.sidebar-collapsed {
 .logo-enhanced {
     height: 52px !important;
     width: auto;
+    object-fit: contain;
     transition: all 0.3s ease;
 }
 
@@ -2180,13 +2181,19 @@ body {
 }
 
 .navbar-left .brand-mark {
-    padding: 6px 11px;
-    border-radius: 16px;
+    width: 154px;
+    height: 64px;
+    padding: 7px 12px;
+    border-radius: 18px;
+    overflow: visible;
 }
 
-.navbar-left .logo {
-    height: 44px;
-    max-width: 170px;
+.navbar-left .logo.logo-enhanced {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .search-container {
@@ -2695,7 +2702,7 @@ html[dir="rtl"] .dashboard-hero-actions {
 
 .hero-panel-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     margin-bottom: 20px;
 }
@@ -2723,10 +2730,14 @@ html[dir="rtl"] .dashboard-hero-actions {
     min-height: 300px;
 }
 
-.stats-grid {
+.stats-grid:not(.row) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 18px;
+}
+
+.row.stats-grid {
+    row-gap: 18px;
 }
 
 .enterprise-card {
@@ -2772,6 +2783,123 @@ html[dir="rtl"] .dashboard-hero-actions {
     margin-top: 10px;
     font-size: 1.75rem;
     color: #111827;
+}
+
+.farm-summary-card {
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 24px;
+    box-shadow: 0 24px 64px rgba(17, 24, 39, 0.10);
+    position: relative;
+    overflow: hidden;
+}
+
+.farm-summary-card::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 5px;
+    background: #16a34a;
+}
+
+.farm-summary-card-2::before { background: #b45309; }
+.farm-summary-card-3::before { background: #1d4ed8; }
+.farm-summary-card-4::before { background: #374151; }
+
+.farm-summary-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.farm-summary-card .enterprise-icon {
+    margin-bottom: 0;
+}
+
+.farm-type-pill {
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #065f46;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 7px 11px;
+    white-space: nowrap;
+}
+
+.farm-summary-card-2 .farm-type-pill { background: rgba(251, 191, 36, 0.16); color: #92400e; }
+.farm-summary-card-3 .farm-type-pill { background: rgba(59, 130, 246, 0.14); color: #1d4ed8; }
+.farm-summary-card-4 .farm-type-pill { background: rgba(107, 114, 128, 0.12); color: #374151; }
+
+.farm-summary-title h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.farm-summary-title p {
+    margin: 6px 0 0;
+    color: #54656a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.farm-summary-metrics {
+    display: grid;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.farm-summary-metrics div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f8faf7;
+    border: 1px solid #e7eee4;
+}
+
+.farm-summary-metrics span {
+    color: #54656a;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.farm-summary-metrics strong {
+    margin: 0;
+    color: #111827;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+@media (max-width: 1200px) {
+    .hero-panel-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-panel-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .farm-summary-card {
+        padding: 20px;
+    }
+
+    .farm-summary-head {
+        align-items: center;
+    }
+
+    .farm-summary-metrics div {
+        padding: 11px 12px;
+    }
 }
 
 .chart-card {
@@ -3247,8 +3375,15 @@ html[dir="rtl"] .modern-customer-foot {
 }
 
 @media (max-width: 992px) {
-    .navbar-left .logo {
-        height: 34px !important;
+    .navbar-left .brand-mark {
+        width: 116px;
+        height: 52px;
+        padding: 6px 9px;
+    }
+
+    .navbar-left .logo.logo-enhanced {
+        width: 100% !important;
+        height: 100% !important;
     }
 
     #content {

@@ -176,6 +176,7 @@ class DashboardController extends Controller
             'products' => InventoryProduct::withoutGlobalScopes()->count(),
             'revenue' => Order::withoutGlobalScopes()->sum('total'),
             'analytics' => Order::withoutGlobalScopes()->distinct('status')->count('status'),
+            'farms' => DB::table('farms')->whereNull('deleted_at')->count(),
         ];
 
         $revenueTrend = Order::withoutGlobalScopes()
@@ -334,6 +335,43 @@ class DashboardController extends Controller
             ],
         ];
 
+        $farmSummaryCards = DB::table('farms')
+            ->whereNull('deleted_at')
+            ->orderBy('id')
+            ->get(['id', 'name', 'type', 'location'])
+            ->map(function ($farm) {
+                $pensCount = DB::table('farm_pens')
+                    ->where('farm_id', $farm->id)
+                    ->whereNull('deleted_at')
+                    ->count();
+
+                $animalsCount = DB::table('livestock_animals')
+                    ->join('farm_pens', 'livestock_animals.pen_id', '=', 'farm_pens.id')
+                    ->where('farm_pens.farm_id', $farm->id)
+                    ->whereNull('farm_pens.deleted_at')
+                    ->count();
+
+                $poultryGroupsCount = collect([
+                    'poultry_broiler_cycles',
+                    'poultry_layer_flocks',
+                    'poultry_chicken_breeds',
+                ])->sum(fn (string $table) => DB::table($table)
+                    ->join('farm_pens', "{$table}.pen_id", '=', 'farm_pens.id')
+                    ->where('farm_pens.farm_id', $farm->id)
+                    ->whereNull('farm_pens.deleted_at')
+                    ->whereNull("{$table}.deleted_at")
+                    ->count());
+
+                return [
+                    'name' => $farm->name,
+                    'type' => $farm->type,
+                    'location' => $farm->location,
+                    'pens_count' => $pensCount,
+                    'animals_count' => $animalsCount,
+                    'poultry_groups_count' => $poultryGroupsCount,
+                ];
+            });
+
         return view('dashboard.superadmin', compact(
             'locale',
             'summary',
@@ -342,7 +380,8 @@ class DashboardController extends Controller
             'topCustomers',
             'customerGrowth',
             'customerInsightCards',
-            'analyticsCards'
+            'analyticsCards',
+            'farmSummaryCards'
         ));
     }
 

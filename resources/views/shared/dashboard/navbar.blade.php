@@ -16,7 +16,7 @@
             <i class="fa-solid fa-bars"></i>
         </button>
         <span class="brand-mark" aria-label="EL-Sawady">
-            <img src="{{ asset('assets/images/logo3.jpeg') }}" alt="EL-Sawady" class="logo logo-enhanced">
+            <img src="{{ asset('assets/images/logo-full.png') }}" alt="EL-Sawady" class="logo logo-enhanced">
         </span>
     </div>
     <style>

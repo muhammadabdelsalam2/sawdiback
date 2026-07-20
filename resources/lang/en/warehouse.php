@@ -78,6 +78,11 @@ return [
         'farm' => 'Farm',
         'select_farm' => 'Select Farm',
         'attachments' => 'Attachments',
+        'type' =>'Type',
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'edit' =>'Edit',
+        'delete' => 'Delete',
     ],
     'options' => [
         'feed' => 'Feed',

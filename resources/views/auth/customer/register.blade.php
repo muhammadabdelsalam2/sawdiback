@@ -43,7 +43,7 @@
                                     <div class="d-flex align-items-center mb-4">
                                         <div
                                             class="bg-white rounded p-2 {{ app()->getLocale() == 'ar' ? 'ms-2' : 'me-2' }}">
-                                            <img width="50px" src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
+                                            <img width="50px" height="50px" style="object-fit: contain;" src="{{ asset('assets/images/logo-icon.png')}}" alt="EL-Sawady">
                                         </div>
                                         <span class="fs-5 fw-bold">EL-SAWADY ERP</span>
                                     </div>

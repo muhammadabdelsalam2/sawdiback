@@ -16,7 +16,7 @@
                             <div>
                                 <div class="d-flex align-items-center mb-4 login-brand-lockup">
                                     <span class="brand-mark">
-                                       <img src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
+                                       <img src="{{ asset('assets/images/logo-full.png')}}" alt="EL-Sawady">
                                     </span>
                                     <span class="brand-logo-text fs-5">
                                         {{ __('auth.brand_name') }}
@@ -43,7 +43,7 @@
 
                         <div class="mb-5 text-center text-md-start">
                             <span class="brand-mark d-inline-flex d-md-none mb-4">
-                                <img src="{{ asset('assets/images/logo3.jpeg')}}" alt="EL-Sawady">
+                                <img src="{{ asset('assets/images/logo-full.png')}}" alt="EL-Sawady">
                             </span>
                             <h3 class="fw-bold text-dark">
                                 {{ __('auth.sign_in') }}

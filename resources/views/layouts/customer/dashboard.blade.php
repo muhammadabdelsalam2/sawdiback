@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet">
     {{-- Icon In Title --}}
-    <link rel="icon" href="{{ asset('assets/images/logo3.jpeg') }}" type="image/jpeg">
+    <link rel="icon" href="{{ asset('assets/images/logo-icon.png') }}" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

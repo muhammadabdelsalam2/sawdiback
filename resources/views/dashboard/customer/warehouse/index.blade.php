@@ -9,10 +9,7 @@
             <h2 class="fw-bold mb-1">{{ __('warehouse.title') }}</h2>
             <p class="text-muted mb-0">{{ __('warehouse.description') }}</p>
         </div>
-        <a href="{{ route('customer.warehouse-assets.create', ['locale' => app()->getLocale()]) }}" class="btn btn-primary">
-            {{ __('warehouse.actions.add_asset') }}
-        </a>
-        <a href="{{ route('customer.warehouse-assets.create', ['locale' => app()->getLocale()]) }}" class="btn btn-primary">
+        <a href="{{ route('customer.warehouse-assets.create', ['locale' => request()->route('locale')]) }}" class="btn btn-primary">
             {{ __('warehouse.actions.add_asset') }}
         </a>
     </div>
@@ -48,11 +45,11 @@
                                 @endforelse
                             </td>
                             <td>
-                                <a href="{{ route('customer.warehouse-assets.edit', ['locale' => app()->getLocale(), 'warehouse_asset' => $asset->id]) }}" class="btn btn-sm btn-outline-primary">{{ __('common.edit') }}</a>
-                                <form action="{{ route('customer.warehouse-assets.destroy', ['locale' => app()->getLocale(), 'warehouse_asset' => $asset->id]) }}" method="POST" class="d-inline">
+                                <a href="{{ route('customer.warehouse-assets.edit', ['locale' => request()->route('locale'), 'warehouse_asset' => $asset->id]) }}" class="btn btn-sm btn-outline-primary">{{ __('warehouse.fields.edit') }}</a>
+                                <form action="{{ route('customer.warehouse-assets.destroy', ['locale' => request()->route('locale'), 'warehouse_asset' => $asset->id]) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger">{{ __('common.delete') }}</button>
+                                    <button class="btn btn-sm btn-outline-danger">{{ __('warehouse.fields.delete') }}</button>
                                 </form>
                             </td>
                         </tr>
