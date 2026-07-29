@@ -50,6 +50,11 @@
     </style>
 
     <nav class="sidebar-nav mt-4">
+          {{-- Extra links outside the original ERP document order --}}
+        <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
+            <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
+            <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
+        </a>
         {{-- 1. HR --}}
         @if ($hrEnabled)
             <div class="nav-dropdown {{ request()->routeIs('customer.hr.*') ? 'open' : '' }}">
@@ -251,17 +256,9 @@
             @endcan
         @endif
 
-        {{-- 14. Logout --}}
-        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item d-flex align-items-center">
-            <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
-            <span class="nav-label">{{ __('dashboard.sidebar.requirements.logout') }}</span>
-        </a>
 
-        {{-- Extra links outside the original ERP document order --}}
-        <a href="{{ route($dashboardRoute, ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('dashboard') || request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
-            <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
-            <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
-        </a>
+
+
 
         @can('farms.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'open' : '' }}">
@@ -304,6 +301,11 @@
                 <a href="{{ route('customer.procurement.invoices.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.procurement.invoices.*') ? 'active' : '' }}">{{ __('procurement.sidebar.invoices') }}</a>
             </div>
         </div>
+          {{-- 14. Logout --}}
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item d-flex align-items-center">
+            <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
+            <span class="nav-label">{{ __('dashboard.sidebar.requirements.logout') }}</span>
+        </a>
 
         <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
             @csrf
