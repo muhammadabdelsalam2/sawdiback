@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasPublicFileUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 
 class Category extends Model
 {
     //
     use SoftDeletes;
+    use HasPublicFileUrl;
 
     protected $fillable = [
         'tenant_id',
@@ -107,14 +108,10 @@ public function getNameAttribute(): ?string
 
 public function getImageUrlAttribute(): string
 {
-    if ($this->image && filter_var($this->image, FILTER_VALIDATE_URL)) {
-        return $this->image;
-    }
+    $url = $this->publicFileUrl($this->image);
 
-    $image = $this->normalizePublicStoragePath($this->image);
-
-    if ($image && Storage::disk('public')->exists($image)) {
-        return asset(Storage::url($image));
+    if ($url) {
+        return $url;
     }
 
     return $this->placeholderImageUrl($this->name ?? $this->code ?? 'Category');
@@ -123,23 +120,6 @@ public function getImageUrlAttribute(): string
 public function getPlaceholderImageUrlAttribute(): string
 {
     return $this->placeholderImageUrl($this->name ?? $this->code ?? 'Category');
-}
-
-private function normalizePublicStoragePath(?string $path): ?string
-{
-    if (! is_string($path) || trim($path) === '') {
-        return null;
-    }
-
-    $path = ltrim($path, '/');
-
-    foreach (['public/', 'storage/'] as $prefix) {
-        if (str_starts_with($path, $prefix)) {
-            $path = substr($path, strlen($prefix));
-        }
-    }
-
-    return $path;
 }
 
 private function placeholderImageUrl(string $name): string

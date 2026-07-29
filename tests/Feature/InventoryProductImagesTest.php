@@ -87,8 +87,11 @@ class InventoryProductImagesTest extends TestCase
         $this->assertNotNull($product->image);
         $initialImage = $product->image;
         $this->assertFileExists(storage_path('app/public/' . $product->image));
-        $this->assertStringContainsString('/storage/inventory/products/', $product->image_url);
+        $this->assertStringContainsString('/files/public/inventory/products/', $product->image_url);
+        $this->assertStringNotContainsString('/storage/', $product->image_url);
         $this->assertStringNotContainsString('ui-avatars.com', $product->image_url);
+
+        $this->get($product->image_url)->assertOk();
 
         $this->actingAs($this->user)
             ->get('/en-SA/inventory/products')
@@ -106,6 +109,17 @@ class InventoryProductImagesTest extends TestCase
             ->assertSee($product->image_url, false)
             ->assertSee('Farm Location');
 
+        $productsResponse = $this->getJson('/api/v1/en-SA/products')
+            ->assertOk()
+            ->assertDontSee('/storage/', false);
+
+        $apiItems = $productsResponse->json('data.data') ?? $productsResponse->json('data') ?? [];
+        $apiProduct = collect($apiItems)->firstWhere('id', $product->id);
+
+        $this->assertIsArray($apiProduct);
+        $this->assertSame($product->image_url, $apiProduct['image']);
+        $this->get($apiProduct['image'])->assertOk();
+
         $this->actingAs($this->user)
             ->put("/en-SA/inventory/products/{$product->id}", $this->payload([
                 'name' => 'Corn Mix Updated',
@@ -116,7 +130,9 @@ class InventoryProductImagesTest extends TestCase
         $product->refresh();
 
         $this->assertFileExists(storage_path('app/public/' . $product->image));
-        $this->assertStringContainsString('/storage/inventory/products/', $product->image_url);
+        $this->assertStringContainsString('/files/public/inventory/products/', $product->image_url);
+        $this->assertStringNotContainsString('/storage/', $product->image_url);
+        $this->get($product->image_url)->assertOk();
 
         $this->actingAs($this->user)
             ->get("/en-SA/inventory/products/{$product->id}/edit")
@@ -125,6 +141,57 @@ class InventoryProductImagesTest extends TestCase
 
         @unlink(storage_path('app/public/' . $initialImage));
         @unlink(storage_path('app/public/' . $product->image));
+    }
+
+    public function test_public_products_api_returns_products_without_farm_id(): void
+    {
+        $product = InventoryProduct::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'code' => 'STORE-CORN',
+            'name' => 'Store Corn',
+            'category' => 'feed',
+            'category_id' => $this->categoryId,
+            'asset_category' => 'feed',
+            'farm_id' => null,
+            'farm_location' => null,
+            'unit' => 'kg',
+            'tax' => 0,
+            'track_expiry' => false,
+            'low_stock_threshold' => 5,
+            'is_active' => true,
+            'is_best_selling' => false,
+            'notes' => 'Public store product',
+            'title' => [
+                'ar' => 'ذرة المتجر',
+                'en' => 'Store Corn',
+            ],
+            'description' => [
+                'ar' => 'منتج متجر',
+                'en' => 'Store product',
+            ],
+            'price' => 10,
+            'last_price' => 9,
+        ]);
+
+        $this->getJson('/api/v1/en-SA/products')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonFragment([
+                'id' => $product->id,
+                'name' => 'Store Corn',
+            ])
+            ->assertDontSee('/storage/', false);
+    }
+
+    public function test_public_categories_api_accepts_full_locale_codes(): void
+    {
+        $this->getJson('/api/v1/ar-SA/categories')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonFragment([
+                'id' => $this->categoryId,
+                'code' => 'feed',
+            ]);
     }
 
     private function payload(array $overrides = []): array

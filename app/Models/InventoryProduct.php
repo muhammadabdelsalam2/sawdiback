@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\ScopedByTenant;
+use App\Models\Concerns\HasPublicFileUrl;
 use App\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InventoryProduct extends Model
 {
     use HasFactory;
+    use HasPublicFileUrl;
     // use ScopedByTenant;
 
     protected $fillable = [
@@ -95,10 +97,10 @@ public function categoryRelation(): BelongsTo
             return $this->image;
         }
 
-        $image = $this->normalizePublicStoragePath($this->image);
+        $url = $this->publicFileUrl($this->image);
 
-        if ($image && file_exists(storage_path('app/public/' . $image))) {
-            return asset('storage/' . $image);
+        if ($url) {
+            return $url;
         }
 
         return $this->placeholderImageUrl($this->localized_title ?? $this->name ?? 'Product');
@@ -107,23 +109,6 @@ public function categoryRelation(): BelongsTo
     public function getPlaceholderImageUrlAttribute(): string
     {
         return $this->placeholderImageUrl($this->localized_title ?? $this->name ?? 'Product');
-    }
-
-    private function normalizePublicStoragePath(?string $path): ?string
-    {
-        if (! is_string($path) || trim($path) === '') {
-            return null;
-        }
-
-        $path = ltrim($path, '/');
-
-        foreach (['public/', 'storage/'] as $prefix) {
-            if (str_starts_with($path, $prefix)) {
-                $path = substr($path, strlen($prefix));
-            }
-        }
-
-        return $path;
     }
 
     private function placeholderImageUrl(string $name): string

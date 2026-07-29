@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\PublicFileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -62,3 +63,6 @@ Route::prefix('{locale}')
         // One dashboard route for both roles
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     });
+Route::get('files/public/{path}', [PublicFileController::class, 'show'])
+    ->where('path', '.*')
+    ->name('public.files.show');
