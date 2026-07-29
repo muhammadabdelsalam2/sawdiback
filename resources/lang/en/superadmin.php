@@ -46,6 +46,18 @@ return [
         'no_farms' => 'No farms are available yet.',
     ],
 
+    'farm_assignments' => [
+        'employees_title' => 'Employees without farms',
+        'employees_desc' => 'Assign a farm to migrated employees that are not linked yet.',
+        'products_title' => 'Products without farms',
+        'products_desc' => 'Assign a farm to migrated products before they affect farm dashboards.',
+        'assign' => 'Assign',
+        'employee_assigned' => 'Employee assigned to farm successfully.',
+        'product_assigned' => 'Product assigned to farm successfully.',
+        'no_unassigned_employees' => 'No employees without farms.',
+        'no_unassigned_products' => 'No products without farms.',
+    ],
+
     'farm_dashboard' => [
         'title' => 'Farm Dashboard',
         'back_to_farms' => 'Back to farms',
@@ -69,6 +81,8 @@ return [
         'animal_status_desc' => 'Health status distribution for farm animals.',
         'finance_chart' => 'Revenue and expenses',
         'finance_chart_desc' => 'Farm-linked revenue and cost records.',
+        'no_chart_data' => 'No data yet',
+        'no_distribution_data' => 'No enough data yet',
         'recent_orders' => 'Recent orders',
         'products' => 'Products',
         'animals' => 'Animals',

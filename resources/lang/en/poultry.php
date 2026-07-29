@@ -46,6 +46,7 @@ return [
         'eggs_loaded' => 'Eggs Loaded',
         'expected_hatch_at' => 'Expected Hatch Date',
         'female_count' => 'Female Count',
+        'farm' => 'Farm',
         'fertilized_count' => 'Fertilized Count',
         'flock_number' => 'Flock Number',
         'is_active' => 'Active',
@@ -102,6 +103,7 @@ return [
         'improved' => 'Improved',
         'broiler' => 'Broiler',
         'layer' => 'Layer',
+        'select_farm' => '-- Select Farm --',
     ],
     'empty' => [
         'no_alerts' => 'No alerts found.',

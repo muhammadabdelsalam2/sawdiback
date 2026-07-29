@@ -46,6 +46,18 @@ return [
         'no_farms' => 'لا توجد مزارع متاحة حالياً.',
     ],
 
+    'farm_assignments' => [
+        'employees_title' => 'موظفون بدون مزرعة',
+        'employees_desc' => 'حدد مزرعة للموظفين المرحلين الذين لم يتم ربطهم بعد.',
+        'products_title' => 'منتجات بدون مزرعة',
+        'products_desc' => 'حدد مزرعة للمنتجات المرحلة قبل دخولها في لوحات المزارع.',
+        'assign' => 'تعيين',
+        'employee_assigned' => 'تم ربط الموظف بالمزرعة بنجاح.',
+        'product_assigned' => 'تم ربط المنتج بالمزرعة بنجاح.',
+        'no_unassigned_employees' => 'لا يوجد موظفون بدون مزرعة.',
+        'no_unassigned_products' => 'لا توجد منتجات بدون مزرعة.',
+    ],
+
     'farm_dashboard' => [
         'title' => 'لوحة تحكم المزرعة',
         'back_to_farms' => 'الرجوع للمزارع',
@@ -69,6 +81,8 @@ return [
         'animal_status_desc' => 'توزيع الحالة الصحية لحيوانات المزرعة.',
         'finance_chart' => 'الإيرادات والمصروفات',
         'finance_chart_desc' => 'سجلات الإيراد والتكلفة المرتبطة بالمزرعة.',
+        'no_chart_data' => 'لا توجد بيانات كافية بعد',
+        'no_distribution_data' => 'لا توجد بيانات كافية للتوزيع بعد',
         'recent_orders' => 'أحدث الطلبات',
         'products' => 'المنتجات',
         'animals' => 'الحيوانات',

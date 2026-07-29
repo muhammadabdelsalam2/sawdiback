@@ -46,6 +46,7 @@ return [
         'eggs_loaded' => 'البيض المعبأ',
         'expected_hatch_at' => 'تاريخ التفقيس المتوقع',
         'female_count' => 'عدد الإناث',
+        'farm' => 'المزرعة',
         'fertilized_count' => 'البيض المخصب',
         'flock_number' => 'رقم القطيع',
         'is_active' => 'نشط',
@@ -102,6 +103,7 @@ return [
         'improved' => 'محسن',
         'broiler' => 'لاحم',
         'layer' => 'بياض',
+        'select_farm' => '-- اختر مزرعة --',
     ],
     'empty' => [
         'no_alerts' => 'لا توجد تنبيهات.',

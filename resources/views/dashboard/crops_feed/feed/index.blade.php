@@ -31,6 +31,15 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">{{ __('crops_feed.fields.farm') }}</label>
+                    <select name="farm_id" class="form-select" required>
+                        <option value="">{{ __('crops_feed.options.select_farm') }}</option>
+                        @foreach($farms as $farm)
+                            <option value="{{ $farm->id }}">{{ $farm->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">{{ __('crops_feed.fields.name') }}</label>
                     <input type="text" name="name" class="form-control" required>
                 </div>
@@ -57,6 +66,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('crops_feed.fields.item_type') }}</th>
+                        <th>{{ __('crops_feed.fields.farm') }}</th>
                         <th>{{ __('crops_feed.fields.name') }}</th>
                         <th>{{ __('crops_feed.fields.quantity') }}</th>
                         <th>{{ __('crops_feed.fields.low_stock_threshold') }}</th>
@@ -67,13 +77,14 @@
                     @forelse($seedlingStocks as $row)
                         <tr>
                             <td>{{ __('crops_feed.options.' . $row->item_type) }}</td>
+                            <td>{{ $row->farm?->name ?? '-' }}</td>
                             <td>{{ $row->name }}</td>
                             <td>{{ $row->quantity }} {{ $row->unit }}</td>
                             <td>{{ $row->low_stock_threshold }}</td>
                             <td>{{ $row->is_low_stock ? __('dashboard.alerts.warning') : __('crops_feed.options.covered') }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="5">{{ __('crops_feed.empty.no_seedling_stocks') }}</td></tr>
+                        <tr><td colspan="6">{{ __('crops_feed.empty.no_seedling_stocks') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

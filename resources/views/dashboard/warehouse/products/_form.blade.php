@@ -77,8 +77,8 @@
             value="{{ old('low_stock_threshold', $product->low_stock_threshold ?? 0) }}">
     </div>
     <div class="col-md-3">
-        <label class="form-label">{{ __('warehouse.fields.farm') }}</label>
-        <select name="farm_id" class="form-select">
+        <label class="form-label">{{ __('warehouse.fields.farm') }} *</label>
+        <select name="farm_id" class="form-select" required>
             <option value="">{{ __('warehouse.fields.select_farm') }}</option>
             @foreach($farms ?? [] as $farm)
                 <option value="{{ $farm->id }}" @selected((int) old('farm_id', $product->farm_id ?? 0) === $farm->id)>{{ $farm->name }}</option>

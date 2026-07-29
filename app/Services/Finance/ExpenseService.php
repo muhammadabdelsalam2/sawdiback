@@ -65,6 +65,7 @@ class ExpenseService
         }
 
         $this->journal->upsertBySource((string) $expense->tenant_id, 'expense', (int) $expense->id, [
+            'farm_id' => $expense->farm_id,
             'entry_date' => $expense->expense_date?->format('Y-m-d') ?? now()->toDateString(),
             'description' => 'Expense ' . $expense->expense_no,
             'created_by' => $expense->created_by,

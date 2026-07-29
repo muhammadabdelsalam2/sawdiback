@@ -93,6 +93,7 @@ return [
         'covered' => 'مغطى',
         'not_covered' => 'غير مغطى',
         'select_animal' => 'اختر الحيوان',
+        'select_farm' => 'اختر مزرعة',
         'none' => 'لا يوجد',
     ],
 

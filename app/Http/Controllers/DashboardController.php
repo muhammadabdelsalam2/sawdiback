@@ -354,7 +354,7 @@ class DashboardController extends Controller
             return 0;
         }
 
-        return collect(['poultry_broiler_cycles', 'poultry_layer_flocks', 'poultry_chicken_breeds'])
+        $penLinkedGroups = collect(['poultry_broiler_cycles', 'poultry_layer_flocks', 'poultry_chicken_breeds'])
             ->sum(function (string $table) use ($farmId) {
                 if (! Schema::hasTable($table)) {
                     return 0;
@@ -371,6 +371,28 @@ class DashboardController extends Controller
 
                 return (int) $query->count();
             });
+
+        $hatcheryBatches = 0;
+        if (
+            Schema::hasTable('poultry_hatchery_batches')
+            && Schema::hasTable('poultry_hatchery_machines')
+            && Schema::hasColumn('poultry_hatchery_machines', 'farm_id')
+        ) {
+            $query = DB::table('poultry_hatchery_batches')
+                ->join('poultry_hatchery_machines', 'poultry_hatchery_batches.hatchery_machine_id', '=', 'poultry_hatchery_machines.id')
+                ->where('poultry_hatchery_machines.farm_id', $farmId);
+
+            if (Schema::hasColumn('poultry_hatchery_batches', 'deleted_at')) {
+                $query->whereNull('poultry_hatchery_batches.deleted_at');
+            }
+            if (Schema::hasColumn('poultry_hatchery_machines', 'deleted_at')) {
+                $query->whereNull('poultry_hatchery_machines.deleted_at');
+            }
+
+            $hatcheryBatches = (int) $query->count();
+        }
+
+        return $penLinkedGroups + $hatcheryBatches;
     }
 
     private function farmInventoryStock(int $farmId): float
@@ -396,14 +418,17 @@ class DashboardController extends Controller
             return collect();
         }
 
-        return DB::table('orders')
-            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-            ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
-            ->where('inventory_products.farm_id', $farmId)
-            ->select('orders.id', 'orders.order_no', 'orders.status', 'orders.created_at', DB::raw('SUM(order_items.line_total) as total'))
-            ->groupBy('orders.id', 'orders.order_no', 'orders.status', 'orders.created_at')
+        return Order::query()
+            ->linkedToFarm($farmId)
             ->orderByDesc('orders.created_at')
-            ->get();
+            ->get(['id', 'order_no', 'status', 'created_at'])
+            ->map(fn (Order $order) => (object) [
+                'id' => $order->id,
+                'order_no' => $order->order_no,
+                'status' => $order->status,
+                'created_at' => $order->created_at,
+                'total' => $order->farmLineTotal($farmId),
+            ]);
     }
 
     private function farmSalesOrders(int $farmId)
@@ -412,15 +437,17 @@ class DashboardController extends Controller
             return collect();
         }
 
-        return DB::table('sales_orders')
-            ->join('sales_order_items', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
-            ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
-            ->where('inventory_products.farm_id', $farmId)
-            ->whereNull('sales_orders.deleted_at')
-            ->select('sales_orders.id', 'sales_orders.order_no', 'sales_orders.status', 'sales_orders.order_date as created_at', DB::raw('SUM(sales_order_items.line_total) as total'))
-            ->groupBy('sales_orders.id', 'sales_orders.order_no', 'sales_orders.status', 'sales_orders.order_date')
+        return SalesOrder::query()
+            ->linkedToFarm($farmId)
             ->orderByDesc('sales_orders.order_date')
-            ->get();
+            ->get(['id', 'order_no', 'status', 'order_date'])
+            ->map(fn (SalesOrder $order) => (object) [
+                'id' => $order->id,
+                'order_no' => $order->order_no,
+                'status' => $order->status,
+                'created_at' => $order->order_date,
+                'total' => $order->farmLineTotal($farmId),
+            ]);
     }
 
     private function farmOrders(int $farmId)
@@ -443,27 +470,27 @@ class DashboardController extends Controller
         $customers = collect();
 
         if (Schema::hasTable('orders') && Schema::hasTable('users') && Schema::hasTable('order_items') && Schema::hasTable('inventory_products')) {
-            $customers = $customers->merge(DB::table('users')
-                ->join('orders', 'users.id', '=', 'orders.user_id')
-                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
-                ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
-                ->where('inventory_products.farm_id', $farmId)
-                ->select('users.name', 'users.email')
-                ->distinct()
-                ->get());
+            $customers = $customers->merge(Order::query()
+                ->linkedToFarm($farmId)
+                ->with('user:id,name,email')
+                ->get()
+                ->map(fn (Order $order) => (object) [
+                    'name' => $order->user?->name,
+                    'email' => $order->user?->email,
+                ])
+                ->filter(fn ($customer) => $customer->name));
         }
 
         if (Schema::hasTable('sales_customers') && Schema::hasTable('sales_orders') && Schema::hasTable('sales_order_items') && Schema::hasTable('inventory_products')) {
-            $customers = $customers->merge(DB::table('sales_customers')
-                ->join('sales_orders', 'sales_customers.id', '=', 'sales_orders.customer_id')
-                ->join('sales_order_items', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
-                ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
-                ->where('inventory_products.farm_id', $farmId)
-                ->whereNull('sales_customers.deleted_at')
-                ->whereNull('sales_orders.deleted_at')
-                ->select('sales_customers.name', DB::raw('NULL as email'))
-                ->distinct()
-                ->get());
+            $customers = $customers->merge(SalesOrder::query()
+                ->linkedToFarm($farmId)
+                ->with('customer:id,name')
+                ->get()
+                ->map(fn (SalesOrder $order) => (object) [
+                    'name' => $order->customer?->name,
+                    'email' => null,
+                ])
+                ->filter(fn ($customer) => $customer->name));
         }
 
         return $customers->unique(fn ($customer) => $customer->name . '|' . $customer->email)->values();
@@ -480,11 +507,40 @@ class DashboardController extends Controller
         $feedingExpenses = $this->sumTable('animal_feeding_logs', 'total_cost', fn ($query) => $query
             ->join('livestock_animals', 'animal_feeding_logs.animal_id', '=', 'livestock_animals.id')
             ->whereIn('livestock_animals.pen_id', $penIds));
+        $journalRevenue = $this->farmJournalAmount($farmId, 'revenue', true);
+        $journalExpenses = $this->farmJournalAmount($farmId, 'expense', false);
+        $unpostedExpenses = $this->sumTable('expenses', 'amount', fn ($query) => $query
+            ->where('farm_id', $farmId)
+            ->where('status', '!=', 'posted'));
 
         return [
-            'revenue' => round($orderRevenue + $penRevenue, 2),
-            'expenses' => round($penExpenses + $cropExpenses + $feedingExpenses, 2),
+            'revenue' => round($orderRevenue + $penRevenue + $journalRevenue, 2),
+            'expenses' => round($penExpenses + $cropExpenses + $feedingExpenses + $journalExpenses + $unpostedExpenses, 2),
         ];
+    }
+
+    private function farmJournalAmount(int $farmId, string $accountType, bool $creditMinusDebit): float
+    {
+        if (! Schema::hasTable('journal_entries') || ! Schema::hasTable('journal_entry_lines') || ! Schema::hasTable('accounts')) {
+            return 0.0;
+        }
+
+        if (! Schema::hasColumn('journal_entries', 'farm_id')) {
+            return 0.0;
+        }
+
+        $row = DB::table('journal_entry_lines as l')
+            ->join('journal_entries as e', 'e.id', '=', 'l.journal_entry_id')
+            ->join('accounts as a', 'a.id', '=', 'l.account_id')
+            ->where('e.farm_id', $farmId)
+            ->where('a.type', $accountType)
+            ->selectRaw('SUM(l.debit) as total_debit, SUM(l.credit) as total_credit')
+            ->first();
+
+        $debit = (float) ($row->total_debit ?? 0);
+        $credit = (float) ($row->total_credit ?? 0);
+
+        return $creditMinusDebit ? ($credit - $debit) : ($debit - $credit);
     }
 
     private function farmAttendanceToday(int $farmId, array $penIds): int

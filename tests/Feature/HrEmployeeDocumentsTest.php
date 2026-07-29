@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Employee;
+use App\Models\Farm;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,6 +19,7 @@ class HrEmployeeDocumentsTest extends TestCase
 
     private User $user;
     private Tenant $tenant;
+    private Farm $farm;
     private array $createdAttachmentPaths = [];
 
     protected function tearDown(): void
@@ -47,12 +49,20 @@ class HrEmployeeDocumentsTest extends TestCase
 
         $this->user = User::factory()->create(['tenant_id' => $this->tenant->id]);
         $this->user->assignRole('SuperAdmin');
+
+        $this->farm = Farm::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'HR Farm',
+            'type' => 'owned',
+            'is_active' => true,
+        ]);
     }
 
     public function test_employee_can_be_created_with_required_hr_fields_and_three_attachments(): void
     {
         $response = $this->actingAs($this->user)->post('/en-SA/hr/employees', [
             'full_name' => 'Ahmed Worker',
+            'farm_id' => $this->farm->id,
             'worker_number' => 'WRK-1001',
             'profession' => 'Poultry Technician',
             'hire_date' => '2026-01-15',
@@ -71,6 +81,7 @@ class HrEmployeeDocumentsTest extends TestCase
 
         $this->assertDatabaseHas('employees', [
             'tenant_id' => $this->tenant->id,
+            'farm_id' => $this->farm->id,
             'full_name' => 'Ahmed Worker',
             'worker_number' => 'WRK-1001',
             'profession' => 'Poultry Technician',

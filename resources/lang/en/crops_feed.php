@@ -93,6 +93,7 @@ return [
         'covered' => 'Covered',
         'not_covered' => 'Not Covered',
         'select_animal' => 'Select Animal',
+        'select_farm' => 'Select Farm',
         'none' => 'None',
     ],
 

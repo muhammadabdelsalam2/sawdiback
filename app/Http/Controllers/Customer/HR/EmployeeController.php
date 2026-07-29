@@ -7,6 +7,7 @@ use App\Http\Requests\Customer\HR\EmployeeStoreRequest;
 use App\Http\Requests\Customer\HR\EmployeeUpdateRequest;
 use App\Models\Employee;
 use App\Models\EmployeeAttachment;
+use App\Models\Farm;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobTitleRepositoryInterface;
@@ -49,8 +50,9 @@ class EmployeeController extends Controller
 
         $departments = $this->departmentsRepo->paginate($tenantId, 200);
         $jobTitles = $this->jobTitlesRepo->paginate($tenantId, 200);
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
 
-        return view('dashboard.customer.hr.employees.create', compact('departments', 'jobTitles'));
+        return view('dashboard.customer.hr.employees.create', compact('departments', 'jobTitles', 'farms'));
     }
 
     public function store(EmployeeStoreRequest $request, string $locale): RedirectResponse
@@ -86,10 +88,11 @@ class EmployeeController extends Controller
         $tenantId = (string) auth()->user()->tenant_id;
         $departments = $this->departmentsRepo->paginate($tenantId, 200);
         $jobTitles = $this->jobTitlesRepo->paginate($tenantId, 200);
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
 
         $employee->load('attachments');
 
-        return view('dashboard.customer.hr.employees.edit', compact('employee', 'departments', 'jobTitles'));
+        return view('dashboard.customer.hr.employees.edit', compact('employee', 'departments', 'jobTitles', 'farms'));
     }
 
     public function update(EmployeeUpdateRequest $request, string $locale, Employee $employee): RedirectResponse

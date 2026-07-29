@@ -132,12 +132,14 @@ return [
         'nearest_expiry_date' => 'Nearest Expiry',
         'batch_number' => 'Batch Number',
         'expiry_date' => 'Expiry Date',
+        'farm' => 'Farm',
     ],
 
     'options' => [
         'select_species' => 'Select species',
         'no_breed' => 'No breed',
         'none' => 'None',
+        'central_stock' => 'Central stock',
         'no_data' => '-',
         'male' => 'Male',
         'female' => 'Female',

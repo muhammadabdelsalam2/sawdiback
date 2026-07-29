@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -97,6 +99,38 @@ class Order extends Model
     public function review(): HasOne
     {
         return $this->hasOne(OrderReview::class);
+    }
+
+    public function scopeLinkedToFarm(Builder $query, int $farmId): Builder
+    {
+        return $query->whereExists(function ($subquery) use ($farmId): void {
+            $subquery->selectRaw('1')
+                ->from('order_items')
+                ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
+                ->whereColumn('order_items.order_id', 'orders.id')
+                ->where('inventory_products.farm_id', $farmId);
+        });
+    }
+
+    public function farms(): Collection
+    {
+        return Farm::withoutGlobalScopes()
+            ->join('inventory_products', 'farms.id', '=', 'inventory_products.farm_id')
+            ->join('order_items', 'inventory_products.id', '=', 'order_items.inventory_product_id')
+            ->where('order_items.order_id', $this->id)
+            ->select('farms.*')
+            ->distinct()
+            ->get()
+            ->values();
+    }
+
+    public function farmLineTotal(int $farmId): float
+    {
+        return round((float) DB::table('order_items')
+            ->join('inventory_products', 'order_items.inventory_product_id', '=', 'inventory_products.id')
+            ->where('order_items.order_id', $this->id)
+            ->where('inventory_products.farm_id', $farmId)
+            ->sum('order_items.line_total'), 2);
     }
 
 

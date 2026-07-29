@@ -66,6 +66,15 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
+                        <label class="form-label">{{ __('hr.fields.farm') }} *</label>
+                        <select name="farm_id" class="form-select" required>
+                            <option value="">{{ __('hr.options.select_farm') }}</option>
+                            @foreach($farms as $farm)
+                                <option value="{{ $farm->id }}" @selected(old('farm_id', $employee->farm_id) == $farm->id)>{{ $farm->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">{{ __('hr.fields.department') }}</label>
                         <select name="department_id" class="form-select">
                             <option value="">{{ __('hr.options.select') }}</option>

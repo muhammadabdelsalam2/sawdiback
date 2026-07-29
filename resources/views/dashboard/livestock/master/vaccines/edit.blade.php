@@ -32,6 +32,15 @@
                     <input type="text" name="batch_number" class="form-control">
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">{{ __('livestock.fields.farm') }}</label>
+                    <select name="farm_id" class="form-select">
+                        <option value="">{{ __('livestock.options.central_stock') }}</option>
+                        @foreach($farms as $farm)
+                            <option value="{{ $farm->id }}">{{ $farm->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">{{ __('livestock.fields.quantity') }}</label>
                     <input type="number" step="0.01" min="0" name="quantity" class="form-control" required>
                 </div>
@@ -53,6 +62,7 @@
                     <thead>
                         <tr>
                             <th>{{ __('livestock.fields.batch_number') }}</th>
+                            <th>{{ __('livestock.fields.farm') }}</th>
                             <th>{{ __('livestock.fields.quantity') }}</th>
                             <th>{{ __('livestock.fields.expiry_date') }}</th>
                             <th>{{ __('livestock.fields.notes') }}</th>
@@ -62,12 +72,13 @@
                         @forelse($vaccine->batches as $batch)
                             <tr>
                                 <td>{{ $batch->batch_number ?? '-' }}</td>
+                                <td>{{ $batch->farm?->name ?? __('livestock.options.central_stock') }}</td>
                                 <td>{{ $batch->quantity }}</td>
                                 <td>{{ $batch->expiry_date?->format('Y-m-d') }}</td>
                                 <td>{{ $batch->notes ?? '-' }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="4">{{ __('livestock.empty.no_vaccine_batches') }}</td></tr>
+                            <tr><td colspan="5">{{ __('livestock.empty.no_vaccine_batches') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>

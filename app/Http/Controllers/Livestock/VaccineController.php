@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Livestock\VaccineBatchStoreRequest;
 use App\Http\Requests\Livestock\VaccineStoreRequest;
 use App\Http\Requests\Livestock\VaccineUpdateRequest;
+use App\Models\Farm;
 use App\Models\Vaccine;
 use App\Models\VaccineBatch;
 use Illuminate\Http\RedirectResponse;
@@ -43,9 +44,10 @@ class VaccineController extends Controller
 
     public function edit(string $locale, Vaccine $vaccine): View
     {
-        $vaccine->load(['batches' => fn ($q) => $q->orderBy('expiry_date')]);
+        $vaccine->load(['batches' => fn ($q) => $q->with('farm')->orderBy('expiry_date')]);
+        $farms = Farm::query()->where('tenant_id', $vaccine->tenant_id)->orderBy('name')->get();
 
-        return view('dashboard.livestock.master.vaccines.edit', compact('vaccine'));
+        return view('dashboard.livestock.master.vaccines.edit', compact('vaccine', 'farms'));
     }
 
     public function storeBatch(VaccineBatchStoreRequest $request, string $locale, Vaccine $vaccine): RedirectResponse

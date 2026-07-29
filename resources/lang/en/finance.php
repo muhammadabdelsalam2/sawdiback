@@ -27,6 +27,7 @@ return [
         'view' => 'View',
         'select' => 'Select',
         'none' => 'None',
+        'farm' => 'Farm',
         'active' => 'Active',
         'inactive' => 'Inactive',
         'all_status' => 'All Status',

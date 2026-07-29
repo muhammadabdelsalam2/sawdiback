@@ -132,12 +132,14 @@ return [
         'nearest_expiry_date' => 'أقرب انتهاء',
         'batch_number' => 'رقم الدفعة',
         'expiry_date' => 'تاريخ الانتهاء',
+        'farm' => 'المزرعة',
     ],
 
     'options' => [
         'select_species' => 'اختر النوع',
         'no_breed' => 'بدون سلالة',
         'none' => 'لا يوجد',
+        'central_stock' => 'مخزون مركزي',
         'no_data' => '-',
         'male' => 'ذكر',
         'female' => 'أنثى',

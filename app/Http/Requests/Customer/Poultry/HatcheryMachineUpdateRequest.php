@@ -11,6 +11,7 @@ class HatcheryMachineUpdateRequest extends BasePoultryRequest
         $machine = $this->route('hatchery_machine');
 
         return [
+            'farm_id' => ['required', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $this->tenantId()))],
             'machine_number' => ['required', 'string', 'max:100', Rule::unique('poultry_hatchery_machines', 'machine_number')->ignore($machine?->id)->where(fn ($q) => $q->where('tenant_id', $this->tenantId()))],
             'capacity' => ['required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],

@@ -2,6 +2,7 @@
 
 namespace App\Models\Finance;
 
+use App\Models\Farm;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class JournalEntry extends Model
 
     protected $fillable = [
         'tenant_id',
+        'farm_id',
         'entry_no',
         'entry_date',
         'description',
@@ -33,5 +35,10 @@ class JournalEntry extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function farm(): BelongsTo
+    {
+        return $this->belongsTo(Farm::class);
     }
 }

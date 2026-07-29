@@ -11,6 +11,15 @@
         <label class="form-label">{{ __('finance.expenses.fields.amount') }} *</label>
         <input type="number" step="0.01" name="amount" class="form-control" value="{{ old('amount', $expense->amount ?? '') }}" required>
     </div>
+    <div class="col-md-4">
+        <label class="form-label">{{ __('finance.common.farm') }}</label>
+        <select name="farm_id" class="form-select">
+            <option value="">{{ __('finance.common.none') }}</option>
+            @foreach($farms ?? [] as $farm)
+                <option value="{{ $farm->id }}" @selected(old('farm_id', $expense->farm_id ?? '') == $farm->id)>{{ $farm->name }}</option>
+            @endforeach
+        </select>
+    </div>
 </div>
 <div class="row g-3 mt-1">
     <div class="col-md-6">

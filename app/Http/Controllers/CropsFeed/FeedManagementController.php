@@ -10,6 +10,7 @@ use App\Http\Requests\CropsFeed\FeedReportRequest;
 use App\Http\Requests\CropsFeed\FeedStockMovementStoreRequest;
 use App\Models\Crop;
 use App\Models\CropSeedlingStock;
+use App\Models\Farm;
 use App\Models\FeedConsumption;
 use App\Models\FeedType;
 use App\Services\CropsFeed\AllocateCropToFeedService;
@@ -36,7 +37,8 @@ class FeedManagementController extends Controller
         $crops = Crop::query()->orderByDesc('id')->get();
         $animals = \App\Models\LivestockAnimal::query()->orderBy('tag_number')->get();
         $recentConsumptions = FeedConsumption::query()->with(['feedType', 'animal'])->orderByDesc('id')->limit(20)->get();
-        $seedlingStocks = CropSeedlingStock::query()->orderBy('name')->get();
+        $seedlingStocks = CropSeedlingStock::query()->with('farm')->orderBy('name')->get();
+        $farms = Farm::query()->orderBy('name')->get();
 
         $stocks = $feedTypes->map(function (FeedType $feedType) {
             $onHand = $this->feedStockService->stockOnHand($feedType->id);
@@ -47,7 +49,7 @@ class FeedManagementController extends Controller
             ];
         });
 
-        return view('dashboard.crops_feed.feed.index', compact('feedTypes', 'stocks', 'recentConsumptions', 'animals', 'crops', 'seedlingStocks'));
+        return view('dashboard.crops_feed.feed.index', compact('feedTypes', 'stocks', 'recentConsumptions', 'animals', 'crops', 'seedlingStocks', 'farms'));
     }
 
     public function storeStockMovement(FeedStockMovementStoreRequest $request, string $locale): RedirectResponse

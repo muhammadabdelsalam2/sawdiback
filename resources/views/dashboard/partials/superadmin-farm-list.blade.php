@@ -1,4 +1,4 @@
-<article class="customer-chart-card">
+<article class="customer-chart-card farm-widget-table-card">
     <div class="customer-chart-head">
         <div>
             <h3>{{ $title }}</h3>
@@ -8,7 +8,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table align-middle mb-0 no-datatable farm-widget-table">
             <thead>
                 <tr>
                     @foreach ($columns as $column)

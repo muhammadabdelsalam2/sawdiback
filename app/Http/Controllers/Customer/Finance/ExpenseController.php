@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer\Finance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Finance\ExpenseStoreRequest;
 use App\Http\Requests\Customer\Finance\ExpenseUpdateRequest;
+use App\Models\Farm;
 use App\Models\Finance\Expense;
 use App\Services\Finance\AccountService;
 use App\Services\Finance\ExpenseService;
@@ -33,8 +34,9 @@ class ExpenseController extends Controller
         $tenantId = $this->context->tenantIdOrFail(auth()->user());
         $expenseAccounts = $this->accounts->listByTypes($tenantId, ['expense']);
         $paymentAccounts = $this->accounts->listByTypes($tenantId, ['asset']);
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
 
-        return view('dashboard.customer.finance.expenses.create', compact('expenseAccounts', 'paymentAccounts'));
+        return view('dashboard.customer.finance.expenses.create', compact('expenseAccounts', 'paymentAccounts', 'farms'));
     }
 
     public function store(ExpenseStoreRequest $request, string $locale): RedirectResponse
@@ -55,8 +57,9 @@ class ExpenseController extends Controller
         $tenantId = $this->context->tenantIdOrFail(auth()->user());
         $expenseAccounts = $this->accounts->listByTypes($tenantId, ['expense']);
         $paymentAccounts = $this->accounts->listByTypes($tenantId, ['asset']);
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
 
-        return view('dashboard.customer.finance.expenses.edit', compact('expense', 'expenseAccounts', 'paymentAccounts'));
+        return view('dashboard.customer.finance.expenses.edit', compact('expense', 'expenseAccounts', 'paymentAccounts', 'farms'));
     }
 
     public function update(ExpenseUpdateRequest $request, string $locale, Expense $expense): RedirectResponse

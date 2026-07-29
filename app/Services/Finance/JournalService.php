@@ -20,6 +20,7 @@ class JournalService
 
         $payload = [
             'tenant_id' => $tenantId,
+            'farm_id' => $data['farm_id'] ?? null,
             'entry_no' => $data['entry_no'] ?? $this->generateEntryNo(),
             'entry_date' => $data['entry_date'],
             'description' => $data['description'] ?? null,
@@ -40,6 +41,7 @@ class JournalService
 
         $payload = [
             'tenant_id' => $tenantId,
+            'farm_id' => $data['farm_id'] ?? $existing?->farm_id,
             'entry_no' => $existing?->entry_no ?? ($data['entry_no'] ?? $this->generateEntryNo()),
             'entry_date' => $data['entry_date'],
             'description' => $data['description'] ?? null,

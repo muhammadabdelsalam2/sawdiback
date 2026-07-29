@@ -101,6 +101,16 @@
                                 {{ __('dashboard.sidebar.settings.permissionsManagement') }}
                             </a>
                         @endcan
+                        @can('farms.manage')
+                            <a href="{{ route('superadmin.farm-assignments.employees', ['locale' => $activeLocale]) }}"
+                                class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.employees') ? 'active' : '' }}">
+                                {{ __('superadmin.farm_assignments.employees_title') }}
+                            </a>
+                            <a href="{{ route('superadmin.farm-assignments.products', ['locale' => $activeLocale]) }}"
+                                class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.products') ? 'active' : '' }}">
+                                {{ __('superadmin.farm_assignments.products_title') }}
+                            </a>
+                        @endcan
                     </div>
                 </div>
 

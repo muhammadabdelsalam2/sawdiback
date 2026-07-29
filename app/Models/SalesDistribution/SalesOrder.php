@@ -2,11 +2,15 @@
 
 namespace App\Models\SalesDistribution;
 
+use App\Models\Farm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class SalesOrder extends Model
 {
@@ -53,5 +57,37 @@ class SalesOrder extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(SalesInvoice::class, 'sales_order_id');
+    }
+
+    public function scopeLinkedToFarm(Builder $query, int $farmId): Builder
+    {
+        return $query->whereExists(function ($subquery) use ($farmId): void {
+            $subquery->selectRaw('1')
+                ->from('sales_order_items')
+                ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
+                ->whereColumn('sales_order_items.sales_order_id', 'sales_orders.id')
+                ->where('inventory_products.farm_id', $farmId);
+        });
+    }
+
+    public function farms(): Collection
+    {
+        return Farm::withoutGlobalScopes()
+            ->join('inventory_products', 'farms.id', '=', 'inventory_products.farm_id')
+            ->join('sales_order_items', 'inventory_products.id', '=', 'sales_order_items.product_id')
+            ->where('sales_order_items.sales_order_id', $this->id)
+            ->select('farms.*')
+            ->distinct()
+            ->get()
+            ->values();
+    }
+
+    public function farmLineTotal(int $farmId): float
+    {
+        return round((float) DB::table('sales_order_items')
+            ->join('inventory_products', 'sales_order_items.product_id', '=', 'inventory_products.id')
+            ->where('sales_order_items.sales_order_id', $this->id)
+            ->where('inventory_products.farm_id', $farmId)
+            ->sum('sales_order_items.line_total'), 2);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Finance\JournalEntryStoreRequest;
+use App\Models\Farm;
 use App\Models\Finance\JournalEntry;
 use App\Services\Finance\AccountService;
 use App\Services\Finance\FinanceContextService;
@@ -31,8 +32,9 @@ class JournalEntryController extends Controller
     {
         $tenantId = $this->context->tenantIdOrFail(auth()->user());
         $accounts = $this->accounts->listByTenant($tenantId);
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
 
-        return view('dashboard.customer.finance.journal_entries.create', compact('accounts'));
+        return view('dashboard.customer.finance.journal_entries.create', compact('accounts', 'farms'));
     }
 
     public function store(JournalEntryStoreRequest $request, string $locale): RedirectResponse

@@ -207,34 +207,18 @@
             'animalValues' => $animalValues,
             'financeLabels' => $financeLabels,
             'financeValues' => $financeValues,
+            'text' => [
+                'noDataYet' => __('superadmin.farm_dashboard.no_chart_data'),
+                'noDistributionYet' => __('superadmin.farm_dashboard.no_distribution_data'),
+            ],
         ], JSON_UNESCAPED_UNICODE) !!}
     </script>
 
+    <script src="{{ asset('assets/js/pages/farm-dashboard.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (typeof Chart === 'undefined') return;
             const data = JSON.parse(document.getElementById('farmDashboardData')?.textContent || '{}');
-            const baseOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: 'rgba(15, 23, 42, 0.06)' } } }
-            };
-
-            const makeChart = (id, type, labels, values, color) => {
-                const ctx = document.getElementById(id);
-                if (!ctx) return;
-                new Chart(ctx, {
-                    type,
-                    data: { labels, datasets: [{ data: values, backgroundColor: color, borderColor: color, borderWidth: 2, tension: .35, fill: type === 'line' }] },
-                    options: type === 'doughnut' ? { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } : baseOptions
-                });
-            };
-
-            makeChart('farmMilkChart', 'line', data.milkLabels || [], data.milkValues || [], 'rgba(34, 197, 94, .72)');
-            makeChart('farmOrdersChart', 'bar', data.orderLabels || [], data.orderValues || [], 'rgba(59, 130, 246, .72)');
-            makeChart('farmAnimalsChart', 'doughnut', data.animalLabels || [], data.animalValues || [], ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6']);
-            makeChart('farmFinanceChart', 'doughnut', data.financeLabels || [], data.financeValues || [], ['#22c55e', '#ef4444']);
+            window.FarmDashboardCharts?.init(data, data.text || {});
         });
     </script>
 

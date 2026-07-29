@@ -18,6 +18,7 @@ class ExpenseStoreRequest extends BaseFinanceRequest
                 Rule::unique('expenses', 'expense_no')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
             ],
             'expense_date' => ['required', 'date'],
+            'farm_id' => ['nullable', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency_id' => ['nullable', 'integer', 'exists:currencies,id'],
             'expense_account_id' => [

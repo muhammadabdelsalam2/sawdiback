@@ -12,6 +12,7 @@ class JournalEntryStoreRequest extends BaseFinanceRequest
 
         return [
             'entry_date' => ['required', 'date'],
+            'farm_id' => ['nullable', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'description' => ['nullable', 'string'],
             'lines' => ['required', 'array', 'min:2'],
             'lines.*.account_id' => [

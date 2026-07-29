@@ -11,6 +11,7 @@ use App\Http\Controllers\SuperAdmin\AccessManagementController;
 use App\Http\Controllers\SuperAdmin\AccountController;
 use App\Http\Controllers\SuperAdmin\ContactInfoController;
 use App\Http\Controllers\SuperAdmin\ContentController;
+use App\Http\Controllers\SuperAdmin\FarmAssignmentController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,17 @@ Route::prefix('{locale}')
                 ->except(['show'])
                 ->names('users')
                 ->middleware(['permission:users.manage']);
+
+            Route::middleware(['permission:farms.manage'])->group(function () {
+                Route::get('farm-assignments/employees', [FarmAssignmentController::class, 'employees'])
+                    ->name('farm-assignments.employees');
+                Route::put('farm-assignments/employees/{employee}', [FarmAssignmentController::class, 'assignEmployee'])
+                    ->name('farm-assignments.employees.assign');
+                Route::get('farm-assignments/products', [FarmAssignmentController::class, 'products'])
+                    ->name('farm-assignments.products');
+                Route::put('farm-assignments/products/{product}', [FarmAssignmentController::class, 'assignProduct'])
+                    ->name('farm-assignments.products.assign');
+            });
 
             // Plans / Features
             Route::middleware(['permission:plans.manage'])->group(function () {

@@ -2949,6 +2949,69 @@ html[dir="rtl"] .dashboard-hero-actions {
     display: block;
 }
 
+.chart-empty-body {
+    display: grid;
+    place-items: center;
+}
+
+.chart-empty-state {
+    display: grid;
+    place-items: center;
+    gap: 12px;
+    min-height: 180px;
+    width: 100%;
+    border: 1px dashed rgba(15, 23, 42, 0.14);
+    border-radius: 8px;
+    background: #f8fbf7;
+    color: #64748b;
+    text-align: center;
+}
+
+.chart-empty-state i {
+    color: #16a34a;
+    font-size: 30px;
+}
+
+.chart-empty-state strong {
+    color: #334155;
+    font-size: 14px;
+}
+
+.farm-widget-table-card {
+    min-height: 278px;
+    padding: 18px;
+}
+
+.farm-widget-table-card .table-responsive {
+    margin-top: 12px;
+}
+
+.farm-widget-table {
+    table-layout: fixed;
+}
+
+.farm-widget-table thead th {
+    padding: 10px 8px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.farm-widget-table tbody td {
+    padding: 10px 8px;
+    color: #111827;
+    font-size: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    overflow-wrap: anywhere;
+}
+
+.farm-widget-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
 .customer-insights-section {
     display: grid;
     gap: 20px;

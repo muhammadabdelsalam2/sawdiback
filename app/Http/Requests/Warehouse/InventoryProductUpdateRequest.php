@@ -29,7 +29,7 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
             'asset_category' => ['required', 'in:feed,seed,equipment,other'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'farm_location' => ['nullable', 'string', 'max:255'],
-            'farm_id' => ['nullable', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
+            'farm_id' => ['required', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'unit' => ['required', 'string', 'max:50'],
             'tax' => ['nullable', 'numeric', 'min:0'],
             'track_expiry' => ['nullable', 'boolean'],

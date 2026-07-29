@@ -3,6 +3,7 @@
 namespace App\Models\Finance;
 
 use App\Models\Currency;
+use App\Models\Farm;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class Expense extends Model
 
     protected $fillable = [
         'tenant_id',
+        'farm_id',
         'expense_no',
         'expense_date',
         'amount',
@@ -46,6 +48,11 @@ class Expense extends Model
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'currency_id');
+    }
+
+    public function farm(): BelongsTo
+    {
+        return $this->belongsTo(Farm::class);
     }
 
     public function creator(): BelongsTo

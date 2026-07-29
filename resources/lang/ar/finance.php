@@ -27,6 +27,7 @@ return [
         'view' => 'عرض',
         'select' => 'اختيار',
         'none' => 'بدون',
+        'farm' => 'المزرعة',
         'active' => 'نشط',
         'inactive' => 'غير نشط',
         'all_status' => 'كل الحالات',

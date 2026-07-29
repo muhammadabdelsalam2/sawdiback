@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Customer\HR;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EmployeeUpdateRequest extends FormRequest
 {
@@ -11,6 +12,7 @@ class EmployeeUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'farm_id' => ['required', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $this->tenantId()))],
             'department_id' => ['nullable', 'integer'],
             'job_title_id' => ['nullable', 'integer'],
             'worker_number' => ['nullable', 'string', 'max:100'],
@@ -32,5 +34,10 @@ class EmployeeUpdateRequest extends FormRequest
             'attachment_iqama' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'attachment_identity' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ];
+    }
+
+    protected function tenantId(): ?string
+    {
+        return session('tenant_id') ?? auth()->user()?->tenant_id;
     }
 }
