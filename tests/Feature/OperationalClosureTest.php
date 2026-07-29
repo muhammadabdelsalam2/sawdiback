@@ -70,6 +70,50 @@ class OperationalClosureTest extends TestCase
             ->assertSee('Attendance Rate');
     }
 
+    public function test_staff_performance_attendance_rate_uses_employee_day_capacity_for_multi_day_period(): void
+    {
+        $employeeIds = [];
+        foreach (['Attendance Worker One', 'Attendance Worker Two'] as $index => $name) {
+            $employeeIds[] = DB::table('employees')->insertGetId([
+                'tenant_id' => $this->tenant->id,
+                'full_name' => $name,
+                'worker_number' => 'MW-' . ($index + 1),
+                'profession' => 'Technician',
+                'employment_status' => 'active',
+                'operational_department' => 'livestock',
+                'hire_date' => '2026-07-01',
+                'salary' => 2500,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach (range(1, 5) as $day) {
+            DB::table('attendances')->insert([
+                'tenant_id' => $this->tenant->id,
+                'employee_id' => $employeeIds[0],
+                'day' => "2026-07-0{$day}",
+                'check_in_at' => "2026-07-0{$day} 08:00:00",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $report = app(\App\Services\Finance\ProfitLossService::class)->report((string) $this->tenant->id, [
+            'date_from' => '2026-07-01',
+            'date_to' => '2026-07-05',
+        ]);
+
+        $row = collect($report['staff_performance'])->firstWhere('department', 'livestock');
+
+        $this->assertSame(2, $row['employee_count']);
+        $this->assertSame(5, $row['attendance_count']);
+        $this->assertSame(50.0, $row['attendance_rate']);
+        $this->assertGreaterThanOrEqual(0, $row['attendance_rate']);
+        $this->assertLessThanOrEqual(100, $row['attendance_rate']);
+    }
+
     public function test_warehouse_asset_crud_stores_attachment_and_links_to_farm(): void
     {
         $farmId = DB::table('farms')->insertGetId([

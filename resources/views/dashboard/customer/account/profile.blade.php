@@ -30,7 +30,7 @@
                                     @php
                                         $avatar = $user?->avatar;
                                         $avatarUrl = $avatar
-                                            ? (filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : asset('storage/' . ltrim($avatar, '/')))
+                                            ? \App\Support\PublicFileUrl::url($avatar)
                                             : asset('assets/images/user.png');
                                     @endphp
                                     <img id="avatarPreview" src="{{ $avatarUrl }}" alt="{{ $user->name }}"

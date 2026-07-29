@@ -103,6 +103,11 @@ class HrEmployeeDocumentsTest extends TestCase
             $path = $employee->attachments()->where('type', $type)->value('path');
             $this->createdAttachmentPaths[] = $path;
             $this->assertFileExists(storage_path('app/public/' . $path));
+
+            $attachment = $employee->attachments()->where('type', $type)->firstOrFail();
+            $this->assertStringContainsString('/files/public/hr/employee-attachments/', $attachment->url);
+            $this->assertStringNotContainsString('/storage/', $attachment->url);
+            $this->get($attachment->url)->assertOk();
         }
 
         $this->actingAs($this->user)

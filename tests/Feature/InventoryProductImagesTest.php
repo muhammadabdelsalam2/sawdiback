@@ -143,7 +143,7 @@ class InventoryProductImagesTest extends TestCase
         @unlink(storage_path('app/public/' . $product->image));
     }
 
-    public function test_public_products_api_returns_products_without_farm_id(): void
+    public function test_public_products_api_returns_farm_linked_products(): void
     {
         $product = InventoryProduct::query()->create([
             'tenant_id' => $this->tenant->id,
@@ -152,7 +152,7 @@ class InventoryProductImagesTest extends TestCase
             'category' => 'feed',
             'category_id' => $this->categoryId,
             'asset_category' => 'feed',
-            'farm_id' => null,
+            'farm_id' => $this->farmId,
             'farm_location' => null,
             'unit' => 'kg',
             'tax' => 0,

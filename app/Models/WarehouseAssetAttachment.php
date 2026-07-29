@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasPublicFileUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class WarehouseAssetAttachment extends Model
 {
     use HasFactory;
+    use HasPublicFileUrl;
 
     protected $fillable = [
         'tenant_id',
@@ -29,6 +31,6 @@ class WarehouseAssetAttachment extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('storage/' . $this->path);
+        return $this->publicFileUrl($this->path) ?? '';
     }
 }

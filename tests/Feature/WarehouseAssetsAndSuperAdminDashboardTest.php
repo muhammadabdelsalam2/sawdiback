@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use App\Models\WarehouseAssetAttachment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -17,6 +19,16 @@ class WarehouseAssetsAndSuperAdminDashboardTest extends TestCase
 
     private Tenant $tenant;
     private User $user;
+    private array $createdAttachmentPaths = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->createdAttachmentPaths as $path) {
+            @unlink(storage_path('app/public/' . $path));
+        }
+
+        parent::tearDown();
+    }
 
     protected function setUp(): void
     {
@@ -75,6 +87,9 @@ class WarehouseAssetsAndSuperAdminDashboardTest extends TestCase
                 'quantity_or_status' => 'Ready',
                 'farm_id' => $farmId,
                 'notes' => 'Working asset',
+                'attachments' => [
+                    UploadedFile::fake()->create('pump-manual.pdf', 120, 'application/pdf'),
+                ],
             ])
             ->assertRedirect('/ar-SA/warehouse-assets');
 
@@ -87,6 +102,15 @@ class WarehouseAssetsAndSuperAdminDashboardTest extends TestCase
             'farm_id' => $farmId,
             'type' => 'equipment',
         ]);
+
+        $attachment = WarehouseAssetAttachment::query()
+            ->where('warehouse_asset_id', $assetId)
+            ->firstOrFail();
+        $this->createdAttachmentPaths[] = $attachment->path;
+        $this->assertFileExists(storage_path('app/public/' . $attachment->path));
+        $this->assertStringContainsString('/files/public/warehouse/assets/', $attachment->url);
+        $this->assertStringNotContainsString('/storage/', $attachment->url);
+        $this->get($attachment->url)->assertOk();
 
         $this->actingAs($this->user)
             ->put("/ar-SA/warehouse-assets/{$assetId}", [

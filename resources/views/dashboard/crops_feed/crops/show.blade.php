@@ -26,6 +26,7 @@
             <div class="row g-3">
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.farm') }}:</strong> {{ $crop->farm?->name ?? '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.greenhouse_type') }}:</strong> {{ $crop->greenhouse_type ?? '-' }}</div>
+                <div class="col-md-3"><strong>{{ __('crops_feed.fields.greenhouse_number') }}:</strong> {{ $crop->greenhouse_number ?? '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.greenhouse_location') }}:</strong> {{ $crop->greenhouse_location ?? '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.irrigation_type') }}:</strong> {{ $crop->irrigation_type ? __('crops_feed.options.' . $crop->irrigation_type) : '-' }}</div>
                 <div class="col-md-3"><strong>{{ __('crops_feed.fields.land_area') }}:</strong> {{ $crop->land_area }}</div>

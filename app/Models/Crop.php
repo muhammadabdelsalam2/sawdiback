@@ -19,6 +19,7 @@ class Crop extends Model
         'tenant_id',
         'farm_id',
         'greenhouse_type',
+        'greenhouse_number',
         'greenhouse_location',
         'irrigation_type',
         'name',

@@ -65,6 +65,22 @@ return [
         'settings' => [
             'permissionsManagement' => 'إدارة الصلاحيات'
         ],
+        'requirements' => [
+            'hr' => 'الموارد البشرية (HR)',
+            'livestock' => 'إدارة الحيوانات',
+            'crops' => 'الزراعة',
+            'poultry' => 'الدواجن',
+            'health_vaccinations' => 'الصحة والتطعيمات',
+            'inventory' => 'المخزون (الأعلاف + المستلزمات)',
+            'sales' => 'المبيعات',
+            'financial_reports' => 'التقارير المالية',
+            'warehouse' => 'المستودع',
+            'analytics' => 'التحليل',
+            'production' => 'الإنتاج',
+            'system_management' => 'إدارة النظام',
+            'user_management' => 'إدارة المستخدمين',
+            'logout' => 'تسجيل الخروج',
+        ],
     ],
     'contact_info' => [
         'title' => 'بيانات التواصل',

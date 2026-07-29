@@ -49,7 +49,7 @@
                                         </a>
                                     @elseif ($content->video)
                                         <video width="100" height="60" controls>
-                                            <source src="{{ asset('storage/' . $content->video) }}" type="video/mp4">
+                                            <source src="{{ \App\Support\PublicFileUrl::url($content->video) }}" type="video/mp4">
                                             Your browser does not support the video tag.
                                         </video>
                                     @else

@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Ecommerce\ReviewSubmitRequest;
 use App\Services\API\Ecommerce\Review\ReviewService;
 use App\Support\ApiResponse;
+use App\Support\PublicFileUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -50,7 +50,7 @@ class ReviewController extends Controller
 
         if (!empty($imagePaths)) {
             foreach ($imagePaths as $path) {
-                $imageUrls[] = Storage::disk('public')->url($path);
+                $imageUrls[] = PublicFileUrl::url($path);
             }
 
             if (is_array($result['data'])) {

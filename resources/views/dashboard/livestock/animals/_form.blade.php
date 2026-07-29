@@ -87,6 +87,17 @@
         </select>
     </div>
     <div class="col-md-3">
+        <label class="form-label">{{ __('livestock.fields.intended_purpose') }}</label>
+        <select name="intended_purpose" class="form-select">
+            <option value="">{{ __('livestock.options.none') }}</option>
+            @foreach (['milk', 'breeding', 'sale'] as $purpose)
+                <option value="{{ $purpose }}" @selected(old('intended_purpose', $animal->intended_purpose ?? '') === $purpose)>
+                    {{ __('livestock.options.' . $purpose) }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
         <label class="form-label">{{ __('livestock.fields.initial_weight_optional') }}</label>
         <input type="number" step="0.01" min="0" name="initial_weight" class="form-control"
             value="{{ old('initial_weight') }}" @disabled($isEdit)>

@@ -22,6 +22,10 @@
         <input type="text" name="greenhouse_type" class="form-control" value="{{ old('greenhouse_type', $crop->greenhouse_type ?? '') }}">
     </div>
     <div class="col-md-4">
+        <label class="form-label">{{ __('crops_feed.fields.greenhouse_number') }}</label>
+        <input type="text" name="greenhouse_number" class="form-control" value="{{ old('greenhouse_number', $crop->greenhouse_number ?? '') }}">
+    </div>
+    <div class="col-md-4">
         <label class="form-label">{{ __('crops_feed.fields.greenhouse_location') }}</label>
         <input type="text" name="greenhouse_location" class="form-control" value="{{ old('greenhouse_location', $crop->greenhouse_location ?? '') }}">
     </div>

@@ -32,6 +32,7 @@ class LivestockAnimalUpdateRequest extends BaseLivestockRequest
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'status' => ['sometimes', Rule::in(['active', 'sold', 'dead', 'slaughtered'])],
             'health_status' => ['sometimes', Rule::in(['healthy', 'under_treatment', 'quarantined'])],
+            'intended_purpose' => ['nullable', Rule::in(['milk', 'breeding', 'sale'])],
             'mother_id' => ['nullable', 'integer', Rule::exists('livestock_animals', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'father_id' => ['nullable', 'integer', Rule::exists('livestock_animals', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'notes' => ['nullable', 'string'],

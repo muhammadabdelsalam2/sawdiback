@@ -6,7 +6,7 @@
         $avatar = $user?->avatar;
         $avatarUrl = null;
         if ($avatar) {
-            $avatarUrl = filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : asset('storage/' . ltrim($avatar, '/'));
+            $avatarUrl = \App\Support\PublicFileUrl::url($avatar);
         } else {
             $avatarUrl = asset('assets/images/user.png');
         }

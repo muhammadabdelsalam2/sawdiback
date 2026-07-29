@@ -64,7 +64,7 @@
                             @php
                                 $avatar = $user?->avatar;
                                 $avatarUrl = $avatar
-                                    ? (filter_var($avatar, FILTER_VALIDATE_URL) ? $avatar : asset('storage/' . ltrim($avatar, '/')))
+                                    ? \App\Support\PublicFileUrl::url($avatar)
                                     : asset('assets/images/user.png');
                             @endphp
                             <div class="d-flex align-items-center gap-3 flex-wrap">

@@ -33,6 +33,7 @@ return [
         'farm' => 'Farm',
         'land_area' => 'Land Area',
         'greenhouse_type' => 'Greenhouse Type',
+        'greenhouse_number' => 'Greenhouse Number',
         'greenhouse_location' => 'Greenhouse Number / Location',
         'irrigation_type' => 'Irrigation Type',
         'planting_date' => 'Planting Date',

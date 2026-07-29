@@ -4,6 +4,7 @@ namespace App\Services\Finance;
 
 use App\Models\Employee;
 use App\Services\Livestock\LivestockPenProfitService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ProfitLossService
@@ -173,26 +174,50 @@ class ProfitLossService
 
         $rows = [];
         foreach ($employees->groupBy('operational_department') as $department => $items) {
-            $attendanceCount = DB::table('attendances')
+            $attendanceQuery = DB::table('attendances')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('employee_id', $items->pluck('id'));
 
             if ($dateFrom) {
-                $attendanceCount->whereDate('day', '>=', $dateFrom);
+                $attendanceQuery->whereDate('day', '>=', $dateFrom);
             }
             if ($dateTo) {
-                $attendanceCount->whereDate('day', '<=', $dateTo);
+                $attendanceQuery->whereDate('day', '<=', $dateTo);
             }
+
+            $attendanceCount = (clone $attendanceQuery)->count();
+            $days = $this->staffPerformanceDays($tenantId, $items->pluck('id')->all(), $dateFrom, $dateTo);
+            $capacity = $items->count() * $days;
 
             $rows[] = [
                 'department' => $department ?? 'Unassigned',
                 'employee_count' => $items->count(),
-            'attendance_count' => $attendanceCount->count(),
-            'attendance_rate' => $items->count() > 0 ? round(($attendanceCount->count() / $items->count()) * 100, 2) : 0,
+                'attendance_count' => $attendanceCount,
+                'attendance_rate' => $capacity > 0 ? min(100, round(($attendanceCount / $capacity) * 100, 2)) : 0,
             ];
         }
 
         return $rows;
+    }
+
+    private function staffPerformanceDays(string $tenantId, array $employeeIds, ?string $dateFrom, ?string $dateTo): int
+    {
+        if ($dateFrom && $dateTo) {
+            return max(1, Carbon::parse($dateFrom)->diffInDays(Carbon::parse($dateTo)) + 1);
+        }
+
+        $query = DB::table('attendances')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('employee_id', $employeeIds);
+
+        if ($dateFrom) {
+            $query->whereDate('day', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('day', '<=', $dateTo);
+        }
+
+        return max(1, (int) $query->distinct()->count('day'));
     }
 
     private function poultryFinancialSummary(string $tenantId, ?string $dateFrom, ?string $dateTo): array

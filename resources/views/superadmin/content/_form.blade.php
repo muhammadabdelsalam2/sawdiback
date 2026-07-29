@@ -79,7 +79,7 @@
             @if (isset($content) && $content->video)
                 <div class="mt-2">
                     <video width="200" height="120" controls>
-                        <source src="{{ asset('storage/' . $content->video) }}" type="video/mp4">
+                        <source src="{{ \App\Support\PublicFileUrl::url($content->video) }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                     <p class="text-muted small mt-1">{{ __('dashboard.content.current_video') }}</p>

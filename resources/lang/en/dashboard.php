@@ -66,6 +66,22 @@ return [
         'settings' => [
             'permissionsManagement' => 'Permissions Management'
         ],
+        'requirements' => [
+            'hr' => 'Human Resources (HR)',
+            'livestock' => 'Animal Management',
+            'crops' => 'Agriculture',
+            'poultry' => 'Poultry',
+            'health_vaccinations' => 'Health and Vaccinations',
+            'inventory' => 'Inventory (Feed + Supplies)',
+            'sales' => 'Sales',
+            'financial_reports' => 'Financial Reports',
+            'warehouse' => 'Warehouse',
+            'analytics' => 'Analytics',
+            'production' => 'Production',
+            'system_management' => 'System Management',
+            'user_management' => 'User Management',
+            'logout' => 'Logout',
+        ],
     ],
     'contact_info' => [
         'title' => 'Contact Info',

@@ -13,6 +13,7 @@ use App\Models\InventoryProductionRecord;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\Finance\ProfitLossService;
+use App\Support\PublicFileUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -332,7 +333,7 @@ class DashboardController extends Controller
             ->orderByDesc('warehouse_asset_attachments.id')
             ->value('warehouse_asset_attachments.path');
 
-        return $path ? asset('storage/' . ltrim((string) $path, '/')) : null;
+        return PublicFileUrl::url((string) $path);
     }
 
     private function farmMilkTotal(string $tenantId, array $penIds): float

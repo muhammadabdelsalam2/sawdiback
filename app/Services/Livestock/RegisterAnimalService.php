@@ -30,6 +30,7 @@ class RegisterAnimalService
                 'purchase_price' => $data['purchase_price'] ?? null,
                 'status' => $data['status'] ?? 'active',
                 'health_status' => $data['health_status'] ?? 'healthy',
+                'intended_purpose' => $data['intended_purpose'] ?? null,
                 'mother_id' => $data['mother_id'] ?? null,
                 'father_id' => $data['father_id'] ?? null,
                 'notes' => $data['notes'] ?? null,

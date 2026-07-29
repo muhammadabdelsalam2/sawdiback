@@ -33,6 +33,7 @@ return [
         'farm' => 'المزرعة',
         'land_area' => 'المساحة',
         'greenhouse_type' => 'نوع البيت الزراعي',
+        'greenhouse_number' => 'رقم البيت الزراعي',
         'greenhouse_location' => 'رقم / موقع البيت الزراعي',
         'irrigation_type' => 'نوع الري',
         'planting_date' => 'تاريخ الزراعة',

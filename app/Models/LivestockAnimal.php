@@ -26,6 +26,7 @@ class LivestockAnimal extends Model
         'purchase_price',
         'status',
         'health_status',
+        'intended_purpose',
         'mother_id',
         'father_id',
         'notes',

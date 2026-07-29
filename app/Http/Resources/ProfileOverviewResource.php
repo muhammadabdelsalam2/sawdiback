@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Support\PublicFileUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileOverviewResource extends JsonResource
 {
@@ -13,7 +13,7 @@ class ProfileOverviewResource extends JsonResource
         $avatar = $this->avatar;
 
         if ($avatar && !filter_var($avatar, FILTER_VALIDATE_URL)) {
-            $avatar = Storage::disk('public')->url($avatar);
+            $avatar = PublicFileUrl::url($avatar);
         }
 
         $language = $this->preferred_language

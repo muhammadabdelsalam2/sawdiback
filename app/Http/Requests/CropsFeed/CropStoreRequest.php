@@ -13,6 +13,7 @@ class CropStoreRequest extends BaseCropsFeedRequest
         return [
             'farm_id' => ['nullable', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'greenhouse_type' => ['nullable', 'string', 'max:255'],
+            'greenhouse_number' => ['nullable', 'string', 'max:255'],
             'greenhouse_location' => ['nullable', 'string', 'max:255'],
             'irrigation_type' => ['nullable', Rule::in(['towers', 'seedlings', 'ground'])],
             'name' => ['required', 'string', 'max:255'],
