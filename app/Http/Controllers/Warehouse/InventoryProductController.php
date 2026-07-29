@@ -8,7 +8,10 @@ use App\Http\Requests\Warehouse\InventoryProductUpdateRequest;
 use App\Models\Category;
 use App\Models\Farm;
 use App\Models\InventoryProduct;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
 
@@ -49,7 +52,7 @@ class InventoryProductController extends Controller
     {
         $data = $request->validated();
         $category = $this->findCategoryForTenant($data['category_id']);
-        // $data['category'] = $category->code;
+        $data['category'] = $this->legacyCategoryValue($category);
         $data['tenant_id'] = $category->tenant_id ?? $this->tenantId();
         $data = $this->prepareLocalizedFields($request, $data);
 
@@ -57,7 +60,7 @@ class InventoryProductController extends Controller
         $data['track_expiry'] = $request->boolean('track_expiry');
         $data['is_best_selling'] = $request->boolean('is_best_selling');
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('inventory/products', 'public');
+            $data['image'] = $this->storeImage($request->file('image'));
         }
 
         InventoryProduct::query()->create($data);
@@ -83,7 +86,7 @@ class InventoryProductController extends Controller
         $data = $request->validated();
 
         $category = $this->findCategoryForTenant($data['category_id']);
-        //$data['category'] = $category->code;
+        $data['category'] = $this->legacyCategoryValue($category);
         $data['tenant_id'] = $product->tenant_id ?: ($category->tenant_id ?? $this->tenantId());
         $data = $this->prepareLocalizedFields($request, $data, $product);
 
@@ -92,7 +95,7 @@ class InventoryProductController extends Controller
         $data['is_best_selling'] = $request->boolean('is_best_selling');
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('inventory/products', 'public');
+            $data['image'] = $this->storeImage($request->file('image'));
         }
 
         $product->update($data);
@@ -197,5 +200,23 @@ class InventoryProductController extends Controller
             'ar' => $fallback,
             'en' => $fallback,
         ];
+    }
+
+    private function storeImage(UploadedFile $image): string
+    {
+        $extension = strtolower($image->getClientOriginalExtension() ?: 'jpg');
+        $path = 'inventory/products/' . Str::random(40) . '.' . $extension;
+        File::ensureDirectoryExists(storage_path('app/public/inventory/products'));
+        $image->move(storage_path('app/public/inventory/products'), basename($path));
+
+        return $path;
+    }
+
+    private function legacyCategoryValue(Category $category): string
+    {
+        $code = $category->code;
+        $allowed = ['feed', 'vet_medicine', 'equipment', 'animal_product'];
+
+        return in_array($code, $allowed, true) ? $code : 'feed';
     }
 }

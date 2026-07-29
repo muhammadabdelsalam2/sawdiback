@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Concerns\ScopedByTenant;
 use App\Scopes\ActiveScope;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -98,8 +97,8 @@ public function categoryRelation(): BelongsTo
 
         $image = $this->normalizePublicStoragePath($this->image);
 
-        if ($image && Storage::disk('public')->exists($image)) {
-            return asset(Storage::url($image));
+        if ($image && file_exists(storage_path('app/public/' . $image))) {
+            return asset('storage/' . $image);
         }
 
         return $this->placeholderImageUrl($this->localized_title ?? $this->name ?? 'Product');

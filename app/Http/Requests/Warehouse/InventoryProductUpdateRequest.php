@@ -27,7 +27,7 @@ class InventoryProductUpdateRequest extends BaseWarehouseRequest
             'title_en' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'asset_category' => ['required', 'in:feed,seed,equipment,other'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => $this->productImageRules(),
             'farm_location' => ['nullable', 'string', 'max:255'],
             'farm_id' => ['required', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
             'unit' => ['required', 'string', 'max:50'],
