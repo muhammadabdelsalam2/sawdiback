@@ -73,7 +73,19 @@
                 </div>
             </div>
         @endif
-
+          @can('farms.view')
+            <div class="nav-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'open' : '' }}">
+                <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.farms') }}</span>
+                    <i class="{{ $chevronClass }}"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="{{ route('customer.farms.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.farms.*') ? 'active' : '' }}">{{ __('farms.titles.farms') }}</a>
+                    <a href="{{ route('customer.farm-pens.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">{{ __('farms.titles.pens') }}</a>
+                </div>
+            </div>
+        @endcan
         {{-- 2. Livestock --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.livestock.animals.*') || request()->routeIs('customer.livestock.reproduction-cycles.*') || request()->routeIs('customer.livestock.species.*') || request()->routeIs('customer.livestock.breeds.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.animals.*') || request()->routeIs('customer.livestock.reproduction-cycles.*') || request()->routeIs('customer.livestock.species.*') || request()->routeIs('customer.livestock.breeds.*') ? 'active' : '' }}">
@@ -260,19 +272,7 @@
 
 
 
-        @can('farms.view')
-            <div class="nav-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'open' : '' }}">
-                <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.farms.*') || request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">
-                    <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{ __('dashboard.sidebar.farms') }}</span>
-                    <i class="{{ $chevronClass }}"></i>
-                </a>
-                <div class="dropdown-container">
-                    <a href="{{ route('customer.farms.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.farms.*') ? 'active' : '' }}">{{ __('farms.titles.farms') }}</a>
-                    <a href="{{ route('customer.farm-pens.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.farm-pens.*') ? 'active' : '' }}">{{ __('farms.titles.pens') }}</a>
-                </div>
-            </div>
-        @endcan
+
 
         <div class="nav-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
