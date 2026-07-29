@@ -5,6 +5,11 @@
     @endphp
 
     <nav class="sidebar-nav mt-4">
+          {{-- Extra links outside the original ERP document order --}}
+        <a href="{{ route('superadmin.dashboard', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
+            <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
+            <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
+        </a>
         {{-- 1. HR --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.hr.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
@@ -21,7 +26,7 @@
         </div>
 
         {{-- 2. Livestock --}}
-        <div class="nav-dropdown {{ request()->routeIs('customer.livestock.animals.*') || request()->routeIs('customer.livestock.reproduction-cycles.*') || request()->routeIs('customer.livestock.species.*') || request()->routeIs('customer.livestock.breeds.*') ? 'open' : '' }}">
+        <!-- <div class="nav-dropdown {{ request()->routeIs('customer.livestock.animals.*') || request()->routeIs('customer.livestock.reproduction-cycles.*') || request()->routeIs('customer.livestock.species.*') || request()->routeIs('customer.livestock.breeds.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.animals.*') || request()->routeIs('customer.livestock.reproduction-cycles.*') || request()->routeIs('customer.livestock.species.*') || request()->routeIs('customer.livestock.breeds.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-2.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.requirements.livestock') }}</span>
@@ -33,7 +38,7 @@
                 <a href="{{ route('customer.livestock.species.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.livestock.species.*') ? 'active' : '' }}">{{ __('livestock.titles.species') }}</a>
                 <a href="{{ route('customer.livestock.breeds.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.livestock.breeds.*') ? 'active' : '' }}">{{ __('livestock.titles.breeds') }}</a>
             </div>
-        </div>
+        </div> -->
 
         {{-- 3. Crops --}}
         <a href="{{ route('customer.crops-feed.crops.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('customer.crops-feed.crops.*') ? 'active' : '' }}">
@@ -74,7 +79,7 @@
         </div>
 
         {{-- 6. Inventory --}}
-        <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') || request()->routeIs('customer.crops-feed.feed.*') || request()->routeIs('customer.livestock.feed-types.*') ? 'open' : '' }}">
+        <!-- <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') || request()->routeIs('customer.crops-feed.feed.*') || request()->routeIs('customer.livestock.feed-types.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') || request()->routeIs('customer.crops-feed.feed.*') || request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.requirements.inventory') }}</span>
@@ -87,10 +92,10 @@
                 <a href="{{ route('customer.crops-feed.feed.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.crops-feed.feed.*') ? 'active' : '' }}">{{ __('crops_feed.titles.feed_management') }}</a>
                 <a href="{{ route('customer.livestock.feed-types.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">{{ __('livestock.titles.feed_types') }}</a>
             </div>
-        </div>
+        </div> -->
 
         {{-- 7. Sales --}}
-        <div class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
+        <!-- <div class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
             <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-6.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.requirements.sales') }}</span>
@@ -102,7 +107,7 @@
                 <a href="{{ route('customer.sales-distribution.orders.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.sales-distribution.orders.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.orders') }}</a>
                 <a href="{{ route('customer.sales-distribution.invoices.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.sales-distribution.invoices.*') ? 'active' : '' }}">{{ __('sales_dist.sidebar.invoices') }}</a>
             </div>
-        </div>
+        </div> -->
 
         {{-- 8. Financial reports --}}
         <div class="nav-dropdown {{ request()->routeIs('customer.finance.*') ? 'open' : '' }}">
@@ -119,12 +124,12 @@
         </div>
 
         {{-- 9. Warehouse --}}
-        @can('warehouse.view')
+        <!-- @can('warehouse.view')
             <a href="{{ route('customer.warehouse-assets.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('customer.warehouse-assets.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.requirements.warehouse') }}</span>
             </a>
-        @endcan
+        @endcan -->
 
         {{-- 10. Analytics --}}
         @can('analytics.view')
@@ -181,11 +186,7 @@
             <span class="nav-label">{{ __('dashboard.sidebar.requirements.logout') }}</span>
         </a>
 
-        {{-- Extra links outside the original ERP document order --}}
-        <a href="{{ route('superadmin.dashboard', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
-            <img src="{{ asset('assets/images/sidebar-icon-1.svg') }}" alt="" class="nav-icon">
-            <span class="nav-label">{{ __('dashboard.sidebar.dashboard') }}</span>
-        </a>
+
 
         <form id="logout-form" action="{{ route('logout', ['locale' => $activeLocale]) }}" method="POST" class="d-none">
             @csrf
