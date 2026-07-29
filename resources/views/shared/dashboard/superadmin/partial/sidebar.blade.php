@@ -2,6 +2,7 @@
 <aside id="sidebar">
     @php
         $activeLocale = $currentLocale ?? app()->getLocale();
+        $chevronClass = 'fa-solid fa-chevron-right chevron m-1 ' . (($currentLang ?? app()->getLocale()) === 'en' ? 'me-auto' : 'ms-auto');
     @endphp
 
     <nav class="sidebar-nav mt-4">
