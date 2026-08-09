@@ -278,17 +278,20 @@
                 </a>
                 <div class="dropdown-container">
                     <a href="{{ route('customer.subscription.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.subscription.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.my_subscription') }}</a>
-                    @can('plans.manage')
-                        <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.plans') }}</a>
-                    @endcan
-                    @can('subscriptions.manage')
-                        <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.subscriptions') }}</a>
-                    @endcan
+                    @if ($isSuperAdmin)
+                        @can('plans.manage')
+                            <a href="{{ route('superadmin.plans.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.plans') }}</a>
+                        @endcan
+                        @can('subscriptions.manage')
+                            <a href="{{ route('superadmin.subscriptions.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.subscriptions') }}</a>
+                        @endcan
+                    @endif
                 </div>
             </div>
         @endauth
 
-        {{-- 15. System management --}}
+        {{-- 15. System management (superadmin.* routes require role:SuperAdmin only — hard-gate here too) --}}
+        @if ($isSuperAdmin)
         @can('roles.manage')
             <div class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">
@@ -312,14 +315,17 @@
                 </div>
             </div>
         @endcan
+        @endif
 
-        {{-- 16. User management --}}
+        {{-- 16. User management (superadmin.users.* requires role:SuperAdmin only — hard-gate here too) --}}
+        @if ($isSuperAdmin)
         @can('users.manage')
             <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
                 <span class="nav-label">{{ __('dashboard.sidebar.requirements.user_management') }}</span>
             </a>
         @endcan
+        @endif
 
         {{-- 17. Logout --}}
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item d-flex align-items-center">
