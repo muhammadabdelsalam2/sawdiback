@@ -28,7 +28,7 @@ class LayerFlockController extends Controller
 
     public function create(): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.layer_flocks.create', compact('pens'));
     }
@@ -54,7 +54,7 @@ class LayerFlockController extends Controller
 
     public function edit(string $locale, PoultryLayerFlock $layer_flock): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.layer_flocks.edit', ['flock' => $layer_flock, 'pens' => $pens]);
     }

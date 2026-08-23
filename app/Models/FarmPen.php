@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\ScopedByTenant;
 use App\Services\Livestock\LivestockPenProfitService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +22,11 @@ class FarmPen extends Model
     protected $casts = ['capacity' => 'integer'];
 
     protected $appends = ['animal_count', 'male_count', 'female_count', 'mortality_rate', 'net_profit'];
+
+    public function scopeForSelect(Builder $query): Builder
+    {
+        return $query->with('farm')->orderBy('pen_number');
+    }
 
     public function farm(): BelongsTo
     {

@@ -23,7 +23,7 @@ class ChickenBreedController extends Controller
 
     public function create(): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.chicken_breeds.create', compact('pens'));
     }
@@ -45,7 +45,7 @@ class ChickenBreedController extends Controller
 
     public function edit(string $locale, PoultryChickenBreed $chicken_breed): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.chicken_breeds.edit', ['breed' => $chicken_breed, 'pens' => $pens]);
     }

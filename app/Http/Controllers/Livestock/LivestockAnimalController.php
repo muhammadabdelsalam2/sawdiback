@@ -40,7 +40,7 @@ class LivestockAnimalController extends Controller
         $species = AnimalSpecies::query()->orderBy('name')->get();
         $breeds = AnimalBreed::query()->orderBy('name')->get();
         $animals = LivestockAnimal::query()->orderBy('tag_number')->get();
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['livestock', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals', 'pens'));
     }
@@ -82,7 +82,7 @@ class LivestockAnimalController extends Controller
         $species = AnimalSpecies::query()->orderBy('name')->get();
         $breeds = AnimalBreed::query()->orderBy('name')->get();
         $animals = LivestockAnimal::query()->whereKeyNot($animal->id)->orderBy('tag_number')->get();
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['livestock', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals', 'pens'));
     }

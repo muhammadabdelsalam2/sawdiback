@@ -17,7 +17,7 @@ class FarmPenController extends Controller
 {
     public function index(): View
     {
-        $pens = FarmPen::query()->with(['farm', 'animals'])->orderBy('pen_number')->paginate(15);
+        $pens = FarmPen::query()->forSelect()->with('animals')->paginate(15);
 
         return view('dashboard.customer.farms.pens.index', compact('pens'));
     }

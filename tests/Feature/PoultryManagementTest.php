@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Farm;
+use App\Models\FarmPen;
 use App\Models\Poultry\PoultryBroilerCycle;
 use App\Models\Tenant;
 use App\Models\User;
@@ -52,6 +54,34 @@ class PoultryManagementTest extends TestCase
 
         $response->assertRedirect('/en-SA/poultry/broiler-cycles/' . $cycle->id);
         $this->assertSame($this->user->tenant_id, $cycle->tenant_id);
+    }
+
+    public function test_poultry_forms_show_all_tenant_pens_for_selection(): void
+    {
+        $farm = Farm::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Suwaihan',
+            'type' => 'owned',
+        ]);
+
+        FarmPen::query()->create([
+            'tenant_id' => $this->tenant->id,
+            'farm_id' => $farm->id,
+            'pen_number' => '881',
+            'type' => 'livestock',
+        ]);
+
+        foreach ([
+            '/en-SA/poultry/broiler-cycles/create',
+            '/en-SA/poultry/layer-flocks/create',
+            '/en-SA/poultry/chicken-breeds/create',
+        ] as $path) {
+            $this->actingAs($this->user)
+                ->get($path)
+                ->assertOk()
+                ->assertSee('Suwaihan')
+                ->assertSee('881');
+        }
     }
 
     public function test_broiler_cycle_calculates_profit_and_mortality_rate(): void

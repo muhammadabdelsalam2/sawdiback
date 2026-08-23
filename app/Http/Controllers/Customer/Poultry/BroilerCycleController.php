@@ -30,7 +30,7 @@ class BroilerCycleController extends Controller
 
     public function create(): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.broiler_cycles.create', compact('pens'));
     }
@@ -57,7 +57,7 @@ class BroilerCycleController extends Controller
 
     public function edit(string $locale, PoultryBroilerCycle $broiler_cycle): View
     {
-        $pens = FarmPen::query()->with('farm')->whereIn('type', ['poultry', 'mixed'])->orderBy('pen_number')->get();
+        $pens = FarmPen::query()->forSelect()->get();
 
         return view('dashboard.customer.poultry.broiler_cycles.edit', ['cycle' => $broiler_cycle, 'pens' => $pens]);
     }
