@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Leave Requests</h3>
+        <h3 class="mb-0">{{ __('hr.titles.leave_requests') }}</h3>
         <a class="btn btn-primary"
            href="{{ route('customer.hr.leaves.create', ['locale' => request()->route('locale')]) }}">
-            New Request
+            {{ __('hr.actions.new_request') }}
         </a>
     </div>
 
@@ -25,13 +25,13 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Employee</th>
-                        <th>Type</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Status</th>
-                        <th class="text-end">Actions</th>
+                        <th>{{ __('hr.fields.id') }}</th>
+                        <th>{{ __('hr.fields.employee') }}</th>
+                        <th>{{ __('hr.fields.type') }}</th>
+                        <th>{{ __('hr.fields.from') }}</th>
+                        <th>{{ __('hr.fields.to') }}</th>
+                        <th>{{ __('hr.fields.status') }}</th>
+                        <th class="text-end">{{ __('hr.fields.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,16 +39,16 @@
                         <tr>
                             <td>{{ $l->id }}</td>
                             <td>{{ $l->employee?->full_name ?? '-' }}</td>
-                            <td>{{ $l->type }}</td>
+                            <td>{{ __('hr.options.' . $l->type) }}</td>
                             <td>{{ $l->start_date?->format('Y-m-d') }}</td>
                             <td>{{ $l->end_date?->format('Y-m-d') }}</td>
                             <td>
                                 @if($l->status === 'approved')
-                                    <span class="badge bg-success">Approved</span>
+                                    <span class="badge bg-success">{{ __('hr.options.approved') }}</span>
                                 @elseif($l->status === 'rejected')
-                                    <span class="badge bg-danger">Rejected</span>
+                                    <span class="badge bg-danger">{{ __('hr.options.rejected') }}</span>
                                 @else
-                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    <span class="badge bg-warning text-dark">{{ __('hr.options.pending') }}</span>
                                 @endif
                             </td>
                             <td class="text-end">
@@ -57,8 +57,8 @@
                                           action="{{ route('customer.hr.leaves.approve', ['locale' => request()->route('locale'), 'leave' => $l->id]) }}">
                                         @csrf
                                         <button class="btn btn-sm btn-outline-success"
-                                                onclick="return confirm('Approve this request?')">
-                                            Approve
+                                                onclick="return confirm('{{ __('hr.messages.confirm_approve_leave') }}')">
+                                            {{ __('hr.actions.approve') }}
                                         </button>
                                     </form>
 
@@ -66,19 +66,19 @@
                                           action="{{ route('customer.hr.leaves.reject', ['locale' => request()->route('locale'), 'leave' => $l->id]) }}">
                                         @csrf
                                         <button class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Reject this request?')">
-                                            Reject
+                                                onclick="return confirm('{{ __('hr.messages.confirm_reject_leave') }}')">
+                                            {{ __('hr.actions.reject') }}
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-muted small">No actions</span>
+                                    <span class="text-muted small">{{ __('hr.empty.no_actions') }}</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="7" class="text-center text-muted py-4">
-                                No leave requests.
+                                {{ __('hr.empty.no_leave_requests') }}
                             </td>
                         </tr>
                     @endforelse

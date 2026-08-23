@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Departments</h3>
+        <h3 class="mb-0">{{ __('hr.titles.departments') }}</h3>
         <a class="btn btn-primary"
            href="{{ route('customer.hr.departments.create', ['locale' => request()->route('locale')]) }}">
-            Add Department
+            {{ __('hr.actions.add_department') }}
         </a>
     </div>
 
@@ -25,10 +25,10 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th style="width:80px">#</th>
-                        <th>Name</th>
-                        <th style="width:180px">Code</th>
-                        <th class="text-end" style="width:200px">Actions</th>
+                        <th style="width:80px">{{ __('hr.fields.id') }}</th>
+                        <th>{{ __('hr.fields.name') }}</th>
+                        <th style="width:180px">{{ __('hr.fields.code') }}</th>
+                        <th class="text-end" style="width:200px">{{ __('hr.fields.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-secondary"
                                    href="{{ route('customer.hr.departments.edit', ['locale' => request()->route('locale'), 'department' => $d->id]) }}">
-                                    Edit
+                                    {{ __('hr.actions.edit') }}
                                 </a>
 
                                 <form class="d-inline"
@@ -49,8 +49,8 @@
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Delete this department?')">
-                                        Delete
+                                            onclick="return confirm('{{ __('hr.messages.confirm_delete_department') }}')">
+                                        {{ __('hr.actions.delete') }}
                                     </button>
                                 </form>
                             </td>
@@ -58,7 +58,7 @@
                     @empty
                         <tr>
                             <td colspan="4" class="text-center text-muted py-4">
-                                No departments yet.
+                                {{ __('hr.empty.no_departments') }}
                             </td>
                         </tr>
                     @endforelse

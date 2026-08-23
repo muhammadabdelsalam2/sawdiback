@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="mb-0">Job Titles</h3>
+        <h3 class="mb-0">{{ __('hr.titles.job_titles') }}</h3>
         <a class="btn btn-primary"
            href="{{ route('customer.hr.job-titles.create', ['locale' => request()->route('locale')]) }}">
-            Add Job Title
+            {{ __('hr.actions.add_job_title') }}
         </a>
     </div>
 
@@ -25,10 +25,10 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th style="width:80px">#</th>
-                        <th>Name</th>
-                        <th style="width:180px">Code</th>
-                        <th class="text-end" style="width:200px">Actions</th>
+                        <th style="width:80px">{{ __('hr.fields.id') }}</th>
+                        <th>{{ __('hr.fields.name') }}</th>
+                        <th style="width:180px">{{ __('hr.fields.code') }}</th>
+                        <th class="text-end" style="width:200px">{{ __('hr.fields.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-secondary"
                                    href="{{ route('customer.hr.job-titles.edit', ['locale' => request()->route('locale'), 'job_title' => $t->id]) }}">
-                                    Edit
+                                    {{ __('hr.actions.edit') }}
                                 </a>
 
                                 <form class="d-inline"
@@ -49,8 +49,8 @@
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Delete this job title?')">
-                                        Delete
+                                            onclick="return confirm('{{ __('hr.messages.confirm_delete_job_title') }}')">
+                                        {{ __('hr.actions.delete') }}
                                     </button>
                                 </form>
                             </td>
@@ -58,7 +58,7 @@
                     @empty
                         <tr>
                             <td colspan="4" class="text-center text-muted py-4">
-                                No job titles yet.
+                                {{ __('hr.empty.no_job_titles') }}
                             </td>
                         </tr>
                     @endforelse
