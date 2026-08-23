@@ -29,6 +29,7 @@ class PlanFactory extends Factory
             ['key' => 'priority_support', 'type' => 'boolean'],
             ['key' => 'storage_limit', 'type' => 'numeric'],
             ['key' => 'custom_domain', 'type' => 'boolean'],
+            ['key' => 'hr_management', 'type' => 'boolean'],
         ];
 
         $randomFeatures = collect($featureKeys)->random(rand(2, 4));
@@ -43,6 +44,11 @@ class PlanFactory extends Factory
                 'enabled' => true
             ];
         }
+
+        $featuresJson['hr_management'] = [
+            'value' => true,
+            'enabled' => true,
+        ];
 
         return [
             'name' => $name,

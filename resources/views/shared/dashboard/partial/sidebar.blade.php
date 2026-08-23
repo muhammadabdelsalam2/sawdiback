@@ -4,8 +4,8 @@
         $isSuperAdmin = auth()->check() && auth()->user()->hasRole('SuperAdmin');
         $dashboardRoute = $isSuperAdmin ? 'superadmin.dashboard' : 'dashboard';
         $activeLocale = $currentLocale ?? app()->getLocale();
-        $features = auth()->check() ? auth()->user()->planFeatures() : [];
-        $hrEnabled = (bool) ($features['hr_management']['enabled'] ?? false);
+        $features = $planFeatures ?? (auth()->check() ? auth()->user()->planFeatures() : []);
+        $hrEnabled = (bool) ($featureFlags['hr_management'] ?? ($features['hr_management']['enabled'] ?? false));
         $chevronClass = 'fa-solid fa-chevron-right chevron m-1 ' . (($currentLang ?? app()->getLocale()) === 'en' ? 'me-auto' : 'ms-auto');
     @endphp
 
@@ -59,7 +59,7 @@
 
         {{-- 1. HR --}}
         @can('hr.view')
-            @if ($hrEnabled)
+            @if ($isSuperAdmin || $hrEnabled)
                 <div class="nav-dropdown {{ request()->routeIs('customer.hr.*') ? 'open' : '' }}">
                     <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.hr.*') ? 'active' : '' }}">
                         <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">

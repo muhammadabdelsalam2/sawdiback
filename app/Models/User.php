@@ -68,6 +68,13 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class, 'customer_id');
     }
 
+    public function activeSubscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class, 'customer_id')
+            ->active()
+            ->latestOfMany();
+    }
+
     public function addresses(): HasMany
     {
         return $this->hasMany(UserAddress::class);
@@ -111,11 +118,11 @@ class User extends Authenticatable
     public function planFeatures(): array
     {
         $this->loadMissing([
-            'subscription.plan',
+            'activeSubscription.plan',
             'tenant.plan',
         ]);
 
-        $plan = $this->subscription?->plan ?? $this->tenant?->plan;
+        $plan = $this->activeSubscription?->plan ?? $this->tenant?->plan;
 
         if (!$plan) {
             return [];

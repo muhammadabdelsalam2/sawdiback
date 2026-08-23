@@ -176,19 +176,10 @@ return [
         'description' => 'Use your own domain',
     ],
     'hr_management' => [
-        'label' => 'Custom Domain',
+        'label' => 'HR Management',
         'type' => 'boolean',
-        'default' => false,
-        'description' => 'Use your own domain',
+        'default' => true,
+        'description' => 'Enable HR module in dashboard navigation',
     ],
-
-    // 'hr_management' => [
-    //     'label' => 'HR Management',
-    //     'type' => 'boolean',
-    //     'default' => false,
-    //     'description' => 'Enable HR module in dashboard navigation',
-    // ],
-
-
 
 ];

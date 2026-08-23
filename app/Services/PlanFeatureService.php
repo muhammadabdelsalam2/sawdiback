@@ -25,7 +25,7 @@ class PlanFeatureService
         $activeSubscription = Subscription::query()
             ->with('plan') // ensure plan is loaded if relation exists
             ->where('customer_id', $user->id)  // ✅ correct column
-            ->where('status', 'active')
+            ->active()
             ->latest('id')
             ->first();
 

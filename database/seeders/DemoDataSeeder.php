@@ -64,6 +64,7 @@ class DemoDataSeeder extends Seeder
             ['key' => 'priority_support', 'type' => 'boolean'],
             ['key' => 'storage_limit', 'type' => 'numeric'],
             ['key' => 'custom_domain', 'type' => 'boolean'],
+            ['key' => 'hr_management', 'type' => 'boolean'],
         ];
 
         $plans = Plan::factory(5)->create()->each(function ($plan) use ($featureKeys) {
@@ -75,6 +76,10 @@ class DemoDataSeeder extends Seeder
                     'enabled' => true,
                 ];
             }
+            $planFeatures['hr_management'] = [
+                'value' => true,
+                'enabled' => true,
+            ];
             $plan->features = $planFeatures;
             $plan->save();
         });
