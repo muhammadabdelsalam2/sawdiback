@@ -59,9 +59,12 @@ if ($user) {
      * Get best selling products for mobile app
      */
     public function bestSelling(Request $request, string $locale): JsonResponse
-    {
-         auth()->setUser(auth('sanctum')->user());
-        LocaleResolver::apply($locale);
+{
+    $user = auth('sanctum')->user();
+    if ($user) {
+        auth()->setUser($user);
+    }
+    LocaleResolver::apply($locale);
 
         $request->validate([
             'limit' => 'nullable|integer|min:1|max:50',
@@ -107,19 +110,22 @@ if ($user) {
         ]);
     }
 
-    public function show($locale, InventoryProduct $product): JsonResponse
-    {
-         auth()->setUser(auth('sanctum')->user());
-        LocaleResolver::apply($locale);
-
-        $data = $this->productService->getProductDetails($product);
-
-        return ApiResponse::success(
-            data: $data,
-            message: __('ecommerce.product.message'),
-            code: 200
-        );
+  public function show($locale, InventoryProduct $product): JsonResponse
+{
+    $user = auth('sanctum')->user();
+    if ($user) {
+        auth()->setUser($user);
     }
+    LocaleResolver::apply($locale);
+
+    $data = $this->productService->getProductDetails($product);
+
+    return ApiResponse::success(
+        data: $data,
+        message: __('ecommerce.product.message'),
+        code: 200
+    );
+}
 
     // Feature: Add to favorites
     public function addToFavorites($locale, Request $request, $product)
