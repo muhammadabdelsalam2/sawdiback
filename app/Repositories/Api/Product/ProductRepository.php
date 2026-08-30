@@ -83,20 +83,17 @@ private function baseWith(): array
         });
     });
 
-    // Category Filter
+      // Category Filter
     $query->when($filters['category'] ?? null, function ($q) use ($filters) {
+        $value = $filters['category'];
 
-        // لو الفرونت بيرسل category_id
-        $q->where('category_id', $filters['category']);
-
-        /*
-
-
-        $q->whereHas('categoryRelation', function ($subQuery) use ($filters) {
-            $subQuery->where('slug', $filters['category'])
-                     ->orWhere('name', $filters['category']);
-        });
-        */
+        if (is_numeric($value)) {
+            $q->where('category_id', $value);
+        } else {
+            $q->whereHas('categoryRelation', function ($subQuery) use ($value) {
+                $subQuery->where('code', $value);
+            });
+        }
     });
 
     // Price Filter
