@@ -12,16 +12,17 @@ class FarmPenStoreRequest extends FormRequest
         return true;
     }
 
-    public function rules(): array
-    {
-        $tenantId = session('tenant_id') ?? auth()->user()?->tenant_id;
-
-        return [
-            'farm_id' => ['required', 'integer', Rule::exists('farms', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId))],
-            'pen_number' => ['required', 'string', 'max:100'],
-            'type' => ['required', Rule::in(['livestock', 'poultry', 'mixed'])],
-            'capacity' => ['nullable', 'integer', 'min:0'],
-            'notes' => ['nullable', 'string'],
-        ];
-    }
+   public function rules(): array
+{
+    return [
+        'farm_id' => ['required', 'exists:farms,id'],
+        'pen_number' => ['required', 'string', 'max:50'],
+        'name' => ['nullable', 'string', 'max:255'],
+        'type' => ['required', 'string', 'in:goat,cattle,poultry,fish,rabbit,other'],
+        'capacity' => ['nullable', 'integer', 'min:0'],
+        'current_count' => ['nullable', 'integer', 'min:0'],
+        'status' => ['required', 'string', 'in:active,maintenance,quarantine,empty'],
+        'notes' => ['nullable', 'string'],
+    ];
+}
 }

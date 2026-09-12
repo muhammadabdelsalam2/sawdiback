@@ -30,6 +30,13 @@ class Employee extends Model
         'iqama_expiry_date',
         'salary',
         'is_active',
+        'replacement_employee_id',
+'next_annual_leave_date',
+'education',
+'work_experience',
+'self_development',
+'achievements_creativity',
+'infractions_absence_notes',
     ];
 
     protected $casts = [
@@ -38,6 +45,7 @@ class Employee extends Model
         'iqama_expiry_date' => 'date',
         'salary' => 'decimal:2',
         'is_active' => 'boolean',
+        'next_annual_leave_date' => 'date',
     ];
 
     public function department(): BelongsTo
@@ -69,4 +77,48 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeAttachment::class);
     }
+    public function financialActions()
+{
+    return $this->hasMany(EmployeeFinancialAction::class);
+}
+
+public function replacementEmployee()
+{
+    return $this->belongsTo(Employee::class, 'replacement_employee_id');
+}
+
+public function substituteFor()
+{
+    return $this->hasMany(Employee::class, 'replacement_employee_id');
+}
+
+public function getActiveIncreasesTotalAttribute(): float
+{
+    $fixed = (float) $this->financialActions()
+        ->where('type', 'salary_increase_fixed')
+        ->where('status', 'active')
+        ->sum('amount');
+
+    $percentSum = (float) $this->financialActions()
+        ->where('type', 'salary_increase_percent')
+        ->where('status', 'active')
+        ->sum('percentage');
+
+    $fromPercent = ((float) $this->basic_salary * $percentSum) / 100;
+
+    return $fixed + $fromPercent;
+}
+
+public function getCurrentSalaryAttribute(): float
+{
+    return (float) $this->basic_salary + $this->active_increases_total;
+}
+
+public function getActiveLoansBalanceAttribute(): float
+{
+    return (float) $this->financialActions()
+        ->where('type', 'advance_payment')
+        ->where('status', 'active')
+        ->sum('remaining_amount');
+}
 }

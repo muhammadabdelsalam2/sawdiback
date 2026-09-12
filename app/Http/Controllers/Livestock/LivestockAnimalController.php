@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Livestock;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\Livestock\TransferAnimalRequest;
 use App\Http\Requests\Livestock\AnimalStatusChangeRequest;
 use App\Http\Requests\Livestock\LivestockAnimalStoreRequest;
 use App\Http\Requests\Livestock\LivestockAnimalUpdateRequest;
@@ -13,6 +14,7 @@ use App\Models\FeedType;
 use App\Models\LivestockAnimal;
 use App\Models\Vaccine;
 use App\Repositories\LivestockAnimalRepository;
+use App\Services\Livestock\AnimalMovementService;
 use App\Services\Livestock\ChangeAnimalStatusService;
 use App\Services\Livestock\RegisterAnimalService;
 use Illuminate\Http\RedirectResponse;
@@ -31,18 +33,22 @@ class LivestockAnimalController extends Controller
     public function index(Request $request, string $locale): View
     {
         $items = $this->animals->paginateWithRelations((int) $request->integer('per_page', 15));
+        $currentLocale = $locale;
 
-        return view('dashboard.livestock.animals.index', compact('items'));
+        return view('dashboard.livestock.animals.index', compact('items', 'currentLocale'));
     }
 
     public function create(string $locale): View
     {
-        $species = AnimalSpecies::query()->orderBy('name')->get();
-        $breeds = AnimalBreed::query()->orderBy('name')->get();
-        $animals = LivestockAnimal::query()->orderBy('tag_number')->get();
-        $pens = FarmPen::query()->forSelect()->get();
+        $tenantId = (string) auth()->user()->tenant_id;
 
-        return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals', 'pens'));
+        $species = AnimalSpecies::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $breeds  = AnimalBreed::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $animals = LivestockAnimal::query()->where('tenant_id', $tenantId)->orderBy('tag_number')->get();
+        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
+        $currentLocale = $locale;
+
+        return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals', 'pens', 'currentLocale'));
     }
 
     public function store(LivestockAnimalStoreRequest $request, string $locale): RedirectResponse
@@ -50,12 +56,35 @@ class LivestockAnimalController extends Controller
         $animal = $this->registerAnimalService->execute($request->validated());
 
         return redirect()
-            ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
+            ->route('customer.livestock.animals.show', ['locale' => $locale, 'animal' => $animal->id])
             ->with('success', __('livestock.messages.success.animal_registered'));
+    }
+
+    public function transfer(
+        TransferAnimalRequest $request,
+        string $locale,
+        LivestockAnimal $animal,
+        AnimalMovementService $movementService
+    ): RedirectResponse {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $animal->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
+        $toPen = FarmPen::where('tenant_id', $tenantId)->findOrFail($request->validated('to_pen_id'));
+
+        $movementService->transfer($animal, $toPen);
+
+        return back()->with('success', __('livestock.messages.animal_transferred') ?? 'تم نقل الحيوان وتحديث طاقة الحظائر بنجاح');
     }
 
     public function show(string $locale, LivestockAnimal $animal): View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $animal->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $animal->load([
             'species',
             'breed',
@@ -66,38 +95,55 @@ class LivestockAnimalController extends Controller
             'vaccinations.vaccine',
             'reproductionCyclesAsFemale',
             'milkProductionLogs',
-            'feedingLogs.feedType',
+            'feedingLogs' => fn($q) => $q->with('feedType')->latest('feeding_date')->limit(10),
             'weightLogs',
-            'statusHistory',
+            'statusHistory' => fn($q) => $q->latest('changed_at'),
         ]);
 
-        $feedTypes = FeedType::query()->orderBy('name')->get();
-        $vaccines = Vaccine::query()->orderBy('name')->get();
+        $feedTypes = FeedType::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $vaccines  = Vaccine::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $currentLocale = $locale;
 
-        return view('dashboard.livestock.animals.show', compact('animal', 'feedTypes', 'vaccines'));
+        return view('dashboard.livestock.animals.show', compact('animal', 'feedTypes', 'vaccines', 'currentLocale'));
     }
 
     public function edit(string $locale, LivestockAnimal $animal): View
     {
-        $species = AnimalSpecies::query()->orderBy('name')->get();
-        $breeds = AnimalBreed::query()->orderBy('name')->get();
-        $animals = LivestockAnimal::query()->whereKeyNot($animal->id)->orderBy('tag_number')->get();
-        $pens = FarmPen::query()->forSelect()->get();
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $animal->tenant_id !== $tenantId) {
+            abort(403);
+        }
 
-        return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals', 'pens'));
+        $species = AnimalSpecies::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $breeds  = AnimalBreed::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $animals = LivestockAnimal::query()->where('tenant_id', $tenantId)->whereKeyNot($animal->id)->orderBy('tag_number')->get();
+        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
+        $currentLocale = $locale;
+
+        return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals', 'pens', 'currentLocale'));
     }
 
     public function update(LivestockAnimalUpdateRequest $request, string $locale, LivestockAnimal $animal): RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $animal->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $this->animals->update($animal, $request->validated());
 
         return redirect()
-            ->route('customer.livestock.animals.show', ['locale' => session('locale_full', 'en-SA'), 'animal' => $animal->id])
+            ->route('customer.livestock.animals.show', ['locale' => $locale, 'animal' => $animal->id])
             ->with('success', __('livestock.messages.success.animal_updated'));
     }
 
     public function changeStatus(AnimalStatusChangeRequest $request, string $locale, LivestockAnimal $animal): RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $animal->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $this->changeAnimalStatusService->execute($animal, $request->validated());
 
         return redirect()

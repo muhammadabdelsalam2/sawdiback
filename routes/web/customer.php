@@ -61,7 +61,7 @@ Route::prefix('{locale}')
     ->group(function () {
 
         Route::get('/global-search', [SearchController::class, 'index'])
-            ->name('global.search'); // Make it public for testing, can be protected later
+            ->name('global.search');
 
         Route::prefix('account')->group(function () {
             Route::get('profile', [AccountController::class, 'profile'])->name('profile.show');
@@ -85,12 +85,25 @@ Route::prefix('{locale}')
         Route::post('subscription/cancel', [CustomerSubscriptionController::class, 'cancel'])
             ->name('subscription.cancel');
 
+        // =========================
+        // Farms & Pens
+        // =========================
         Route::middleware(['permission:farms.view'])->group(function () {
+            // تسجيل القيود المالية
             Route::post('farm-pens/{farm_pen}/financial-entries', [FarmPenController::class, 'storeFinancialEntry'])
-                ->middleware(['permission:farms.manage'])
                 ->name('farm-pens.financial-entries.store');
+
+            // الاستعادة
+            Route::post('farms/{farm}/restore', [FarmController::class, 'restore'])
+                ->name('farms.restore');
+
+            Route::post('farm-pens/{farm_pen}/restore', [FarmPenController::class, 'restore'])
+                ->name('farm-pens.restore');
+
+            // موارد المزارع والحظائر
             Route::resource('farms', FarmController::class)
                 ->middleware(['permission:farms.manage']);
+
             Route::resource('farm-pens', FarmPenController::class)
                 ->parameters(['farm-pens' => 'farm_pen'])
                 ->middleware(['permission:farms.manage']);
@@ -113,6 +126,7 @@ Route::prefix('{locale}')
             Route::get('animals/{animal}/edit', [LivestockAnimalController::class, 'edit'])->name('animals.edit');
             Route::put('animals/{animal}', [LivestockAnimalController::class, 'update'])->name('animals.update');
             Route::post('animals/{animal}/status', [LivestockAnimalController::class, 'changeStatus'])->name('animals.status.change');
+            Route::post('animals/{animal}/transfer', [LivestockAnimalController::class, 'transfer'])->name('animals.transfer');
 
             Route::post('feeding-logs', [LivestockOperationsController::class, 'recordFeeding'])->name('feeding-logs.store');
             Route::post('milk-production-logs', [LivestockOperationsController::class, 'recordMilkProduction'])->name('milk-production-logs.store');
@@ -132,6 +146,9 @@ Route::prefix('{locale}')
             Route::get('alerts/under-treatment', [LivestockOperationsController::class, 'underTreatmentAnimals'])->name('alerts.under-treatment');
         });
 
+        // =========================
+        // Inventory
+        // =========================
         Route::prefix('inventory')->name('inventory.')->middleware(['permission:inventory.view'])->group(function () {
             Route::resource('categories', InventoryCategoryController::class)->except(['show']);
             Route::resource('products', InventoryProductController::class)->except(['show']);
@@ -146,9 +163,12 @@ Route::prefix('{locale}')
             Route::get('traceability', [WarehouseController::class, 'traceability'])->name('traceability.index');
         });
 
+        // =========================
+        // Warehouse Assets
+        // =========================
         Route::prefix('warehouse-assets')->name('warehouse-assets.')->middleware(['permission:warehouse.view'])->group(function () {
             Route::get('/', [WarehouseAssetController::class, 'index'])->name('index');
-             Route::middleware(['permission:warehouse.manage'])->group(function () {
+            Route::middleware(['permission:warehouse.manage'])->group(function () {
                 Route::get('/create', [WarehouseAssetController::class, 'create'])->name('create');
                 Route::post('/', [WarehouseAssetController::class, 'store'])->name('store');
                 Route::get('/{warehouse_asset}/edit', [WarehouseAssetController::class, 'edit'])->name('edit');
@@ -157,10 +177,16 @@ Route::prefix('{locale}')
             });
         });
 
+        // =========================
+        // Analytics
+        // =========================
         Route::prefix('analytics')->name('analytics.')->middleware(['permission:analytics.view'])->group(function () {
             Route::get('/', [AnalyticsController::class, 'index'])->name('index');
         });
 
+        // =========================
+        // Crops & Feed
+        // =========================
         Route::prefix('crops-feed')->name('crops-feed.')->middleware(['permission:crops.view'])->group(function () {
             Route::resource('crops', CropController::class);
             Route::post('crops/growth-stages', [CropController::class, 'storeGrowthStage'])->name('crops.growth-stages.store');
@@ -176,6 +202,9 @@ Route::prefix('{locale}')
             Route::get('reports', [FeedManagementController::class, 'reports'])->name('reports.index');
         });
 
+        // =========================
+        // Poultry
+        // =========================
         Route::prefix('poultry')
             ->name('poultry.')
             ->middleware(['permission:poultry.view'])
@@ -221,6 +250,9 @@ Route::prefix('{locale}')
                     ->name('chicken-breeds.egg-logs.store');
             });
 
+        // =========================
+        // Sales & Distribution
+        // =========================
         Route::prefix('sales-distribution')->name('sales-distribution.')->middleware(['permission:sales.view'])->group(function () {
             Route::get('/', [SalesDistributionDashboardController::class, 'index'])->name('dashboard');
 
@@ -270,10 +302,10 @@ Route::prefix('{locale}')
             ->name('ecommerce.')
             ->middleware(['permission:ecommerce.view'])
             ->group(function () {
-            Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
-            Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
-            Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
-        });
+                Route::get('orders', [EcommerceOrderController::class, 'index'])->name('orders.index');
+                Route::get('orders/{order}', [EcommerceOrderController::class, 'show'])->name('orders.show');
+                Route::post('orders/{order}/status', [EcommerceOrderController::class, 'updateStatus'])->name('orders.status');
+            });
 
         // =========================
         // HR Management (Feature Gated)
@@ -283,25 +315,29 @@ Route::prefix('{locale}')
             ->middleware(['feature:hr_management', 'permission:hr.view'])
             ->group(function () {
 
-            Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
-                ->name('index');
+                Route::get('/', fn() => redirect()->route('customer.hr.employees.index', ['locale' => request()->route('locale')]))
+                    ->name('index');
 
-            Route::resource('departments', DepartmentController::class)->except(['show']);
-            Route::resource('job-titles', JobTitleController::class)->except(['show']);
-            Route::get('employees/document-alerts', [EmployeeController::class, 'documentAlerts'])
-                ->name('employees.document-alerts');
-            Route::resource('employees', EmployeeController::class);
+                Route::resource('departments', DepartmentController::class)->except(['show']);
+                Route::resource('job-titles', JobTitleController::class)->except(['show']);
+                Route::get('employees/document-alerts', [EmployeeController::class, 'documentAlerts'])
+                    ->name('employees.document-alerts');
+                Route::resource('employees', EmployeeController::class);
 
-            // Attendance
-            Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-            Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
-            Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
+                Route::get('employees/{employee}/salary-certificate', [EmployeeController::class, 'salaryCertificate'])->name('employees.salary_certificate');
+                Route::post('employees/{employee}/financial-actions', [EmployeeController::class, 'storeFinancialAction'])->name('employees.financial_actions.store');
+                Route::delete('employees/{employee}/financial-actions/{financialAction}', [EmployeeController::class, 'deleteFinancialAction'])->name('employees.financial_actions.destroy');
 
-            // Leaves
-            Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
-            Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
-            Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
-            Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
-            Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
-        });
+                // Attendance
+                Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+                Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
+                Route::post('attendance/{attendance}/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
+
+                // Leaves
+                Route::get('leaves', [LeaveRequestController::class, 'index'])->name('leaves.index');
+                Route::get('leaves/create', [LeaveRequestController::class, 'create'])->name('leaves.create');
+                Route::post('leaves', [LeaveRequestController::class, 'store'])->name('leaves.store');
+                Route::post('leaves/{leave}/approve', [LeaveRequestController::class, 'approve'])->name('leaves.approve');
+                Route::post('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
+            });
     });

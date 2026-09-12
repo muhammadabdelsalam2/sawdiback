@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     'titles' => [
         'employees' => 'الموظفون',
         'departments' => 'الأقسام',
@@ -17,6 +18,7 @@ return [
         'attendance' => 'الحضور',
         'create_leave_request' => 'إنشاء طلب إجازة',
         'attachments' => 'المرفقات',
+        
     ],
     'actions' => [
         'add_employee' => 'إضافة موظف',
@@ -135,4 +137,38 @@ return [
         'no_expiring_documents' => 'لا توجد مستندات موظفين ستنتهي ضمن فترة التنبيه المحددة.',
         'expiring_document_line' => 'الموظف :employee لديه مستندات قاربت على الانتهاء: :documents',
     ],
+    'salary_certificate' => 'شهادة راتب',
+'salary_certificate_title' => 'شهادة لمن يهمه الأمر / مفردات راتب',
+'to_whom_it_may_concern' => 'إلى من يهمه الأمر',
+'print_certificate' => 'طباعة الشهادة',
+'salary_certificate_body' => 'تشهد إدارة :company بأن السيد/السيدة :name (رقم العامل: :emp_id) يعمل لدينا بمسمى وظيفي (:job) بقسم (:dept) وذلك منذ تاريخ تعيينه في :hire_date وما زال على رأس عمله، وبيانات راتبه كالتالي:',
+'certificate_disclaimer' => 'أعطيت هذه الشهادة بناءً على طلب الموظف لتقديمها لمن يهمه الأمر دون أدنى مسؤولية على المزرعة.',
+'hr_manager' => 'مسؤول الموارد البشرية',
+'company_stamp' => 'الختم الرسمي',
+'basic_salary' => 'الراتب الأساسي',
+'allowances_and_increments' => 'الزيادات والبدلات المستمرة',
+'gross_salary' => 'إجمالي الراتب الحالي',
+'education' => 'المؤهل العلمي',
+'work_experience' => 'الخبرة العملية السابقة',
+'self_development' => 'التطوير والتدريب الذاتي',
+'achievements_creativity' => 'الإنجازات والإبداعات',
+'infractions_absence_notes' => 'سجل المخالفات والغياب / التهرب',
+'replacement_employee' => 'الموظف البديل أثناء الإجازة',
+'next_annual_leave_date' => 'موعد الإجازة السنوية القادمة',
+'financial_actions' => 'السلفيات والمكافآت والزيادات',
+'add_financial_action' => 'إضافة حركة مالية / سلفة / زيادة',
+'advance_payment' => 'سلفة مالية',
+'monthly_deduction' => 'استقطاع شهري',
+'salary_increase_fixed' => 'زيادة راتب (مبلغ مقطوع)',
+'salary_increase_percent' => 'زيادة راتب (نسبة مئوية %)',
+'financial_bonus' => 'مكافأة مالية',
+'in_kind_gift' => 'هدية عينية',
+'gift_description' => 'بيان الهدية العينية',
+'installments_count' => 'عدد شهور التقسيط',
+'remaining_amount' => 'المبلغ المتبقي',
+'financial_action_added_successfully' => 'تم تسجيل الحركة المالية للموظف بنجاح',
+'financial_action_deleted_successfully' => 'تم حذف السجل المالي بنجاح',
+'status_traveling' => 'في سفر',
+'status_on_leave' => 'في إجازة',
+'unspecified' => 'غير محدد',
 ];

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Customer\HR;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\HR\EmployeeStoreRequest;
 use App\Http\Requests\Customer\HR\EmployeeUpdateRequest;
+use App\Http\Requests\Customer\HR\EmployeeFinancialActionStoreRequest;
 use App\Models\Employee;
 use App\Models\EmployeeAttachment;
+use App\Models\EmployeeFinancialAction;
 use App\Models\Farm;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
@@ -51,8 +53,9 @@ class EmployeeController extends Controller
         $departments = $this->departmentsRepo->paginate($tenantId, 200);
         $jobTitles = $this->jobTitlesRepo->paginate($tenantId, 200);
         $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $employees = Employee::query()->where('tenant_id', $tenantId)->where('is_active', true)->orderBy('full_name')->get();
 
-        return view('dashboard.customer.hr.employees.create', compact('departments', 'jobTitles', 'farms'));
+        return view('dashboard.customer.hr.employees.create', compact('departments', 'jobTitles', 'farms', 'employees'));
     }
 
     public function store(EmployeeStoreRequest $request, string $locale): RedirectResponse
@@ -76,7 +79,14 @@ class EmployeeController extends Controller
     {
         $this->authorizeTenant($employee);
 
-        $employee->load(['department', 'jobTitle', 'attachments']);
+        $employee->load([
+            'department',
+            'jobTitle',
+            'farm',
+            'attachments',
+            'replacementEmployee',
+            'financialActions' => fn($q) => $q->latest(),
+        ]);
 
         return view('dashboard.customer.hr.employees.show', compact('employee'));
     }
@@ -89,10 +99,16 @@ class EmployeeController extends Controller
         $departments = $this->departmentsRepo->paginate($tenantId, 200);
         $jobTitles = $this->jobTitlesRepo->paginate($tenantId, 200);
         $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
+        $employees = Employee::query()
+            ->where('tenant_id', $tenantId)
+            ->where('id', '!=', $employee->id)
+            ->where('is_active', true)
+            ->orderBy('full_name')
+            ->get();
 
         $employee->load('attachments');
 
-        return view('dashboard.customer.hr.employees.edit', compact('employee', 'departments', 'jobTitles', 'farms'));
+        return view('dashboard.customer.hr.employees.edit', compact('employee', 'departments', 'jobTitles', 'farms', 'employees'));
     }
 
     public function update(EmployeeUpdateRequest $request, string $locale, Employee $employee): RedirectResponse
@@ -118,10 +134,60 @@ class EmployeeController extends Controller
             ->with('success', __('hr.messages.success.employee_deleted'));
     }
 
+    public function salaryCertificate(string $locale, Employee $employee): View
+    {
+        $this->authorizeTenant($employee);
+
+        $employee->load([
+            'department',
+            'jobTitle',
+            'farm',
+            'financialActions' => fn($q) => $q->where('status', 'active'),
+        ]);
+
+        return view('dashboard.customer.hr.employees.salary-certificate', compact('employee'));
+    }
+
+    public function storeFinancialAction(EmployeeFinancialActionStoreRequest $request, string $locale, Employee $employee): RedirectResponse
+    {
+        $this->authorizeTenant($employee);
+
+        $data = $request->validated();
+        $data['tenant_id'] = $employee->tenant_id;
+        $data['created_by'] = auth()->id();
+        $data['status'] = 'active';
+
+        if ($data['type'] === 'advance_payment') {
+            $amount = (float) ($data['amount'] ?? 0);
+            $installments = (int) ($data['installments_count'] ?? 1);
+            $data['installment_amount'] = $installments > 0 ? round($amount / $installments, 2) : $amount;
+            $data['remaining_amount'] = $amount;
+        }
+
+        $employee->financialActions()->create($data);
+
+        return redirect()->route('customer.hr.employees.show', ['locale' => $locale, 'employee' => $employee->id])
+            ->with('success', __('hr.messages.success.financial_action_added'));
+    }
+
+    public function deleteFinancialAction(string $locale, Employee $employee, EmployeeFinancialAction $financialAction): RedirectResponse
+    {
+        $this->authorizeTenant($employee);
+
+        if ((int) $financialAction->employee_id !== (int) $employee->id) {
+            abort(404);
+        }
+
+        $financialAction->delete();
+
+        return redirect()->route('customer.hr.employees.show', ['locale' => $locale, 'employee' => $employee->id])
+            ->with('success', __('hr.messages.success.financial_action_deleted'));
+    }
+
     private function authorizeTenant(Employee $employee): void
     {
         $tenantId = (string) auth()->user()->tenant_id;
-        if ($employee->tenant_id !== $tenantId) {
+        if ((string) $employee->tenant_id !== $tenantId) {
             abort(403);
         }
     }
