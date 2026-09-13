@@ -12,17 +12,34 @@ class FarmUpdateRequest extends FormRequest
         return true;
     }
 
-   public function rules(): array
-{
-    return [
-        'farm_id' => ['required', 'exists:farms,id'],
-        'pen_number' => ['required', 'string', 'max:50'],
-        'name' => ['nullable', 'string', 'max:255'],
-        'type' => ['required', 'string', 'in:goat,cattle,poultry,fish,rabbit,other'],
-        'capacity' => ['nullable', 'integer', 'min:0'],
-        'current_count' => ['nullable', 'integer', 'min:0'],
-        'status' => ['required', 'string', 'in:active,maintenance,quarantine,empty'],
-        'notes' => ['nullable', 'string'],
-    ];
-}
+    public function rules(): array
+    {
+        $farmId = $this->route('farm') instanceof \App\Models\Farm 
+            ? $this->route('farm')->id 
+            : $this->route('farm');
+
+        return [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('farms', 'name')
+                    ->where(fn ($query) => $query->where('tenant_id', auth()->user()->tenant_id))
+                    ->ignore($farmId),
+            ],
+            'code' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('farms', 'code')
+                    ->where(fn ($query) => $query->where('tenant_id', auth()->user()->tenant_id))
+                    ->ignore($farmId),
+            ],
+            'ownership_type' => ['nullable', 'string', 'in:owned,rented'],
+            'location'       => ['nullable', 'string', 'max:255'],
+            'area_sqm'       => ['nullable', 'numeric', 'min:0'],
+            'is_active'      => ['sometimes', 'boolean'],
+            'notes'          => ['nullable', 'string'],
+        ];
+    }
 }

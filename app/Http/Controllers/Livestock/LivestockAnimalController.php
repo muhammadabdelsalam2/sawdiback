@@ -30,12 +30,20 @@ class LivestockAnimalController extends Controller
     ) {
     }
 
-    public function index(Request $request, string $locale): View
+  public function index(Request $request, string $locale): View
     {
-        $items = $this->animals->paginateWithRelations((int) $request->integer('per_page', 15));
+        $tenantId = (string) auth()->user()->tenant_id;
+
+        $items = $this->animals->paginateWithRelations(
+            (int) $request->integer('per_page', 15),
+            $request->only(['species_id', 'farm_id', 'pen_id', 'status', 'search'])
+        );
+
+        $farms = \App\Models\Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get(['id', 'name']);
+        $pens  = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
         $currentLocale = $locale;
 
-        return view('dashboard.livestock.animals.index', compact('items', 'currentLocale'));
+        return view('dashboard.livestock.animals.index', compact('items', 'farms', 'pens', 'currentLocale'));
     }
 
     public function create(string $locale): View

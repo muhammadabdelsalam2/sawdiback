@@ -79,6 +79,14 @@ return [
         'rabbit' => 'Rabbit',
         'other' => 'Other',
     ],
+    'pen_types' => [
+        'goat'    => 'Goats',
+        'cattle'  => 'Cattle',
+        'poultry' => 'Poultry',
+        'fish'    => 'Fish',
+        'rabbit'  => 'Rabbits',
+        'other'   => 'Other',
+    ],
     'empty' => [
         'no_animals' => 'No animals associated with this pen.',
         'no_farms' => 'No farms found.',

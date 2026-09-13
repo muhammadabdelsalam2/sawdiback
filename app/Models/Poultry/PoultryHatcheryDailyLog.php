@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models\Poultry;
+
+use App\Models\Concerns\ScopedByTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class PoultryHatcheryDailyLog extends Model
+{
+    use HasFactory;
+    use ScopedByTenant;
+
+    protected $fillable = [
+        'tenant_id',
+        'hatchery_batch_id',
+        'log_date',
+        'temperature',
+        'humidity',
+        'has_incident',
+        'incident_reason',
+        'notes',
+    ];
+
+    protected $casts = [
+        'log_date'     => 'date',
+        'temperature'  => 'decimal:2',
+        'humidity'     => 'decimal:2',
+        'has_incident' => 'boolean',
+    ];
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(PoultryHatcheryBatch::class, 'hatchery_batch_id');
+    }
+}

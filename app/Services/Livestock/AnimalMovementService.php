@@ -15,30 +15,55 @@ class AnimalMovementService
             throw new InvalidArgumentException('Unauthorized pen access across tenants.');
         }
 
+        // إذا كانت الحظيرة الهدف هي نفس الحظيرة الحالية لا داعي لتنفيذ أي تعديل
+        if ((int) $animal->pen_id === (int) $toPen->id) {
+            return;
+        }
+
         DB::transaction(function () use ($animal, $toPen) {
             $fromPenId = $animal->pen_id;
+            $tenantId  = $animal->tenant_id;
+            $isActive  = $animal->status === 'active';
 
-            // تحديث الحظيرة للحيوان
+            // 1. تحديث الحظيرة التابع لها الحيوان
             $animal->update(['pen_id' => $toPen->id]);
 
-            // خصم العدد من الحظيرة السابقة إذا وجدت
-            if ($fromPenId) {
-                FarmPen::where('id', $fromPenId)
-                    ->where('current_count', '>', 0)
-                    ->decrement('current_count');
-            }
+            // 2. تحديث العدادات فقط في حال كان الحيوان نشطاً
+            if ($isActive) {
+                if ($fromPenId) {
+                    FarmPen::where('tenant_id', $tenantId)
+                        ->where('id', $fromPenId)
+                        ->where('current_count', '>', 0)
+                        ->decrement('current_count');
+                }
 
-            // زيادة العدد في الحظيرة الجديدة
-            $toPen->increment('current_count');
+                FarmPen::where('tenant_id', $tenantId)
+                    ->where('id', $toPen->id)
+                    ->increment('current_count');
+            }
         });
     }
 
-    public function syncPenCount(int|string $penId): void
+    public function syncPenCount(int|string $penId, ?string $tenantId = null): void
     {
-        $count = LivestockAnimal::where('pen_id', $penId)
+        $query = FarmPen::query()->where('id', $penId);
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        $pen = $query->first();
+
+        if (! $pen) {
+            return;
+        }
+
+        $actualCount = LivestockAnimal::query()
+            ->where('tenant_id', $pen->tenant_id)
+            ->where('pen_id', $pen->id)
             ->where('status', 'active')
             ->count();
 
-        FarmPen::where('id', $penId)->update(['current_count' => $count]);
+        $pen->update(['current_count' => $actualCount]);
     }
 }

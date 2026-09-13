@@ -7,17 +7,26 @@ use App\Http\Requests\Customer\Farms\FarmStoreRequest;
 use App\Http\Requests\Customer\Farms\FarmUpdateRequest;
 use App\Models\Farm;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class FarmController extends Controller
 {
-    public function index(): View
+  public function index(Request $request): View
     {
-        $farms = Farm::query()->withCount('pens')->orderBy('name')->paginate(15);
+        $status = $request->get('status', 'active');
+        $query = Farm::query()->withCount('pens');
 
-        return view('dashboard.customer.farms.farms.index', compact('farms'));
+        if ($status === 'trashed') {
+            $query->onlyTrashed();
+        } elseif ($status === 'all') {
+            $query->withTrashed();
+        }
+
+        $farms = $query->orderBy('name')->paginate(15)->withQueryString();
+
+        return view('dashboard.customer.farms.farms.index', compact('farms', 'status'));
     }
-
     public function create(): View
     {
         return view('dashboard.customer.farms.farms.create');
@@ -50,5 +59,22 @@ class FarmController extends Controller
 
         return redirect()->route('customer.farms.index', ['locale' => $locale])
             ->with('success', __('farms.messages.success.farm_deleted'));
+    }
+    public function show(string $locale, Farm $farm): View
+    {
+        $farm->load(['pens' => function ($query) {
+            $query->withCount('animals');
+        }, 'employees']);
+
+        return view('dashboard.customer.farms.farms.show', compact('farm'));
+    }
+
+    public function restore(string $locale, int $farmId): RedirectResponse
+    {
+        $farm = Farm::onlyTrashed()->findOrFail($farmId);
+        $farm->restore();
+
+        return redirect()->route('customer.farms.index', ['locale' => $locale])
+            ->with('success', __('farms.messages.success.farm_restored') ?? 'تم استرجاع المزرعة بنجاح');
     }
 }

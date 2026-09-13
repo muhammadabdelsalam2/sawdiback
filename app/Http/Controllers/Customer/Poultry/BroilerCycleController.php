@@ -13,6 +13,7 @@ use App\Models\Poultry\PoultryBroilerCost;
 use App\Models\Poultry\PoultryBroilerCycle;
 use App\Models\Poultry\PoultryBroilerMortality;
 use App\Models\Poultry\PoultryBroilerSale;
+use App\Services\Poultry\PoultryFinancialService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -44,15 +45,20 @@ class BroilerCycleController extends Controller
             ->with('success', __('poultry.messages.success.broiler_cycle_created'));
     }
 
-    public function show(string $locale, PoultryBroilerCycle $broiler_cycle): View
+    public function show(string $locale, PoultryBroilerCycle $broiler_cycle, PoultryFinancialService $financialService): View
     {
         $broiler_cycle->load([
             'mortalities' => fn ($q) => $q->orderByDesc('mortality_date'),
-            'sales' => fn ($q) => $q->orderByDesc('sale_date'),
-            'costs' => fn ($q) => $q->orderByDesc('cost_date'),
+            'sales'       => fn ($q) => $q->orderByDesc('sale_date'),
+            'costs'       => fn ($q) => $q->orderByDesc('cost_date'),
         ]);
 
-        return view('dashboard.customer.poultry.broiler_cycles.show', ['cycle' => $broiler_cycle]);
+        $metrics = $financialService->calculateBroilerCycleMetrics($broiler_cycle);
+
+        return view('dashboard.customer.poultry.broiler_cycles.show', [
+            'cycle'   => $broiler_cycle,
+            'metrics' => $metrics,
+        ]);
     }
 
     public function edit(string $locale, PoultryBroilerCycle $broiler_cycle): View
@@ -62,9 +68,14 @@ class BroilerCycleController extends Controller
         return view('dashboard.customer.poultry.broiler_cycles.edit', ['cycle' => $broiler_cycle, 'pens' => $pens]);
     }
 
-    public function update(BroilerCycleUpdateRequest $request, string $locale, PoultryBroilerCycle $broiler_cycle): RedirectResponse
+    public function update(BroilerCycleUpdateRequest $request, string $locale, PoultryBroilerCycle $broiler_cycle, PoultryFinancialService $financialService): RedirectResponse
     {
         $broiler_cycle->update($request->validated());
+
+        // ترحيل قيد التسوية المحاسبي تلقائياً إذا أُغلقت الدورة
+        if (in_array($broiler_cycle->status, ['closed', 'completed'], true)) {
+            $financialService->recordBroilerCycleJournalEntry($broiler_cycle, auth()->id() ?? 1);
+        }
 
         return redirect()
             ->route('customer.poultry.broiler-cycles.show', ['locale' => $locale, 'broiler_cycle' => $broiler_cycle->id])

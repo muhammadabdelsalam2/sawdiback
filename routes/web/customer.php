@@ -51,6 +51,7 @@ use App\Http\Controllers\Customer\Poultry\HatcheryBatchController;
 use App\Http\Controllers\Customer\Poultry\HatcheryMachineController;
 use App\Http\Controllers\Customer\Poultry\LayerFlockController;
 use App\Http\Controllers\Customer\Poultry\PoultryAlertController;
+use App\Http\Controllers\Customer\Poultry\PoultryTransportController;
 use App\Http\Controllers\Customer\Account\AccountController;
 use App\Http\Controllers\setting\SearchController;
 
@@ -210,7 +211,12 @@ Route::prefix('{locale}')
             ->middleware(['permission:poultry.view'])
             ->group(function () {
                 Route::get('alerts', PoultryAlertController::class)->name('alerts.index');
-
+Route::get('hatchery-batches/{hatchery_batch}/profit-loss', [HatcheryBatchController::class, 'profitLoss'])
+    ->name('hatchery-batches.profit-loss');
+Route::post('hatchery-batches/{hatchery_batch}/daily-logs', [HatcheryBatchController::class, 'storeDailyLog'])
+    ->name('customer.poultry.hatchery-batches.daily-logs.store');
+Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::class, 'financialSummary'])
+    ->name('vehicle-rentals.financial-summary');
                 Route::resource('broiler-cycles', BroilerCycleController::class)
                     ->parameters(['broiler-cycles' => 'broiler_cycle'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
@@ -241,6 +247,9 @@ Route::prefix('{locale}')
                 Route::resource('hatchery-batches', HatcheryBatchController::class)
                     ->parameters(['hatchery-batches' => 'hatchery_batch'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
+                Route::post('hatchery-batches/{hatchery_batch}/daily-logs', [HatcheryBatchController::class, 'storeDailyLog'])
+                    ->middleware(['permission:poultry.manage'])
+                    ->name('hatchery-batches.daily-logs.store');
 
                 Route::resource('chicken-breeds', ChickenBreedController::class)
                     ->parameters(['chicken-breeds' => 'chicken_breed'])
@@ -248,6 +257,24 @@ Route::prefix('{locale}')
                 Route::post('chicken-breeds/{chicken_breed}/egg-logs', [ChickenBreedController::class, 'storeEggLog'])
                     ->middleware(['permission:poultry.manage'])
                     ->name('chicken-breeds.egg-logs.store');
+
+                // مسارات سيارات النقل ورحلات التأجير المضافة
+                Route::resource('transport-vehicles', PoultryTransportController::class)
+                    ->parameters(['transport-vehicles' => 'transport_vehicle'])
+                    ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
+
+                Route::prefix('vehicle-rentals')->name('vehicle-rentals.')->group(function () {
+                    Route::get('/', [PoultryTransportController::class, 'indexRentals'])->name('index');
+                    Route::post('/', [PoultryTransportController::class, 'storeRental'])
+                        ->middleware(['permission:poultry.manage'])
+                        ->name('store');
+                    Route::put('{rental}', [PoultryTransportController::class, 'updateRental'])
+                        ->middleware(['permission:poultry.manage'])
+                        ->name('update');
+                    Route::delete('{rental}', [PoultryTransportController::class, 'destroyRental'])
+                        ->middleware(['permission:poultry.manage'])
+                        ->name('destroy');
+                });
             });
 
         // =========================

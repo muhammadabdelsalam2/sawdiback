@@ -15,20 +15,27 @@ class FarmPen extends Model
 
     protected $table = 'farm_pens';
 
-    protected $fillable = [
+    public const TYPES = [
+        'goat',      // ماعز
+        'cattle',    // بقر
+        'poultry',   // دواجن
+        'fish',      // أسماك
+        'rabbit',    // أرانب
+        'other',     // أخرى
+    ];
+
+   protected $fillable = [
         'tenant_id',
         'farm_id',
         'pen_number',
-        'name',
-        'type', // goat, cattle, poultry, fish, rabbit, other
+        'type',
         'capacity',
         'current_count',
-        'status',
         'notes',
     ];
 
     protected $casts = [
-        'capacity' => 'integer',
+        'capacity'      => 'integer',
         'current_count' => 'integer',
     ];
 
@@ -42,8 +49,25 @@ class FarmPen extends Model
         return $this->hasMany(LivestockPenFinancialEntry::class, 'pen_id');
     }
 
- public function animals(): HasMany
-{
-    return $this->hasMany(LivestockAnimal::class, 'pen_id');
-}
+    public function animals(): HasMany
+    {
+        return $this->hasMany(LivestockAnimal::class, 'pen_id');
+    }
+
+    public static function getTypeOptions(): array
+    {
+        return [
+            'goat'    => __('farms.pen_types.goat') ?? 'ماعز',
+            'cattle'  => __('farms.pen_types.cattle') ?? 'البقر',
+            'poultry' => __('farms.pen_types.poultry') ?? 'الدواجن',
+            'fish'    => __('farms.pen_types.fish') ?? 'أسماك',
+            'rabbit'  => __('farms.pen_types.rabbit') ?? 'أرانب',
+            'other'   => __('farms.pen_types.other') ?? 'أخرى',
+        ];
+    }
+    public function scopeForSelect($query)
+    {
+        return $query->select(['id', 'farm_id', 'pen_number', 'type', 'capacity', 'current_count'])
+                     ->with('farm:id,name');
+    }
 }
