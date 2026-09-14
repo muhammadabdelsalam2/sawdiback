@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Customer\HR;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\HR\EmployeeFinancialActionStoreRequest;
 use App\Http\Requests\Customer\HR\EmployeeStoreRequest;
 use App\Http\Requests\Customer\HR\EmployeeUpdateRequest;
-use App\Http\Requests\Customer\HR\EmployeeFinancialActionStoreRequest;
 use App\Models\Employee;
 use App\Models\EmployeeAttachment;
 use App\Models\EmployeeFinancialAction;
@@ -15,7 +15,9 @@ use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobTitleRepositoryInterface;
 use App\Services\Customer\HR\HrContextService;
 use App\Services\HR\HrDocumentAlertService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -44,6 +46,23 @@ class EmployeeController extends Controller
         $rows = $alerts->expiringDocuments($days);
 
         return view('dashboard.customer.hr.employees.document-alerts', compact('rows', 'days'));
+    }
+
+    public function annualLeaveAlerts(string $locale): View
+    {
+        $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
+        $thresholdDays = 30;
+
+        $approachingLeaves = Employee::query()
+            ->where('tenant_id', $tenantId)
+            ->where('is_active', true)
+            ->whereNotNull('next_annual_leave_date')
+            ->whereBetween('next_annual_leave_date', [now()->toDateString(), now()->addDays($thresholdDays)->toDateString()])
+            ->with(['department', 'jobTitle', 'replacementEmployee'])
+            ->orderBy('next_annual_leave_date')
+            ->get();
+
+        return view('dashboard.customer.hr.employees.annual-leave-alerts', compact('approachingLeaves', 'thresholdDays'));
     }
 
     public function create(string $locale): View
@@ -134,6 +153,26 @@ class EmployeeController extends Controller
             ->with('success', __('hr.messages.success.employee_deleted'));
     }
 
+    public function updateStatus(Request $request, string $locale, Employee $employee): RedirectResponse
+    {
+        $this->authorizeTenant($employee);
+
+        $validated = $request->validate([
+            'employment_status'       => ['required', 'string', 'in:active,on_leave,traveling,terminated'],
+            'replacement_employee_id' => ['nullable', 'exists:employees,id'],
+            'next_annual_leave_date'  => ['nullable', 'date'],
+        ]);
+
+        $employee->update([
+            'employment_status'       => $validated['employment_status'],
+            'replacement_employee_id' => $validated['replacement_employee_id'] ?? $employee->replacement_employee_id,
+            'next_annual_leave_date'  => $validated['next_annual_leave_date'] ?? $employee->next_annual_leave_date,
+            'is_active'               => $validated['employment_status'] !== 'terminated',
+        ]);
+
+        return redirect()->back()->with('success', __('hr.messages.success.status_updated'));
+    }
+
     public function salaryCertificate(string $locale, Employee $employee): View
     {
         $this->authorizeTenant($employee);
@@ -145,7 +184,9 @@ class EmployeeController extends Controller
             'financialActions' => fn($q) => $q->where('status', 'active'),
         ]);
 
-        return view('dashboard.customer.hr.employees.salary-certificate', compact('employee'));
+        $certificateData = $employee->generateSalaryCertificate();
+
+        return view('dashboard.customer.hr.employees.salary-certificate', compact('employee', 'certificateData'));
     }
 
     public function storeFinancialAction(EmployeeFinancialActionStoreRequest $request, string $locale, Employee $employee): RedirectResponse
@@ -157,7 +198,7 @@ class EmployeeController extends Controller
         $data['created_by'] = auth()->id();
         $data['status'] = 'active';
 
-        if ($data['type'] === 'advance_payment') {
+        if ($data['type'] === EmployeeFinancialAction::TYPE_ADVANCE_PAYMENT) {
             $amount = (float) ($data['amount'] ?? 0);
             $installments = (int) ($data['installments_count'] ?? 1);
             $data['installment_amount'] = $installments > 0 ? round($amount / $installments, 2) : $amount;
@@ -213,10 +254,10 @@ class EmployeeController extends Controller
             $file->move($directory, $filename);
 
             EmployeeAttachment::query()->create([
-                'tenant_id' => $tenantId,
+                'tenant_id'   => $tenantId,
                 'employee_id' => $employee->id,
-                'type' => $type,
-                'path' => 'hr/employee-attachments/' . $filename,
+                'type'        => $type,
+                'path'        => 'hr/employee-attachments/' . $filename,
                 'uploaded_at' => now(),
             ]);
         }
@@ -226,7 +267,7 @@ class EmployeeController extends Controller
     {
         return [
             'attachment_passport' => 'passport',
-            'attachment_iqama' => 'iqama',
+            'attachment_iqama'    => 'iqama',
             'attachment_identity' => 'identity',
         ];
     }

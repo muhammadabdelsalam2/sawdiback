@@ -8,7 +8,7 @@
 @endphp
 
 <div class="container-fluid my-4">
-    {{-- شريط العنوان وأزرار الإجراءات --}}
+    {{-- Top Action Bar --}}
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
             <h2 class="h3 font-weight-bold text-gray-800 mb-1">{{ $employee->full_name }}</h2>
@@ -25,9 +25,12 @@
             <a href="{{ route('customer.hr.employees.index', ['locale' => $currentLocale]) }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left mr-1"></i> {{ __('hr.actions.back') }}
             </a>
-            <a href="{{ route('customer.hr.employees.salary_certificate', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" class="btn btn-outline-info" target="_blank">
+            <a href="{{ route('customer.hr.employees.salary-certificate', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" class="btn btn-outline-info" target="_blank">
                 <i class="fas fa-file-invoice-dollar mr-1"></i> {{ __('hr.salary_certificate') }}
             </a>
+            <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#updateStatusModal">
+                <i class="fas fa-user-clock mr-1"></i> {{ __('hr.update_status_modal_title') }}
+            </button>
             <a href="{{ route('customer.hr.employees.edit', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" class="btn btn-primary">
                 <i class="fas fa-edit mr-1"></i> {{ __('hr.actions.edit') }}
             </a>
@@ -44,7 +47,7 @@
     @endif
 
     <div class="row">
-        {{-- بطاقة المعلومات الأساسية --}}
+        {{-- Employee Details Sidebar Card --}}
         <div class="col-lg-4 col-md-12 mb-4">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-primary text-white">
@@ -61,11 +64,7 @@
                         </span>
                         <div class="mt-2">
                             <span class="badge badge-info">
-                                {{ __('hr.options.' . ($employee->employment_status ?? 'active')) != 'hr.options.' . ($employee->employment_status ?? 'active') 
-                                    ? __('hr.options.' . ($employee->employment_status ?? 'active')) 
-                                    : (__('hr.status_' . ($employee->employment_status ?? 'active')) != 'hr.status_' . ($employee->employment_status ?? 'active') 
-                                        ? __('hr.status_' . ($employee->employment_status ?? 'active')) 
-                                        : $employee->employment_status) }}
+                                {{ __('hr.status_' . ($employee->employment_status ?? 'active')) }}
                             </span>
                         </div>
                     </div>
@@ -116,9 +115,9 @@
             </div>
         </div>
 
-        {{-- التفاصيل المالية والسجل المهني والبديل --}}
+        {{-- Financial and Career Record Sections --}}
         <div class="col-lg-8 col-md-12 mb-4">
-            {{-- ملخص الراتب والوضع المالي --}}
+            {{-- Salary Summary Cards --}}
             <div class="row mb-4">
                 <div class="col-md-4 mb-3">
                     <div class="card border-0 shadow-sm bg-light-primary border-left-primary h-100 py-2">
@@ -131,7 +130,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="card border-0 shadow-sm bg-light-success border-left-success h-100 py-2">
                         <div class="card-body">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ __('hr.gross_salary') }}</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ __('hr.gross_salary_label') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-success">{{ number_format($employee->current_salary, 2) }}</div>
                         </div>
                     </div>
@@ -146,7 +145,7 @@
                 </div>
             </div>
 
-            {{-- بطاقة السجل المهني والمؤهلات والبديل --}}
+            {{-- Professional Profile Card --}}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="card-title font-weight-bold mb-0 text-dark">
@@ -157,27 +156,31 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.education') }}:</label>
-                            <p class="border rounded p-2 bg-light">{{ $employee->education ?: '-' }}</p>
+                            <p class="border rounded p-2 bg-light mb-0">{{ $employee->education ?: '-' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.work_experience') }}:</label>
-                            <p class="border rounded p-2 bg-light">{{ $employee->work_experience ?: '-' }}</p>
+                            <p class="border rounded p-2 bg-light mb-0">{{ $employee->work_experience ?: '-' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.achievements_creativity') }}:</label>
-                            <p class="border rounded p-2 bg-light">{{ $employee->achievements_creativity ?: '-' }}</p>
+                            <p class="border rounded p-2 bg-light mb-0">{{ $employee->achievements_creativity ?: '-' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.self_development') }}:</label>
-                            <p class="border rounded p-2 bg-light">{{ $employee->self_development ?: '-' }}</p>
+                            <p class="border rounded p-2 bg-light mb-0">{{ $employee->self_development ?: '-' }}</p>
                         </div>
                         <div class="col-md-12 mb-3">
                             <label class="font-weight-bold text-danger d-block">{{ __('hr.infractions_absence_notes') }}:</label>
-                            <p class="border border-danger rounded p-2 bg-light text-danger">{{ $employee->infractions_absence_notes ?: '-' }}</p>
+                            <p class="border border-danger rounded p-2 bg-light text-danger mb-0">{{ $employee->infractions_absence_notes ?: '-' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.replacement_employee') }}:</label>
-                            <span class="badge badge-secondary p-2">{{ $employee->replacementEmployee->full_name ?? __('hr.options.select') }}</span>
+                            @if($employee->replacementEmployee)
+                                <span class="badge badge-secondary p-2">{{ $employee->replacementEmployee->full_name }}</span>
+                            @else
+                                <span class="badge badge-light text-muted p-2 border">{{ __('hr.no_replacement_set') }}</span>
+                            @endif
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="font-weight-bold text-muted d-block">{{ __('hr.next_annual_leave_date') }}:</label>
@@ -187,7 +190,7 @@
                 </div>
             </div>
 
-            {{-- جدول الحركات المالية --}}
+            {{-- Financial Actions Table --}}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="card-title font-weight-bold mb-0 text-dark">
@@ -233,7 +236,7 @@
                                         <td class="text-danger font-weight-bold">{{ number_format($action->remaining_amount, 2) }}</td>
                                         <td><span class="badge badge-info">{{ $action->status }}</span></td>
                                         <td>
-                                            <form action="{{ route('customer.hr.employees.financial_actions.destroy', ['locale' => $currentLocale, 'employee' => $employee->id, 'financialAction' => $action->id]) }}" method="POST" onsubmit="return confirm('{{ __('hr.messages.confirm_delete_employee') }}')">
+                                            <form action="{{ route('customer.hr.employees.financial-actions.destroy', ['locale' => $currentLocale, 'employee' => $employee->id, 'financialAction' => $action->id]) }}" method="POST" onsubmit="return confirm('{{ __('hr.messages.confirm_delete_employee') }}')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('hr.actions.delete') }}">
@@ -256,11 +259,59 @@
     </div>
 </div>
 
-{{-- Modal إضافة حركة مالية جديدة --}}
+{{-- Modal: Update Status and Replacement --}}
+<div class="modal fade" id="updateStatusModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form action="{{ route('customer.hr.employees.update-status', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold">{{ __('hr.update_status_modal_title') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">{{ __('hr.fields.status') }}</label>
+                        <select name="employment_status" class="form-control" required>
+                            <option value="active" {{ $employee->employment_status === 'active' ? 'selected' : '' }}>{{ __('hr.status_active') }}</option>
+                            <option value="on_leave" {{ $employee->employment_status === 'on_leave' ? 'selected' : '' }}>{{ __('hr.status_on_leave') }}</option>
+                            <option value="traveling" {{ $employee->employment_status === 'traveling' ? 'selected' : '' }}>{{ __('hr.status_traveling') }}</option>
+                            <option value="terminated" {{ $employee->employment_status === 'terminated' ? 'selected' : '' }}>{{ __('hr.status_terminated') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">{{ __('hr.replacement_employee') }}</label>
+                        <select name="replacement_employee_id" class="form-control">
+                            <option value="">-- {{ __('hr.none') }} --</option>
+                            @foreach(\App\Models\Employee::where('tenant_id', $employee->tenant_id)->where('id', '!=', $employee->id)->where('is_active', true)->get() as $otherEmp)
+                                <option value="{{ $otherEmp->id }}" {{ $employee->replacement_employee_id == $otherEmp->id ? 'selected' : '' }}>
+                                    {{ $otherEmp->full_name }} ({{ $otherEmp->worker_number ?? $otherEmp->id }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold">{{ __('hr.next_annual_leave_date') }}</label>
+                        <input type="date" name="next_annual_leave_date" class="form-control" value="{{ $employee->next_annual_leave_date ? $employee->next_annual_leave_date->format('Y-m-d') : '' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('hr.actions.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('hr.actions.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal: Add Financial Action --}}
 <div class="modal fade" id="addFinancialActionModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <form action="{{ route('customer.hr.employees.financial_actions.store', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" method="POST">
+            <form action="{{ route('customer.hr.employees.financial-actions.store', ['locale' => $currentLocale, 'employee' => $employee->id]) }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title font-weight-bold" id="modalLabel">{{ __('hr.add_financial_action') }}</h5>

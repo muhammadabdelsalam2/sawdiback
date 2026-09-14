@@ -211,12 +211,13 @@ Route::prefix('{locale}')
             ->middleware(['permission:poultry.view'])
             ->group(function () {
                 Route::get('alerts', PoultryAlertController::class)->name('alerts.index');
-Route::get('hatchery-batches/{hatchery_batch}/profit-loss', [HatcheryBatchController::class, 'profitLoss'])
-    ->name('hatchery-batches.profit-loss');
-Route::post('hatchery-batches/{hatchery_batch}/daily-logs', [HatcheryBatchController::class, 'storeDailyLog'])
-    ->name('customer.poultry.hatchery-batches.daily-logs.store');
-Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::class, 'financialSummary'])
-    ->name('vehicle-rentals.financial-summary');
+                Route::get('hatchery-batches/{hatchery_batch}/profit-loss', [HatcheryBatchController::class, 'profitLoss'])
+                    ->name('hatchery-batches.profit-loss');
+                Route::post('hatchery-batches/{hatchery_batch}/daily-logs', [HatcheryBatchController::class, 'storeDailyLog'])
+                    ->name('hatchery-batches.daily-logs.store');
+                Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::class, 'financialSummary'])
+                    ->name('vehicle-rentals.financial-summary');
+
                 Route::resource('broiler-cycles', BroilerCycleController::class)
                     ->parameters(['broiler-cycles' => 'broiler_cycle'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
@@ -247,9 +248,6 @@ Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::cla
                 Route::resource('hatchery-batches', HatcheryBatchController::class)
                     ->parameters(['hatchery-batches' => 'hatchery_batch'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
-                Route::post('hatchery-batches/{hatchery_batch}/daily-logs', [HatcheryBatchController::class, 'storeDailyLog'])
-                    ->middleware(['permission:poultry.manage'])
-                    ->name('hatchery-batches.daily-logs.store');
 
                 Route::resource('chicken-breeds', ChickenBreedController::class)
                     ->parameters(['chicken-breeds' => 'chicken_breed'])
@@ -258,7 +256,6 @@ Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::cla
                     ->middleware(['permission:poultry.manage'])
                     ->name('chicken-breeds.egg-logs.store');
 
-                // مسارات سيارات النقل ورحلات التأجير المضافة
                 Route::resource('transport-vehicles', PoultryTransportController::class)
                     ->parameters(['transport-vehicles' => 'transport_vehicle'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
@@ -347,13 +344,36 @@ Route::get('vehicle-rentals/financial-summary', [PoultryTransportController::cla
 
                 Route::resource('departments', DepartmentController::class)->except(['show']);
                 Route::resource('job-titles', JobTitleController::class)->except(['show']);
+
                 Route::get('employees/document-alerts', [EmployeeController::class, 'documentAlerts'])
                     ->name('employees.document-alerts');
-                Route::resource('employees', EmployeeController::class);
 
-                Route::get('employees/{employee}/salary-certificate', [EmployeeController::class, 'salaryCertificate'])->name('employees.salary_certificate');
-                Route::post('employees/{employee}/financial-actions', [EmployeeController::class, 'storeFinancialAction'])->name('employees.financial_actions.store');
-                Route::delete('employees/{employee}/financial-actions/{financialAction}', [EmployeeController::class, 'deleteFinancialAction'])->name('employees.financial_actions.destroy');
+                Route::get('employees/annual-leave-alerts', [EmployeeController::class, 'annualLeaveAlerts'])
+                    ->name('employees.annual-leave-alerts');
+
+                Route::patch('employees/{employee}/status', [EmployeeController::class, 'updateStatus'])
+                    ->name('employees.update-status');
+
+                Route::get('employees/{employee}/salary-certificate', [EmployeeController::class, 'salaryCertificate'])
+                    ->name('employees.salary-certificate');
+
+                // alias للتوافق مع التسمية القديمة إن وجدت
+                Route::get('employees/{employee}/salary_certificate', [EmployeeController::class, 'salaryCertificate'])
+                    ->name('employees.salary_certificate');
+
+                Route::post('employees/{employee}/financial-actions', [EmployeeController::class, 'storeFinancialAction'])
+                    ->name('employees.financial-actions.store');
+
+                Route::post('employees/{employee}/financial_actions', [EmployeeController::class, 'storeFinancialAction'])
+                    ->name('employees.financial_actions.store');
+
+                Route::delete('employees/{employee}/financial-actions/{financialAction}', [EmployeeController::class, 'deleteFinancialAction'])
+                    ->name('employees.financial-actions.destroy');
+
+                Route::delete('employees/{employee}/financial_actions/{financialAction}', [EmployeeController::class, 'deleteFinancialAction'])
+                    ->name('employees.financial_actions.destroy');
+
+                Route::resource('employees', EmployeeController::class);
 
                 // Attendance
                 Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
