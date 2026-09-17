@@ -36,4 +36,13 @@ class PoultryHatcheryDailyLog extends Model
     {
         return $this->belongsTo(PoultryHatcheryBatch::class, 'hatchery_batch_id');
     }
+    public function breeds(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+{
+    return $this->belongsToMany(
+        PoultryChickenBreed::class,
+        'poultry_hatchery_batch_breeds',
+        'hatchery_batch_id',
+        'breed_id'
+    )->withPivot('egg_count')->withTimestamps();
+}
 }

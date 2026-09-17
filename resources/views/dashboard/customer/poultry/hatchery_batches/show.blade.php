@@ -53,7 +53,7 @@
 @php
     $currentLocale = request()->route('locale') ?? app()->getLocale();
     $isArabic = str_starts_with(strtolower($currentLocale), 'ar');
-    $breedsList = \App\Models\Poultry\PoultryHatcheryBatch::BREEDS;
+    $breedsList = \App\Models\Poultry\PoultryHatcheryBatch::BREEDS ?? [];
 @endphp
 
 <div class="container py-4 livestock-page batch-details-page">
@@ -68,9 +68,15 @@
                 {{ $batch->loaded_at?->format('Y-m-d') }} | 
                 {{ $isArabic ? 'المتوقع للتفقيس:' : 'Expected Hatch:' }} 
                 {{ $batch->expected_hatch_at?->format('Y-m-d') ?? '-' }}
+                @if($batch->actual_hatch_at)
+                    | <span class="text-success font-weight-bold"><i class="fas fa-check-circle mr-1"></i> {{ $isArabic ? 'تم الفقس في:' : 'Hatched at:' }} {{ $batch->actual_hatch_at->format('Y-m-d') }}</span>
+                @endif
             </div>
         </div>
         <div class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-white" href="{{ route('customer.poultry.hatchery-batches.edit', ['locale' => $currentLocale, 'hatchery_batch' => $batch->id]) }}">
+                <i class="fas fa-edit mr-1"></i> {{ __('poultry.actions.edit') }}
+            </a>
             <a class="btn btn-outline-secondary px-3" href="{{ route('customer.poultry.hatchery-batches.index', ['locale' => $currentLocale]) }}">
                 <i class="fas fa-arrow-left mr-1"></i> {{ __('poultry.actions.back') }}
             </a>
@@ -102,12 +108,76 @@
         <div class="col-md-3 col-sm-6">
             <div class="stat-badge">
                 <div class="label">{{ __('poultry.fields.success_rate') }}</div>
-                <div class="value text-info">{{ $batch->success_rate }}%</div>
+                <div class="value text-info">{{ $batch->success_rate ?? ($batch->eggs_loaded > 0 ? round(($batch->chicks_produced / $batch->eggs_loaded) * 100, 2) : 0) }}%</div>
             </div>
         </div>
     </div>
 
-    {{-- 2. تفاصيل التكلفة ومصدر البيض وتوزيع السلالات --}}
+    {{-- 2. بطاقة الأداء المالي وربحية الدفعة --}}
+    <div class="card-block mb-4">
+        <h5 class="font-weight-bold text-dark border-bottom pb-2 mb-3">
+            <i class="fas fa-coins text-warning mr-1"></i> {{ $isArabic ? 'التحليل المالي وتكلفة الدفعة' : 'Financial & Profitability Breakdown' }}
+        </h5>
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-badge border-start border-danger border-4">
+                    <div class="label">{{ $isArabic ? 'إجمالي التكاليف (شراء + تشغيل)' : 'Total Costs' }}</div>
+                    <div class="value text-danger">{{ number_format((float)($financials['total_cost'] ?? $batch->purchase_amount), 2) }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-badge border-start border-success border-4">
+                    <div class="label">{{ $isArabic ? 'الإيراد المحقق / المتوقع' : 'Revenue' }}</div>
+                    <div class="value text-success">{{ number_format((float)($financials['total_revenue'] ?? 0), 2) }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-badge border-start border-primary border-4">
+                    <div class="label">{{ __('poultry.fields.net_profit') }}</div>
+                    <div class="value {{ (float)($financials['net_profit'] ?? 0) >= 0 ? 'text-primary' : 'text-danger' }}">
+                        {{ number_format((float)($financials['net_profit'] ?? 0), 2) }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-badge border-start border-info border-4">
+                    <div class="label">{{ $isArabic ? 'تكلفة الكتكوت الواحد' : 'Cost Per Chick' }}</div>
+                    <div class="value text-info">{{ number_format((float)($financials['cost_per_chick'] ?? 0), 2) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- 3. تسجيل إتمام الفقس الفعلي وترحيل الحسابات --}}
+    @if(!$batch->actual_hatch_at)
+        <div class="card-block mb-4 bg-light border-primary">
+            <h5 class="font-weight-bold text-dark mb-2">
+                <i class="fas fa-check-double text-primary mr-1"></i> {{ $isArabic ? 'تسجيل إتمام الفقس الفعلي للدفعة' : 'Record Actual Hatch Completion' }}
+            </h5>
+            <p class="text-muted small mb-3">
+                {{ $isArabic ? 'عند تسجيل عدد الكتاكيت الفاقسة وتاريخ الفقس، سيتم تثبيت مؤشرات النجاح وترحيل القيد اليومي للمدفوعات والمبيعات تلقائياً.' : 'Recording actual hatch will compute final success rate and trigger automatic journal entries.' }}
+            </p>
+            <form method="POST" action="{{ route('customer.poultry.hatchery-batches.update', ['locale' => $currentLocale, 'hatchery_batch' => $batch->id]) }}" class="row g-3 align-items-end">
+                @csrf
+                @method('PUT')
+                <div class="col-md-4">
+                    <label class="form-label font-weight-bold small text-muted">{{ $isArabic ? 'تاريخ الفقس الفعلي' : 'Actual Hatch Date' }} <span class="text-danger">*</span></label>
+                    <input type="date" name="actual_hatch_at" class="form-control" value="{{ date('Y-m-d') }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label font-weight-bold small text-muted">{{ __('poultry.fields.chicks_produced') }} <span class="text-danger">*</span></label>
+                    <input type="number" min="1" max="{{ $batch->eggs_loaded }}" name="chicks_produced" class="form-control" placeholder="مثال: 4500" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary-green w-100 font-weight-bold" onclick="return confirm('{{ $isArabic ? 'هل أنت متأكد من تسجيل نتيجة الفقس وإتمام الدفعة؟' : 'Confirm hatch completion?' }}')">
+                        <i class="fas fa-lock mr-1"></i> {{ $isArabic ? 'إتمام الدفعة وترحيل الحسابات' : 'Complete & Post Journal' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    @endif
+
+    {{-- 4. تفاصيل التكلفة ومصدر البيض وتوزيع السلالات --}}
     <div class="row g-3 mb-4">
         {{-- بيانات المصدر والتكلفة --}}
         <div class="col-lg-5">
@@ -153,7 +223,7 @@
             </div>
         </div>
 
-        {{-- توزيع السلالات الـ 10 --}}
+        {{-- توزيع السلالات --}}
         <div class="col-lg-7">
             <div class="card-block h-100">
                 <h5 class="font-weight-bold text-dark border-bottom pb-2 mb-3">
@@ -174,7 +244,7 @@
                             @endphp
                             @forelse($batchBreeds as $b)
                                 @php
-                                    $count = (int) $b->pivot->egg_count;
+                                    $count = (int) ($b->pivot->egg_count ?? 0);
                                     $percent = $batch->eggs_loaded > 0 ? round(($count / $batch->eggs_loaded) * 100, 1) : 0;
                                 @endphp
                                 <tr>
@@ -196,7 +266,7 @@
         </div>
     </div>
 
-    {{-- 3. تسجيل متابعة يومية جديدة (Daily Monitoring Entry) --}}
+    {{-- 5. تسجيل متابعة يومية جديدة --}}
     <div class="card-block">
         <h5 class="font-weight-bold text-dark border-bottom pb-2 mb-3">
             <i class="fas fa-plus-circle text-primary mr-1"></i> {{ $isArabic ? 'تسجيل قراءة متابعة يومية للفقاسة' : 'Add Daily Monitoring Log' }}
@@ -245,15 +315,15 @@
         </form>
     </div>
 
-    {{-- 4. جدول المتابعة اليومي (سجل القراءات والأعطال) --}}
+    {{-- 6. جدول المتابعة اليومي --}}
     <div class="card-block">
         <h5 class="font-weight-bold text-dark border-bottom pb-2 mb-3">
             <i class="fas fa-history text-secondary mr-1"></i> {{ $isArabic ? 'جدول المتابعة اليومي للدفعة' : 'Daily Monitoring Log History' }}
         </h5>
         
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered text-center align-middle mb-0">
-                <thead class="table-light">
+        <div class="table-container">
+            <table class="table registry-table mb-0 text-center">
+                <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
                         <th>{{ $isArabic ? 'اليوم / التاريخ' : 'Date' }}</th>
@@ -317,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const incidentInputs = document.querySelectorAll('.incident-input');
 
     function toggleIncidentInputs() {
-        if (incidentSelect.value === '1') {
+        if (incidentSelect && incidentSelect.value === '1') {
             incidentInputs.forEach(el => el.style.display = 'block');
         } else {
             incidentInputs.forEach(el => el.style.display = 'none');
@@ -326,6 +396,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (incidentSelect) {
         incidentSelect.addEventListener('change', toggleIncidentInputs);
+        toggleIncidentInputs();
     }
 });
 </script>

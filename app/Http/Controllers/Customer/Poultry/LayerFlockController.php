@@ -1,153 +1,251 @@
-@extends('layouts.customer.dashboard')
+<?php
 
-@section('title', __('poultry.titles.layer_flock_details'))
+namespace App\Http\Controllers\Customer\Poultry;
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/pages/livestock.css') }}">
-@endpush
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\Poultry\LayerEggProductionLogStoreRequest;
+use App\Http\Requests\Customer\Poultry\LayerFlockStoreRequest;
+use App\Http\Requests\Customer\Poultry\LayerFlockUpdateRequest;
+use App\Http\Requests\Customer\Poultry\LayerMortalityStoreRequest;
+use App\Models\FarmPen;
+use App\Models\Poultry\PoultryLayerEggProductionLog;
+use App\Models\Poultry\PoultryLayerFlock;
+use App\Models\Poultry\PoultryLayerMortality;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\View\View;
 
-@section('content')
-@php
-    $currentLocale = request()->route('locale') ?? app()->getLocale();
-@endphp
-<div class="container py-4 livestock-page">
-    <div class="page-head">
-        <h2 class="page-title">{{ __('poultry.titles.layer_flock_details') }}: {{ $flock->flock_number }}</h2>
-        <div class="d-flex gap-2">
-            <a class="btn btn-sm btn-outline-white" href="{{ route('customer.poultry.layer-flocks.edit', ['locale' => $currentLocale, 'layer_flock' => $flock->id]) }}">
-                <i class="fas fa-edit mr-1"></i> {{ __('poultry.actions.edit') }}
-            </a>
-            <a class="btn btn-sm btn-outline-white" href="{{ route('customer.poultry.layer-flocks.index', ['locale' => $currentLocale]) }}">
-                {{ __('poultry.actions.back') }}
-            </a>
-        </div>
-    </div>
+class LayerFlockController extends Controller
+{
+    /**
+     * استرجاع كلاس موديل القيود اليومية الفعلي بالمشروع بأمان
+     */
+    protected function getJournalEntryClass(): ?string
+    {
+        $classes = [
+            'App\Models\Customer\Finance\JournalEntry',
+            'App\Models\Finance\JournalEntry',
+            'App\Models\JournalEntry',
+        ];
 
-    @include('dashboard.customer.poultry.partials.flash')
+        foreach ($classes as $class) {
+            if (class_exists($class)) {
+                return $class;
+            }
+        }
 
-    {{-- بطاقات الملخص المالي والإنتاجي --}}
-    <div class="card-block mb-3">
-        <div class="row g-3">
-            <div class="col-md-2">
-                <strong>{{ __('poultry.fields.total_egg_revenue') }}:</strong>
-                <span class="text-success font-weight-bold">{{ number_format((float)($flock->total_egg_revenue ?? 0), 2) }}</span>
-            </div>
-            <div class="col-md-2">
-                <strong>{{ __('poultry.fields.total_feed_cost') }}:</strong>
-                <span class="text-danger">{{ number_format((float)($flock->total_feed_cost ?? 0), 2) }}</span>
-            </div>
-            <div class="col-md-2">
-                <strong>{{ __('poultry.fields.net_profit') }}:</strong>
-                <span class="font-weight-bold {{ (float)($flock->net_profit ?? 0) >= 0 ? 'text-primary' : 'text-danger' }}">
-                    {{ number_format((float)($flock->net_profit ?? 0), 2) }}
-                </span>
-            </div>
-            <div class="col-md-2">
-                <strong>الطيور الحية:</strong>
-                <span class="text-primary font-weight-bold">{{ number_format($metrics['current_live_hens'] ?? 0) }}</span>
-            </div>
-            <div class="col-md-2">
-                <strong>نسبة النفوق:</strong>
-                <span class="{{ ($metrics['mortality_rate'] ?? 0) > 5 ? 'text-danger' : 'text-success' }}">
-                    {{ $metrics['mortality_rate'] ?? 0 }}% ({{ $metrics['total_mortality'] ?? 0 }})
-                </span>
-            </div>
-            <div class="col-md-2">
-                <strong>معدل البياض اليومي:</strong>
-                <span class="badge bg-success">{{ $metrics['hen_day_production_rate'] ?? 0 }}%</span>
-            </div>
-        </div>
-    </div>
+        return null;
+    }
 
-    {{-- نموذج تسجيل إنتاج البيض اليومي --}}
-    <div class="card-block mb-3">
-        <h5 class="section-title mb-3 font-weight-bold">
-            <i class="fas fa-egg text-warning mr-1"></i> {{ __('poultry.actions.record_egg_log') }}
-        </h5>
-        <form method="POST" action="{{ route('customer.poultry.layer-flocks.egg-logs.store', ['locale' => $currentLocale, 'layer_flock' => $flock->id]) }}" class="row g-3">
-            @csrf
-            <div class="col-md-2">
-                <input type="date" name="production_date" class="form-control" value="{{ date('Y-m-d') }}" required>
-            </div>
-            <div class="col-md-2">
-                <input type="number" min="0" name="eggs_count" class="form-control" placeholder="{{ __('poultry.fields.eggs_count') }}" required>
-            </div>
-            <div class="col-md-2">
-                <input type="number" step="0.01" min="0" name="sale_price" class="form-control" placeholder="{{ __('poultry.fields.sale_price') }}" required>
-            </div>
-            <div class="col-md-2">
-                <input type="number" step="0.01" min="0" name="daily_feed_cost" class="form-control" placeholder="{{ __('poultry.fields.daily_feed_cost') }}" required>
-            </div>
-            <div class="col-md-2">
-                <input type="number" min="0" name="damaged_count" class="form-control" placeholder="{{ __('poultry.fields.damaged_count') }}" value="0">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary-green w-100">{{ __('poultry.actions.save') }}</button>
-            </div>
-        </form>
-    </div>
+    public function index(string $locale): View
+    {
+        $flocks = PoultryLayerFlock::query()
+            ->with(['eggProductionLogs', 'mortalities'])
+            ->orderByDesc('started_at')
+            ->paginate(15);
 
-    {{-- نموذج تسجيل النفوق اليومي --}}
-    <div class="card-block mb-4">
-        <h5 class="section-title mb-3 font-weight-bold">
-            <i class="fas fa-heart-broken text-danger mr-1"></i> {{ __('poultry.actions.record_mortality') }}
-        </h5>
-        <form method="POST" action="{{ route('customer.poultry.layer-flocks.mortalities.store', ['locale' => $currentLocale, 'layer_flock' => $flock->id]) }}" class="row g-3">
-            @csrf
-            <div class="col-md-3">
-                <input type="date" name="mortality_date" class="form-control" value="{{ date('Y-m-d') }}" required>
-            </div>
-            <div class="col-md-3">
-                <input type="number" min="1" name="quantity" class="form-control" placeholder="{{ __('poultry.fields.quantity') }}" required>
-            </div>
-            <div class="col-md-4">
-                <input type="text" name="notes" class="form-control" placeholder="{{ __('poultry.fields.notes') }}">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary-green w-100">{{ __('poultry.actions.save') }}</button>
-            </div>
-        </form>
-    </div>
+        return view('dashboard.customer.poultry.layer_flocks.index', [
+            'flocks'        => $flocks,
+            'currentLocale' => $locale,
+        ]);
+    }
 
-    {{-- جدول حركة وسجل إنتاج البيض اليومي --}}
-    <div class="card-block">
-        <h5 class="border-bottom pb-2 mb-3 font-weight-bold">
-            <i class="fas fa-history mr-1"></i> سجل إنتاج وتكاليف البيض
-        </h5>
-        <div class="table-container">
-            <table class="table registry-table mb-0">
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>عدد البيض</th>
-                        <th>سعر البيع المقدر</th>
-                        <th>تكلفة العلف اليومي</th>
-                        <th>البيض التالف/الكسر</th>
-                        <th>الأطباق التقريبية (30)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($flock->eggProductionLogs as $log)
-                        @php
-                            $eggs = (int) ($log->eggs_count ?? $log->good_eggs_count ?? 0);
-                            $damaged = (int) ($log->damaged_count ?? $log->damaged_eggs_count ?? 0);
-                        @endphp
-                        <tr>
-                            <td>{{ $log->production_date ? \Carbon\Carbon::parse($log->production_date)->format('Y-m-d') : '-' }}</td>
-                            <td class="text-success font-weight-bold">{{ number_format($eggs) }}</td>
-                            <td>{{ number_format((float)($log->sale_price ?? 0), 2) }}</td>
-                            <td class="text-danger">{{ number_format((float)($log->daily_feed_cost ?? 0), 2) }}</td>
-                            <td class="text-muted">{{ number_format($damaged) }}</td>
-                            <td><span class="badge bg-light text-dark border">{{ round($eggs / 30, 1) }}</span></td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6">{{ __('poultry.empty.no_egg_logs') ?? 'لا توجد سجلات إنتاج بيض مسجلة حتى الآن.' }}</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-@endsection
+    public function create(string $locale): View
+    {
+        $pens = FarmPen::query()->forSelect()->get();
+
+        return view('dashboard.customer.poultry.layer_flocks.create', [
+            'pens'          => $pens,
+            'currentLocale' => $locale,
+        ]);
+    }
+
+    public function store(LayerFlockStoreRequest $request, string $locale): RedirectResponse
+    {
+        $data = $request->validated();
+        if (Schema::hasColumn('poultry_layer_flocks', 'tenant_id')) {
+            $data['tenant_id'] = auth()->user()->tenant_id ?? null;
+        }
+
+        $flock = PoultryLayerFlock::query()->create($data);
+
+        return redirect()
+            ->route('customer.poultry.layer-flocks.show', ['locale' => $locale, 'layer_flock' => $flock->id])
+            ->with('success', __('poultry.messages.success.layer_flock_created') ?? 'تم إنشاء قطيع البياض بنجاح.');
+    }
+
+    public function show(string $locale, PoultryLayerFlock $layer_flock): View
+    {
+        $layer_flock->load([
+            'eggProductionLogs' => fn ($q) => $q->orderByDesc('production_date'),
+            'mortalities'       => fn ($q) => $q->orderByDesc('mortality_date'),
+        ]);
+
+        $metrics = $this->calculateLayerFlockMetrics($layer_flock);
+
+        return view('dashboard.customer.poultry.layer_flocks.show', [
+            'flock'         => $layer_flock,
+            'metrics'       => $metrics,
+            'currentLocale' => $locale,
+        ]);
+    }
+
+    public function edit(string $locale, PoultryLayerFlock $layer_flock): View
+    {
+        $pens = FarmPen::query()->forSelect()->get();
+
+        return view('dashboard.customer.poultry.layer_flocks.edit', [
+            'flock'         => $layer_flock,
+            'pens'          => $pens,
+            'currentLocale' => $locale,
+        ]);
+    }
+
+    public function update(LayerFlockUpdateRequest $request, string $locale, PoultryLayerFlock $layer_flock): RedirectResponse
+    {
+        $layer_flock->update($request->validated());
+
+        if (in_array($layer_flock->status, ['closed', 'completed'], true)) {
+            $this->recordLayerFlockJournalEntry($layer_flock, auth()->id() ?? 1);
+        }
+
+        return redirect()
+            ->route('customer.poultry.layer-flocks.show', ['locale' => $locale, 'layer_flock' => $layer_flock->id])
+            ->with('success', __('poultry.messages.success.layer_flock_updated') ?? 'تم تحديث بيانات القطيع بنجاح.');
+    }
+
+    public function destroy(string $locale, PoultryLayerFlock $layer_flock): RedirectResponse
+    {
+        $layer_flock->delete();
+
+        return redirect()
+            ->route('customer.poultry.layer-flocks.index', ['locale' => $locale])
+            ->with('success', __('poultry.messages.success.layer_flock_deleted') ?? 'تم حذف القطيع بنجاح.');
+    }
+
+    public function storeEggLog(LayerEggProductionLogStoreRequest $request, string $locale, PoultryLayerFlock $layer_flock): RedirectResponse
+    {
+        $data = $request->validated();
+        if (Schema::hasColumn('poultry_layer_egg_production_logs', 'tenant_id')) {
+            $data['tenant_id'] = auth()->user()->tenant_id ?? null;
+        }
+
+        PoultryLayerEggProductionLog::query()->create([
+            'layer_flock_id' => $layer_flock->id,
+            ...$data,
+        ]);
+
+        return redirect()->back()->with('success', __('poultry.messages.success.egg_log_recorded') ?? 'تم تسجيل إنتاج البيض بنجاح.');
+    }
+
+    public function storeMortality(LayerMortalityStoreRequest $request, string $locale, PoultryLayerFlock $layer_flock): RedirectResponse
+    {
+        $data = $request->validated();
+        if (Schema::hasColumn('poultry_layer_mortalities', 'tenant_id')) {
+            $data['tenant_id'] = auth()->user()->tenant_id ?? null;
+        }
+
+        PoultryLayerMortality::query()->create([
+            'layer_flock_id' => $layer_flock->id,
+            ...$data,
+        ]);
+
+        return redirect()->back()->with('success', __('poultry.messages.success.mortality_recorded') ?? 'تم تسجيل النفوق بنجاح.');
+    }
+
+    /**
+     * حساب مؤشرات قطيع البياض (إنتاج البيض السليم/الكسر ومعدل إنتاج البياض اليومي Hen-Day %)
+     */
+    public function calculateLayerFlockMetrics(PoultryLayerFlock $flock): array
+    {
+        $initialBirds = (int) ($flock->initial_hens_count ?? $flock->birds_count ?? $flock->initial_count ?? 0);
+
+        // عمود النفوق
+        $mortalityCol = Schema::hasColumn('poultry_layer_mortalities', 'quantity') ? 'quantity' : 
+                       (Schema::hasColumn('poultry_layer_mortalities', 'count') ? 'count' : 'mortality_count');
+        $totalMortality = (int) ($flock->mortalities()->sum($mortalityCol) ?? 0);
+
+        $currentLiveHens = max(0, $initialBirds - $totalMortality);
+        $mortalityRate = $initialBirds > 0 ? round(($totalMortality / $initialBirds) * 100, 2) : 0;
+
+        // تتبع إنتاج البيض
+        $eggsCol = Schema::hasColumn('poultry_layer_egg_production_logs', 'eggs_count') ? 'eggs_count' : 
+                  (Schema::hasColumn('poultry_layer_egg_production_logs', 'good_eggs_count') ? 'good_eggs_count' : 'good_eggs');
+
+        $damagedEggsCol = Schema::hasColumn('poultry_layer_egg_production_logs', 'damaged_count') ? 'damaged_count' : 
+                         (Schema::hasColumn('poultry_layer_egg_production_logs', 'damaged_eggs_count') ? 'damaged_eggs_count' : 'damaged_eggs');
+
+        $totalGoodEggs = (int) ($flock->eggProductionLogs()->sum($eggsCol) ?? 0);
+        $totalDamagedEggs = Schema::hasColumn('poultry_layer_egg_production_logs', $damagedEggsCol)
+            ? (int) ($flock->eggProductionLogs()->sum($damagedEggsCol) ?? 0)
+            : 0;
+        $totalEggsProduced = $totalGoodEggs + $totalDamagedEggs;
+
+        // حساب معدل Hen-Day % لأحدث يوم إنتاج
+        $latestLog = $flock->eggProductionLogs()->orderByDesc('production_date')->first();
+        $latestDayEggs = $latestLog ? (int) ($latestLog->{$eggsCol} ?? 0) : 0;
+        $henDayProductionRate = $currentLiveHens > 0 ? round(($latestDayEggs / $currentLiveHens) * 100, 2) : 0;
+
+        // إجمالي عدد أطباق البيض (الطبق = 30 بيضة)
+        $totalTrays = round($totalGoodEggs / 30, 1);
+
+        return [
+            'initial_birds'           => $initialBirds,
+            'current_live_hens'       => $currentLiveHens,
+            'total_mortality'         => $totalMortality,
+            'mortality_rate'          => $mortalityRate,
+            'total_good_eggs'         => $totalGoodEggs,
+            'total_damaged_eggs'      => $totalDamagedEggs,
+            'total_eggs_produced'     => $totalEggsProduced,
+            'total_trays'             => $totalTrays,
+            'latest_day_eggs'         => $latestDayEggs,
+            'hen_day_production_rate' => $henDayProductionRate,
+        ];
+    }
+
+    /**
+     * ترحيل القيد المحاسبي لإغلاق/تسوية قطيع البياض
+     */
+    public function recordLayerFlockJournalEntry(PoultryLayerFlock $flock, int $userId): void
+    {
+        $journalClass = $this->getJournalEntryClass();
+        if (! $journalClass) {
+            return;
+        }
+
+        $metrics = $this->calculateLayerFlockMetrics($flock);
+
+        DB::transaction(function () use ($flock, $metrics, $userId, $journalClass) {
+            $entryCode = 'JV-LF-' . $flock->id . '-' . time();
+            $entryDate = now();
+
+            $journalEntry = $journalClass::create([
+                'tenant_id'    => $flock->tenant_id ?? (auth()->check() ? auth()->user()->tenant_id : null),
+                'entry_no'     => $entryCode,
+                'entry_number' => $entryCode,
+                'entry_date'   => $entryDate,
+                'date'         => $entryDate,
+                'description'  => 'تسوية إنتاج قطيع البياض رقم #' . $flock->id,
+                'created_by'   => $userId,
+                'status'       => 'posted',
+            ]);
+
+            if ($metrics['total_good_eggs'] > 0 && method_exists($journalEntry, 'lines')) {
+                $journalEntry->lines()->create([
+                    'account_id'  => 7,
+                    'debit'       => $metrics['total_good_eggs'],
+                    'credit'      => 0,
+                    'description' => 'إجمالي عدد البيض السليم لقطيع #' . $flock->id,
+                ]);
+
+                $journalEntry->lines()->create([
+                    'account_id'  => 8,
+                    'debit'       => 0,
+                    'credit'      => $metrics['total_good_eggs'],
+                    'description' => 'إثبات إنتاج بيض لقطيع #' . $flock->id,
+                ]);
+            }
+        });
+    }
+}

@@ -81,7 +81,7 @@ class PoultryHatcheryBatch extends Model
     public function breeds(): BelongsToMany
     {
         return $this->belongsToMany(
-            ChickenBreed::class,
+            PoultryChickenBreed::class,
             'poultry_hatchery_batch_breeds',
             'hatchery_batch_id',
             'breed_id'

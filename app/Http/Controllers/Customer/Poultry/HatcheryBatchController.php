@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\Poultry\HatcheryBatchStoreRequest;
 use App\Http\Requests\Customer\Poultry\HatcheryBatchUpdateRequest;
 use App\Models\FarmPen;
+use App\Models\Poultry\PoultryChickenBreed;
 use App\Models\Poultry\PoultryHatcheryBatch;
 use App\Models\Poultry\PoultryHatcheryDailyLog;
 use App\Models\Poultry\PoultryHatcheryMachine;
@@ -27,9 +28,10 @@ class HatcheryBatchController extends Controller
             ->orderByDesc('loaded_at')
             ->paginate(15);
 
-        $currentLocale = $locale;
-
-        return view('dashboard.customer.poultry.hatchery_batches.index', compact('batches', 'currentLocale'));
+        return view('dashboard.customer.poultry.hatchery_batches.index', [
+            'batches'       => $batches,
+            'currentLocale' => $locale,
+        ]);
     }
 
     public function create(string $locale): View
@@ -47,10 +49,17 @@ class HatcheryBatchController extends Controller
             ->forSelect()
             ->get();
 
-        $breeds = PoultryHatcheryBatch::BREEDS;
-        $currentLocale = $locale;
+        $breeds = PoultryChickenBreed::query()
+            ->where('tenant_id', $tenantId)
+            ->orderBy('code')
+            ->get();
 
-        return view('dashboard.customer.poultry.hatchery_batches.create', compact('machines', 'pens', 'breeds', 'currentLocale'));
+        return view('dashboard.customer.poultry.hatchery_batches.create', [
+            'machines'      => $machines,
+            'pens'          => $pens,
+            'breeds'        => $breeds,
+            'currentLocale' => $locale,
+        ]);
     }
 
     public function store(HatcheryBatchStoreRequest $request, string $locale): RedirectResponse
@@ -60,12 +69,11 @@ class HatcheryBatchController extends Controller
 
         $batch = PoultryHatcheryBatch::query()->create($data);
 
-        // ربط السلالات وكميات البيض في حال وُجد جدول الوسيط والعلاقة
         $this->syncBatchBreeds($batch, $request);
 
         return redirect()
             ->route('customer.poultry.hatchery-batches.show', ['locale' => $locale, 'hatchery_batch' => $batch->id])
-            ->with('success', __('poultry.messages.success.hatchery_batch_created'));
+            ->with('success', __('poultry.messages.success.hatchery_batch_created') ?? 'تم إنشاء دفعة التفقيس بنجاح.');
     }
 
     public function show(string $locale, PoultryHatcheryBatch $hatchery_batch, PoultryFinancialService $financialService): View
@@ -78,16 +86,16 @@ class HatcheryBatchController extends Controller
         $hatchery_batch->load([
             'machine',
             'pen.farm',
+            'breeds',
             'dailyLogs' => fn ($q) => $q->orderByDesc('log_date'),
         ]);
 
         $financials = $financialService->calculateBatchProfitLoss($hatchery_batch);
-        $currentLocale = $locale;
 
         return view('dashboard.customer.poultry.hatchery_batches.show', [
             'batch'         => $hatchery_batch,
             'financials'    => $financials,
-            'currentLocale' => $currentLocale,
+            'currentLocale' => $locale,
         ]);
     }
 
@@ -109,10 +117,18 @@ class HatcheryBatchController extends Controller
             ->forSelect()
             ->get();
 
-        $breeds = PoultryHatcheryBatch::BREEDS;
-        $currentLocale = $locale;
+        $breeds = PoultryChickenBreed::query()
+            ->where('tenant_id', $tenantId)
+            ->orderBy('code')
+            ->get();
 
-        return view('dashboard.customer.poultry.hatchery_batches.edit', compact('hatchery_batch', 'machines', 'pens', 'breeds', 'currentLocale'));
+        return view('dashboard.customer.poultry.hatchery_batches.edit', [
+            'hatchery_batch' => $hatchery_batch,
+            'machines'       => $machines,
+            'pens'           => $pens,
+            'breeds'         => $breeds,
+            'currentLocale'  => $locale,
+        ]);
     }
 
     public function update(HatcheryBatchUpdateRequest $request, string $locale, PoultryHatcheryBatch $hatchery_batch, PoultryFinancialService $financialService): RedirectResponse
@@ -124,17 +140,16 @@ class HatcheryBatchController extends Controller
 
         $hatchery_batch->update($request->validated());
 
-        // مزامنة السلالات وكمياتها
         $this->syncBatchBreeds($hatchery_batch, $request);
 
-        // ترحيل القيد إذا اكتمل التفقيس
-        if ($hatchery_batch->actual_hatch_at && $hatchery_batch->chicks_produced > 0) {
+        $hatchedCount = (int) ($hatchery_batch->chicks_hatched ?? $hatchery_batch->chicks_produced ?? 0);
+        if ($hatchery_batch->actual_hatch_at && $hatchedCount > 0) {
             $financialService->recordBatchJournalEntry($hatchery_batch, auth()->id() ?? 1);
         }
 
         return redirect()
             ->route('customer.poultry.hatchery-batches.show', ['locale' => $locale, 'hatchery_batch' => $hatchery_batch->id])
-            ->with('success', __('poultry.messages.success.hatchery_batch_updated'));
+            ->with('success', __('poultry.messages.success.hatchery_batch_updated') ?? 'تم تحديث دفعة التفقيس بنجاح.');
     }
 
     public function destroy(string $locale, PoultryHatcheryBatch $hatchery_batch): RedirectResponse
@@ -148,7 +163,7 @@ class HatcheryBatchController extends Controller
 
         return redirect()
             ->route('customer.poultry.hatchery-batches.index', ['locale' => $locale])
-            ->with('success', __('poultry.messages.success.hatchery_batch_deleted'));
+            ->with('success', __('poultry.messages.success.hatchery_batch_deleted') ?? 'تم حذف دفعة التفقيس بنجاح.');
     }
 
     public function storeDailyLog(Request $request, string $locale, PoultryHatcheryBatch $hatchery_batch): RedirectResponse
@@ -187,7 +202,7 @@ class HatcheryBatchController extends Controller
             'notes'                   => $validated['notes'] ?? null,
         ]);
 
-        return redirect()->back()->with('success', __('poultry.messages.success.daily_log_recorded') ?? 'تم تسجيل قراءة المتابعة اليومية بنجاح');
+        return redirect()->back()->with('success', __('poultry.messages.success.daily_log_recorded') ?? 'تم تسجيل قراءة المتابعة اليومية بنجاح.');
     }
 
     public function profitLoss(PoultryHatcheryBatch $hatchery_batch, PoultryFinancialService $financialService): JsonResponse
@@ -225,7 +240,7 @@ class HatcheryBatchController extends Controller
                     $batch->breeds()->sync($syncData);
                 }
             } catch (\Throwable $e) {
-                // في حال عدم توفر جدول breeds المباشر نتجاوز المزامنة بدون كسر العملية
+                // تجاوز الخطأ في حال عدم وجود جدول وسيط
             }
         }
     }
