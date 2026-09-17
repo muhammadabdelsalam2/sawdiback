@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,7 +24,10 @@ class PoultryTransportController extends Controller
 
     public function index(Request $request): JsonResponse|View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+
         $vehicles = PoultryTransportVehicle::query()
+            ->when(Schema::hasColumn('poultry_transport_vehicles', 'tenant_id'), fn($q) => $q->where('tenant_id', $tenantId))
             ->with(['farm:id,name'])
             ->withCount(['rentals' => fn($query) => $query->where('payment_status', 'pending')])
             ->when($request->filled('farm_id'), fn($q) => $q->where('farm_id', $request->integer('farm_id')))
@@ -50,7 +54,12 @@ class PoultryTransportController extends Controller
 
     public function store(TransportVehicleStoreRequest $request): JsonResponse|RedirectResponse
     {
-        $vehicle = PoultryTransportVehicle::create($request->validated());
+        $data = $request->validated();
+        if (Schema::hasColumn('poultry_transport_vehicles', 'tenant_id')) {
+            $data['tenant_id'] = (string) auth()->user()->tenant_id;
+        }
+
+        $vehicle = PoultryTransportVehicle::create($data);
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -69,6 +78,11 @@ class PoultryTransportController extends Controller
 
     public function show(Request $request, PoultryTransportVehicle $transport_vehicle): JsonResponse|View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if (Schema::hasColumn('poultry_transport_vehicles', 'tenant_id') && (string) $transport_vehicle->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $transport_vehicle->load([
             'farm:id,name',
             'rentals' => fn($q) => $q->latest('started_at'),
@@ -89,6 +103,11 @@ class PoultryTransportController extends Controller
 
     public function update(TransportVehicleStoreRequest $request, PoultryTransportVehicle $transport_vehicle): JsonResponse|RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if (Schema::hasColumn('poultry_transport_vehicles', 'tenant_id') && (string) $transport_vehicle->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $transport_vehicle->update($request->validated());
 
         if ($request->expectsJson()) {
@@ -108,6 +127,11 @@ class PoultryTransportController extends Controller
 
     public function destroy(Request $request, PoultryTransportVehicle $transport_vehicle): JsonResponse|RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if (Schema::hasColumn('poultry_transport_vehicles', 'tenant_id') && (string) $transport_vehicle->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $hasActiveRentals = $transport_vehicle->rentals()->where('payment_status', 'pending')->exists();
 
         if ($hasActiveRentals) {
@@ -139,7 +163,10 @@ class PoultryTransportController extends Controller
 
     public function indexRentals(Request $request): JsonResponse|View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+
         $rentals = PoultryVehicleRental::query()
+            ->when(Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id'), fn($q) => $q->where('tenant_id', $tenantId))
             ->with(['vehicle:id,plate_number,driver_name'])
             ->when($request->filled('vehicle_id'), fn($q) => $q->where('vehicle_id', $request->integer('vehicle_id')))
             ->when($request->filled('status'), fn($q) => $q->where('payment_status', $request->string('status')))
@@ -162,7 +189,10 @@ class PoultryTransportController extends Controller
 
     public function createRental(Request $request, string $locale): View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+
         $vehicles = PoultryTransportVehicle::query()
+            ->when(Schema::hasColumn('poultry_transport_vehicles', 'tenant_id'), fn($q) => $q->where('tenant_id', $tenantId))
             ->orderBy('plate_number')
             ->get();
 
@@ -175,7 +205,9 @@ class PoultryTransportController extends Controller
     {
         $rental = DB::transaction(function () use ($request) {
             $data = $request->validated();
-            $data['tenant_id'] = auth()->user()->tenant_id ?? null;
+            if (Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id')) {
+                $data['tenant_id'] = (string) auth()->user()->tenant_id;
+            }
 
             $rental = PoultryVehicleRental::create($data);
 
@@ -200,6 +232,11 @@ class PoultryTransportController extends Controller
 
     public function updateRental(VehicleRentalStoreRequest $request, string $locale, PoultryVehicleRental $rental): JsonResponse|RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if (Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id') && (string) $rental->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         DB::transaction(function () use ($request, $rental) {
             $rental->update($request->validated());
 
@@ -223,6 +260,11 @@ class PoultryTransportController extends Controller
 
     public function destroyRental(Request $request, string $locale, PoultryVehicleRental $rental): JsonResponse|RedirectResponse
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+        if (Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id') && (string) $rental->tenant_id !== $tenantId) {
+            abort(403);
+        }
+
         $vehicleId = $rental->vehicle_id;
 
         DB::transaction(function () use ($rental) {
@@ -247,6 +289,8 @@ class PoultryTransportController extends Controller
 
     public function financialSummary(Request $request, string $locale): JsonResponse|View
     {
+        $tenantId = (string) auth()->user()->tenant_id;
+
         $request->validate([
             'start_date' => ['nullable', 'date'],
             'end_date'   => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -266,9 +310,16 @@ class PoultryTransportController extends Controller
             ]);
         }
 
-        $rentals = PoultryVehicleRental::query()->with('vehicle')->get();
-        $totalRevenue = $rentals->sum('rental_fee');
-        $totalExpenses = $rentals->sum(fn($r) => (float)$r->fuel_cost + (float)$r->driver_commission + (float)$r->other_expenses);
+        $rentals = PoultryVehicleRental::query()
+            ->when(Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id'), fn($q) => $q->where('tenant_id', $tenantId))
+            ->with('vehicle')
+            ->when($request->filled('vehicle_id'), fn($q) => $q->where('vehicle_id', $request->integer('vehicle_id')))
+            ->when($request->filled('start_date'), fn($q) => $q->whereDate('started_at', '>=', $request->date('start_date')))
+            ->when($request->filled('end_date'), fn($q) => $q->whereDate('started_at', '<=', $request->date('end_date')))
+            ->get();
+
+        $totalRevenue = (float) $rentals->sum('rental_fee');
+        $totalExpenses = (float) $rentals->sum(fn($r) => (float)$r->fuel_cost + (float)$r->driver_commission + (float)$r->other_expenses);
         $netProfit = $totalRevenue - $totalExpenses;
         $currentLocale = $locale;
 
