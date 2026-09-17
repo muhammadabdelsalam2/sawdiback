@@ -21,14 +21,24 @@ class PoultryBroilerCycle extends Model
         'pen_id',
         'cycle_number',
         'chick_count',
+        'chick_purchase_cost', // سعر التكلفة والشراء
+        'electricity_cost',    // الكهرباء
+        'water_cost',          // المياه
+        'transport_cost',      // النقل والتوصيل
+        'fuel_cost',           // الوقود
         'started_at',
         'status',
         'notes',
     ];
 
     protected $casts = [
-        'started_at' => 'date',
-        'chick_count' => 'integer',
+        'started_at'          => 'date',
+        'chick_count'         => 'integer',
+        'chick_purchase_cost' => 'decimal:2',
+        'electricity_cost'    => 'decimal:2',
+        'water_cost'          => 'decimal:2',
+        'transport_cost'      => 'decimal:2',
+        'fuel_cost'           => 'decimal:2',
     ];
 
     protected $appends = [
@@ -36,6 +46,7 @@ class PoultryBroilerCycle extends Model
         'total_mortality',
         'mortality_rate',
         'total_sales',
+        'total_operational_costs',
         'total_costs',
         'net_profit',
     ];
@@ -90,13 +101,26 @@ class PoultryBroilerCycle extends Model
         return number_format((float) $value, 2, '.', '');
     }
 
+    // إجمالي التكاليف المباشرة المحددة في دورة اللاحم
+    public function getTotalOperationalCostsAttribute(): float
+    {
+        return (float) $this->chick_purchase_cost
+             + (float) $this->electricity_cost
+             + (float) $this->water_cost
+             + (float) $this->transport_cost
+             + (float) $this->fuel_cost;
+    }
+
+    // إجمالي التكاليف الكلية (المباشرة + الإضافية من جدول التكاليف)
     public function getTotalCostsAttribute(): string
     {
-        $value = $this->relationLoaded('costs')
+        $additionalCosts = $this->relationLoaded('costs')
             ? $this->costs->sum('amount')
             : $this->costs()->sum('amount');
 
-        return number_format((float) $value, 2, '.', '');
+        $total = $this->total_operational_costs + (float) $additionalCosts;
+
+        return number_format($total, 2, '.', '');
     }
 
     public function getNetProfitAttribute(): string

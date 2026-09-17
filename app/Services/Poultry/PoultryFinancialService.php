@@ -11,9 +11,29 @@ use Carbon\Carbon;
 class PoultryFinancialService
 {
     /**
+     * استرجاع كلاس موديل القيود اليومية الفعلي بالمشروع بأمان
+     */
+    protected function getJournalEntryClass(): ?string
+    {
+        $classes = [
+            'App\Models\Customer\Finance\JournalEntry',
+            'App\Models\Finance\JournalEntry',
+            'App\Models\JournalEntry',
+        ];
+
+        foreach ($classes as $class) {
+            if (class_exists($class)) {
+                return $class;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * حساب تكاليف وأرباح ومؤشرات دورة التسمين
      */
- public function calculateBroilerCycleMetrics($cycle): array
+    public function calculateBroilerCycleMetrics($cycle): array
     {
         $initialChicks = (int) ($cycle->initial_chicks_count ?? $cycle->chicks_count ?? 0);
 
@@ -44,7 +64,6 @@ class PoultryFinancialService
         $totalCost = $chickCost + $feedCost + $otherCosts;
 
         // المبيعات والإيرادات
-      // المبيعات والإيرادات
         $amountCol = Schema::hasColumn('poultry_broiler_sales', 'total_amount') ? 'total_amount' : 
                     (Schema::hasColumn('poultry_broiler_sales', 'total_price') ? 'total_price' : null);
         
@@ -52,7 +71,6 @@ class PoultryFinancialService
         if ($amountCol) {
             $totalRevenue = (float) ($cycle->sales()->sum($amountCol) ?? 0);
         } else {
-            // إذا لم يكن هناك عمود إجمالي مخزن، نضرب الكمية في سعر الوحدة
             $totalRevenue = (float) ($cycle->sales()->get()->sum(fn($sale) => (float)($sale->quantity ?? 0) * (float)($sale->unit_price ?? 0)));
         }
 
@@ -78,8 +96,6 @@ class PoultryFinancialService
 
         $fcr = $totalSoldWeight > 0 ? round($totalFeedKg / $totalSoldWeight, 2) : 0;
         $netProfit = $totalRevenue - $totalCost;
-        $fcr = $totalSoldWeight > 0 ? round($totalFeedKg / $totalSoldWeight, 2) : 0;
-        $netProfit = $totalRevenue - $totalCost;
 
         return [
             'initial_chicks'     => $initialChicks,
@@ -103,18 +119,28 @@ class PoultryFinancialService
      */
     public function recordBroilerCycleJournalEntry($cycle, int $userId): void
     {
+        $journalClass = $this->getJournalEntryClass();
+        if (! $journalClass) {
+            return;
+        }
+
         $metrics = $this->calculateBroilerCycleMetrics($cycle);
 
-        DB::transaction(function () use ($cycle, $metrics, $userId) {
-            $journalEntry = \App\Models\Customer\Finance\JournalEntry::create([
-                'entry_number' => 'JV-BC-' . $cycle->id . '-' . time(),
+        DB::transaction(function () use ($cycle, $metrics, $userId, $journalClass) {
+            $entryCode = 'JV-BC-' . $cycle->id . '-' . time();
+
+            $journalEntry = $journalClass::create([
+                'tenant_id'    => $cycle->tenant_id ?? (auth()->check() ? auth()->user()->tenant_id : null),
+                'entry_no'     => $entryCode,
+                'entry_number' => $entryCode,
                 'entry_date'   => now(),
+                'date'         => now(),
                 'description'  => 'تسوية ختامية لدورة التسمين رقم #' . $cycle->id,
                 'created_by'   => $userId,
                 'status'       => 'posted',
             ]);
 
-            if ($metrics['total_cost'] > 0) {
+            if ($metrics['total_cost'] > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 5,
                     'debit'       => $metrics['total_cost'],
@@ -123,7 +149,7 @@ class PoultryFinancialService
                 ]);
             }
 
-            if ($metrics['total_revenue'] > 0) {
+            if ($metrics['total_revenue'] > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 6,
                     'debit'       => 0,
@@ -169,18 +195,28 @@ class PoultryFinancialService
      */
     public function recordBatchJournalEntry(PoultryHatcheryBatch $batch, int $userId): void
     {
+        $journalClass = $this->getJournalEntryClass();
+        if (! $journalClass) {
+            return;
+        }
+
         $financials = $this->calculateBatchProfitLoss($batch);
 
-        DB::transaction(function () use ($batch, $financials, $userId) {
-            $journalEntry = \App\Models\Customer\Finance\JournalEntry::create([
-                'entry_number' => 'JV-HB-' . $batch->id . '-' . time(),
+        DB::transaction(function () use ($batch, $financials, $userId, $journalClass) {
+            $entryCode = 'JV-HB-' . $batch->id . '-' . time();
+
+            $journalEntry = $journalClass::create([
+                'tenant_id'    => $batch->tenant_id ?? (auth()->check() ? auth()->user()->tenant_id : null),
+                'entry_no'     => $entryCode,
+                'entry_number' => $entryCode,
                 'entry_date'   => now(),
+                'date'         => now(),
                 'description'  => 'تسوية أرباح/تكاليف دفعة التفقيس رقم #' . $batch->id,
                 'created_by'   => $userId,
                 'status'       => 'posted',
             ]);
 
-            if ($financials['total_cost'] > 0) {
+            if ($financials['total_cost'] > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 1,
                     'debit'       => $financials['total_cost'],
@@ -189,7 +225,7 @@ class PoultryFinancialService
                 ]);
             }
 
-            if ($financials['total_revenue'] > 0) {
+            if ($financials['total_revenue'] > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 2,
                     'debit'       => 0,
@@ -245,16 +281,27 @@ class PoultryFinancialService
      */
     public function recordRentalJournalEntry(PoultryVehicleRental $rental, int $userId): void
     {
-        DB::transaction(function () use ($rental, $userId) {
-            $journalEntry = \App\Models\Customer\Finance\JournalEntry::create([
-                'entry_number' => 'JV-VR-' . $rental->id . '-' . time(),
-                'entry_date'   => $rental->started_at ?? now(),
+        $journalClass = $this->getJournalEntryClass();
+        if (! $journalClass) {
+            return;
+        }
+
+        DB::transaction(function () use ($rental, $userId, $journalClass) {
+            $entryCode = 'JV-VR-' . $rental->id . '-' . time();
+            $entryDate = $rental->started_at ?? now();
+
+            $journalEntry = $journalClass::create([
+                'tenant_id'    => $rental->tenant_id ?? (auth()->check() ? auth()->user()->tenant_id : null),
+                'entry_no'     => $entryCode,
+                'entry_number' => $entryCode,
+                'entry_date'   => $entryDate,
+                'date'         => $entryDate,
                 'description'  => 'قيد إيرادات ومصروفات رحلة تأجير سيارة نقل #' . $rental->vehicle_id,
                 'created_by'   => $userId,
                 'status'       => 'posted',
             ]);
 
-            if ($rental->rental_fee > 0) {
+            if ($rental->rental_fee > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 3,
                     'debit'       => 0,
@@ -264,7 +311,7 @@ class PoultryFinancialService
             }
 
             $expenses = (float) $rental->fuel_cost + (float) $rental->driver_commission + (float) $rental->other_expenses;
-            if ($expenses > 0) {
+            if ($expenses > 0 && method_exists($journalEntry, 'lines')) {
                 $journalEntry->lines()->create([
                     'account_id'  => 4,
                     'debit'       => $expenses,

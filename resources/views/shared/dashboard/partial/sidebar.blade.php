@@ -138,12 +138,13 @@
                     <a href="{{ route('customer.poultry.hatchery-machines.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-machines.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_machines') }}</a>
                     <a href="{{ route('customer.poultry.hatchery-batches.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-batches.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_batches') }}</a>
                     <a href="{{ route('customer.poultry.chicken-breeds.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.chicken-breeds.*') ? 'active' : '' }}">{{ __('poultry.titles.chicken_breeds') }}</a>
+                    <a href="{{ route('customer.poultry.vehicles.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.vehicles.*') ? 'active' : '' }}">{{ __('poultry.titles.vehicles') }}</a>
                     <a href="{{ route('customer.poultry.alerts.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.alerts.*') ? 'active' : '' }}">{{ __('poultry.titles.alerts') }}</a>
                 </div>
             </div>
         @endcan
 
-        {{-- 6. Health and vaccinations (grouped under livestock's 'animals.view' permission in routes) --}}
+        {{-- 6. Health and vaccinations --}}
         @can('animals.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.livestock.vaccines.*') || request()->routeIs('customer.livestock.alerts.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.vaccines.*') || request()->routeIs('customer.livestock.alerts.*') ? 'active' : '' }}">
@@ -268,7 +269,7 @@
             </div>
         @endcan
 
-        {{-- 14. Production / Subscription (customer.subscription.* has NO permission middleware in routes — always visible to any logged-in Customer/SuperAdmin) --}}
+        {{-- 14. Production / Subscription --}}
         @auth
             <div class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
@@ -290,7 +291,7 @@
             </div>
         @endauth
 
-        {{-- 15. System management (superadmin.* routes require role:SuperAdmin only — hard-gate here too) --}}
+        {{-- 15. System management --}}
         @if ($isSuperAdmin)
         @can('roles.manage')
             <div class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'open' : '' }}">
@@ -317,7 +318,7 @@
         @endcan
         @endif
 
-        {{-- 16. User management (superadmin.users.* requires role:SuperAdmin only — hard-gate here too) --}}
+        {{-- 16. User management --}}
         @if ($isSuperAdmin)
         @can('users.manage')
             <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">

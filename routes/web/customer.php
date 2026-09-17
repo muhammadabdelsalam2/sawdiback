@@ -52,6 +52,7 @@ use App\Http\Controllers\Customer\Poultry\HatcheryMachineController;
 use App\Http\Controllers\Customer\Poultry\LayerFlockController;
 use App\Http\Controllers\Customer\Poultry\PoultryAlertController;
 use App\Http\Controllers\Customer\Poultry\PoultryTransportController;
+use App\Http\Controllers\Customer\Poultry\PoultryVehicleController;
 use App\Http\Controllers\Customer\Account\AccountController;
 use App\Http\Controllers\setting\SearchController;
 
@@ -256,12 +257,20 @@ Route::prefix('{locale}')
                     ->middleware(['permission:poultry.manage'])
                     ->name('chicken-breeds.egg-logs.store');
 
+                // إدارة مركبات نقل الدواجن وعقود التأجير
+                Route::resource('vehicles', PoultryVehicleController::class)
+                    ->parameters(['vehicles' => 'vehicle'])
+                    ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
+
                 Route::resource('transport-vehicles', PoultryTransportController::class)
                     ->parameters(['transport-vehicles' => 'transport_vehicle'])
                     ->middleware(['create' => 'permission:poultry.manage', 'store' => 'permission:poultry.manage', 'edit' => 'permission:poultry.manage', 'update' => 'permission:poultry.manage', 'destroy' => 'permission:poultry.manage']);
 
                 Route::prefix('vehicle-rentals')->name('vehicle-rentals.')->group(function () {
                     Route::get('/', [PoultryTransportController::class, 'indexRentals'])->name('index');
+                    Route::get('create', [PoultryTransportController::class, 'createRental'])
+                        ->middleware(['permission:poultry.manage'])
+                        ->name('create');
                     Route::post('/', [PoultryTransportController::class, 'storeRental'])
                         ->middleware(['permission:poultry.manage'])
                         ->name('store');

@@ -2,6 +2,7 @@
     $isEdit = isset($animal);
     $currentLocale = request()->route('locale') ?? app()->getLocale();
     $isArabic = str_starts_with(strtolower($currentLocale), 'ar');
+    $currentFarmId = old('farm_id', $animal->pen?->farm_id ?? ($animal->farm_id ?? ''));
 @endphp
 
 <div class="row g-3">
@@ -45,15 +46,32 @@
         </select>
     </div>
 
-    {{-- الحظيرة التابعة مع النوع --}}
-    <div class="col-md-4">
+    {{-- المزرعة (بند المزارع الأربعة) --}}
+    <div class="col-md-6">
+        <label class="form-label font-weight-bold small text-muted">
+            {{ __('farms.fields.farm') }} <span class="text-danger">*</span>
+        </label>
+        <select name="farm_id" id="animalFarmSelect" class="form-select" required>
+            <option value="">-- {{ $isArabic ? 'اختر المزرعة (المزارع الأربعة)' : 'Select Farm' }} --</option>
+            @foreach ($farms ?? [] as $farm)
+                <option value="{{ $farm->id }}" @selected($currentFarmId == $farm->id)>
+                    {{ $farm->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- الحظيرة التابعة للمزرعة المختارة --}}
+    <div class="col-md-6">
         <label class="form-label font-weight-bold small text-muted">
             {{ __('farms.fields.pen') }}
         </label>
-        <select name="pen_id" class="form-select">
+        <select name="pen_id" id="animalPenSelect" class="form-select">
             <option value="">-- {{ $isArabic ? 'بدون حظيرة (اختياري)' : 'No Pen (Optional)' }} --</option>
             @foreach ($pens ?? [] as $pen)
-                <option value="{{ $pen->id }}" @selected(old('pen_id', $animal->pen_id ?? '') == $pen->id)>
+                <option value="{{ $pen->id }}" 
+                        data-farm="{{ $pen->farm_id }}" 
+                        @selected(old('pen_id', $animal->pen_id ?? '') == $pen->id)>
                     {{ $pen->farm?->name ?? 'مزرعة' }} - {{ $pen->pen_number }} 
                     ({{ __('farms.pen_types.' . $pen->type) != 'farms.pen_types.' . $pen->type ? __('farms.pen_types.' . $pen->type) : $pen->type }})
                 </option>
@@ -83,35 +101,8 @@
         </select>
     </div>
 
-    {{-- تاريخ الولادة --}}
-    <div class="col-md-3">
-        <label class="form-label font-weight-bold small text-muted">
-            {{ __('livestock.fields.birth_date') }}
-        </label>
-        <input type="date" name="birth_date" class="form-control"
-            value="{{ old('birth_date', optional($animal->birth_date ?? null)->toDateString()) }}">
-    </div>
-
-    {{-- تاريخ الشراء --}}
-    <div class="col-md-3">
-        <label class="form-label font-weight-bold small text-muted">
-            {{ __('livestock.fields.purchase_date') }}
-        </label>
-        <input type="date" name="purchase_date" class="form-control"
-            value="{{ old('purchase_date', optional($animal->purchase_date ?? null)->toDateString()) }}">
-    </div>
-
-    {{-- سعر الشراء --}}
-    <div class="col-md-3">
-        <label class="form-label font-weight-bold small text-muted">
-            {{ __('livestock.fields.purchase_price') }}
-        </label>
-        <input type="number" step="0.01" min="0" name="purchase_price" class="form-control"
-            value="{{ old('purchase_price', $animal->purchase_price ?? '') }}" placeholder="0.00">
-    </div>
-
     {{-- الحالة العامة --}}
-    <div class="col-md-3">
+    <div class="col-md-4">
         <label class="form-label font-weight-bold small text-muted">
             {{ __('livestock.fields.status') }}
         </label>
@@ -122,6 +113,33 @@
                 </option>
             @endforeach
         </select>
+    </div>
+
+    {{-- تاريخ الولادة --}}
+    <div class="col-md-4">
+        <label class="form-label font-weight-bold small text-muted">
+            {{ __('livestock.fields.birth_date') }}
+        </label>
+        <input type="date" name="birth_date" class="form-control"
+            value="{{ old('birth_date', optional($animal->birth_date ?? null)->toDateString()) }}">
+    </div>
+
+    {{-- تاريخ الشراء --}}
+    <div class="col-md-4">
+        <label class="form-label font-weight-bold small text-muted">
+            {{ __('livestock.fields.purchase_date') }}
+        </label>
+        <input type="date" name="purchase_date" class="form-control"
+            value="{{ old('purchase_date', optional($animal->purchase_date ?? null)->toDateString()) }}">
+    </div>
+
+    {{-- سعر الشراء --}}
+    <div class="col-md-4">
+        <label class="form-label font-weight-bold small text-muted">
+            {{ __('livestock.fields.purchase_price') }}
+        </label>
+        <input type="number" step="0.01" min="0" name="purchase_price" class="form-control"
+            value="{{ old('purchase_price', $animal->purchase_price ?? '') }}" placeholder="0.00">
     </div>
 
     {{-- الحالة الصحية --}}
@@ -213,3 +231,36 @@
         <textarea name="notes" class="form-control" rows="3" placeholder="{{ $isArabic ? 'أي ملاحظات إضافية عن الحيوان...' : 'Any additional notes...' }}">{{ old('notes', $animal->notes ?? '') }}</textarea>
     </div>
 </div>
+
+{{-- سكريبت فلترة الحظائر حسب المزرعة المختارة ديناميكياً --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const farmSelect = document.getElementById('animalFarmSelect');
+    const penSelect = document.getElementById('animalPenSelect');
+    if (!farmSelect || !penSelect) return;
+
+    function filterPensByFarm() {
+        const selectedFarmId = farmSelect.value;
+        const penOptions = penSelect.querySelectorAll('option');
+
+        penOptions.forEach(opt => {
+            const penFarm = opt.getAttribute('data-farm');
+            if (!opt.value) {
+                opt.style.display = 'block'; // الخيار الافتراضي فارغ
+                return;
+            }
+            if (!selectedFarmId || penFarm === selectedFarmId) {
+                opt.style.display = 'block';
+            } else {
+                opt.style.display = 'none';
+                if (opt.selected) {
+                    penSelect.value = '';
+                }
+            }
+        });
+    }
+
+    farmSelect.addEventListener('change', filterPensByFarm);
+    filterPensByFarm();
+});
+</script>

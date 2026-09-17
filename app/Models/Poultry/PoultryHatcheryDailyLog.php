@@ -19,15 +19,17 @@ class PoultryHatcheryDailyLog extends Model
         'temperature',
         'humidity',
         'has_incident',
-        'incident_reason',
+        'stoppage_duration_hours', // مدة التوقف بالساعات
+        'incident_reason',         // السبب / العطل
         'notes',
     ];
 
     protected $casts = [
-        'log_date'     => 'date',
-        'temperature'  => 'decimal:2',
-        'humidity'     => 'decimal:2',
-        'has_incident' => 'boolean',
+        'log_date'                => 'date',
+        'temperature'             => 'decimal:2',
+        'humidity'                => 'decimal:2',
+        'has_incident'            => 'boolean',
+        'stoppage_duration_hours' => 'decimal:2',
     ];
 
     public function batch(): BelongsTo

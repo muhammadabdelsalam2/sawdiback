@@ -6,6 +6,7 @@ return [
     ],
     'navbar' => [
         'search' => 'Search',
+        'poultry_vehicles' => 'Poultry Transport Vehicles',
         'search_placeholder' => 'Search anything...',
         'profile' => 'Profile',
         'settings_link' => 'Settings',

@@ -9,6 +9,7 @@ use App\Http\Requests\Livestock\LivestockAnimalStoreRequest;
 use App\Http\Requests\Livestock\LivestockAnimalUpdateRequest;
 use App\Models\AnimalBreed;
 use App\Models\AnimalSpecies;
+use App\Models\Farm;
 use App\Models\FarmPen;
 use App\Models\FeedType;
 use App\Models\LivestockAnimal;
@@ -30,7 +31,7 @@ class LivestockAnimalController extends Controller
     ) {
     }
 
-  public function index(Request $request, string $locale): View
+    public function index(Request $request, string $locale): View
     {
         $tenantId = (string) auth()->user()->tenant_id;
 
@@ -39,8 +40,8 @@ class LivestockAnimalController extends Controller
             $request->only(['species_id', 'farm_id', 'pen_id', 'status', 'search'])
         );
 
-        $farms = \App\Models\Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get(['id', 'name']);
-        $pens  = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
+        $farms = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get(['id', 'name']);
+        $pens  = FarmPen::query()->where('tenant_id', $tenantId)->with('farm')->forSelect()->get();
         $currentLocale = $locale;
 
         return view('dashboard.livestock.animals.index', compact('items', 'farms', 'pens', 'currentLocale'));
@@ -50,13 +51,14 @@ class LivestockAnimalController extends Controller
     {
         $tenantId = (string) auth()->user()->tenant_id;
 
+        $farms   = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get(['id', 'name']);
         $species = AnimalSpecies::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
         $breeds  = AnimalBreed::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
         $animals = LivestockAnimal::query()->where('tenant_id', $tenantId)->orderBy('tag_number')->get();
-        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
+        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->with('farm')->forSelect()->get();
         $currentLocale = $locale;
 
-        return view('dashboard.livestock.animals.create', compact('species', 'breeds', 'animals', 'pens', 'currentLocale'));
+        return view('dashboard.livestock.animals.create', compact('farms', 'species', 'breeds', 'animals', 'pens', 'currentLocale'));
     }
 
     public function store(LivestockAnimalStoreRequest $request, string $locale): RedirectResponse
@@ -122,13 +124,14 @@ class LivestockAnimalController extends Controller
             abort(403);
         }
 
+        $farms   = Farm::query()->where('tenant_id', $tenantId)->orderBy('name')->get(['id', 'name']);
         $species = AnimalSpecies::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
         $breeds  = AnimalBreed::query()->where('tenant_id', $tenantId)->orderBy('name')->get();
         $animals = LivestockAnimal::query()->where('tenant_id', $tenantId)->whereKeyNot($animal->id)->orderBy('tag_number')->get();
-        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->forSelect()->get();
+        $pens    = FarmPen::query()->where('tenant_id', $tenantId)->with('farm')->forSelect()->get();
         $currentLocale = $locale;
 
-        return view('dashboard.livestock.animals.edit', compact('animal', 'species', 'breeds', 'animals', 'pens', 'currentLocale'));
+        return view('dashboard.livestock.animals.edit', compact('animal', 'farms', 'species', 'breeds', 'animals', 'pens', 'currentLocale'));
     }
 
     public function update(LivestockAnimalUpdateRequest $request, string $locale, LivestockAnimal $animal): RedirectResponse

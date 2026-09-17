@@ -119,8 +119,8 @@
                     <div class="col-md-3 form-group mb-3">
                         <label class="font-weight-bold">{{ __('hr.fields.employment_status') }} <span class="text-danger">*</span></label>
                         <select name="employment_status" class="form-control" required>
-                            <option value="active" {{ old('employment_status', $employee->employment_status) == 'active' ? 'selected' : '' }}>{{ __('hr.options.active') }}</option>
-                            <option value="on_leave" {{ old('employment_status', $employee->employment_status) == 'on_leave' ? 'selected' : '' }}>{{ __('hr.options.on_leave') }}</option>
+                            <option value="active" {{ old('employment_status', $employee->employment_status) == 'active' ? 'selected' : '' }}>{{ __('hr.status_active') }}</option>
+                            <option value="on_leave" {{ old('employment_status', $employee->employment_status) == 'on_leave' ? 'selected' : '' }}>{{ __('hr.status_on_leave') }}</option>
                             <option value="traveling" {{ old('employment_status', $employee->employment_status) == 'traveling' ? 'selected' : '' }}>{{ __('hr.status_traveling') }}</option>
                             <option value="contract_ended" {{ old('employment_status', $employee->employment_status) == 'contract_ended' ? 'selected' : '' }}>{{ __('hr.options.contract_ended') }}</option>
                         </select>
@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        {{-- 2. السجل المهني والمؤهلات والبديل والإجازة --}}
+        {{-- 2. السجل المهني والمؤهلات والبديل والإجازة السنوية --}}
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white border-bottom py-3">
                 <h5 class="card-title font-weight-bold text-info mb-0">
@@ -170,9 +170,11 @@
                         <select name="replacement_employee_id" class="form-control select2">
                             <option value="">{{ __('hr.options.select_employee') }}</option>
                             @foreach($employees as $emp)
-                                <option value="{{ $emp->id }}" {{ old('replacement_employee_id', $employee->replacement_employee_id) == $emp->id ? 'selected' : '' }}>
-                                    {{ $emp->full_name }} ({{ $emp->worker_number ?? $emp->id }})
-                                </option>
+                                @if($emp->id !== $employee->id)
+                                    <option value="{{ $emp->id }}" {{ old('replacement_employee_id', $employee->replacement_employee_id) == $emp->id ? 'selected' : '' }}>
+                                        {{ $emp->full_name }} ({{ $emp->worker_number ?? $emp->id }})
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
                     </div>

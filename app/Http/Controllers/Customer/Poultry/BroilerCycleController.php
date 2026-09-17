@@ -19,21 +19,24 @@ use Illuminate\View\View;
 
 class BroilerCycleController extends Controller
 {
-    public function index(): View
+    public function index(string $locale): View
     {
         $cycles = PoultryBroilerCycle::query()
             ->with(['mortalities', 'sales', 'costs'])
             ->orderByDesc('started_at')
             ->paginate(15);
 
-        return view('dashboard.customer.poultry.broiler_cycles.index', compact('cycles'));
+        $currentLocale = $locale;
+
+        return view('dashboard.customer.poultry.broiler_cycles.index', compact('cycles', 'currentLocale'));
     }
 
-    public function create(): View
+    public function create(string $locale): View
     {
         $pens = FarmPen::query()->forSelect()->get();
+        $currentLocale = $locale;
 
-        return view('dashboard.customer.poultry.broiler_cycles.create', compact('pens'));
+        return view('dashboard.customer.poultry.broiler_cycles.create', compact('pens', 'currentLocale'));
     }
 
     public function store(BroilerCycleStoreRequest $request, string $locale): RedirectResponse
@@ -54,25 +57,31 @@ class BroilerCycleController extends Controller
         ]);
 
         $metrics = $financialService->calculateBroilerCycleMetrics($broiler_cycle);
+        $currentLocale = $locale;
 
         return view('dashboard.customer.poultry.broiler_cycles.show', [
-            'cycle'   => $broiler_cycle,
-            'metrics' => $metrics,
+            'cycle'         => $broiler_cycle,
+            'metrics'       => $metrics,
+            'currentLocale' => $currentLocale,
         ]);
     }
 
     public function edit(string $locale, PoultryBroilerCycle $broiler_cycle): View
     {
         $pens = FarmPen::query()->forSelect()->get();
+        $currentLocale = $locale;
 
-        return view('dashboard.customer.poultry.broiler_cycles.edit', ['cycle' => $broiler_cycle, 'pens' => $pens]);
+        return view('dashboard.customer.poultry.broiler_cycles.edit', [
+            'cycle'         => $broiler_cycle,
+            'pens'          => $pens,
+            'currentLocale' => $currentLocale,
+        ]);
     }
 
     public function update(BroilerCycleUpdateRequest $request, string $locale, PoultryBroilerCycle $broiler_cycle, PoultryFinancialService $financialService): RedirectResponse
     {
         $broiler_cycle->update($request->validated());
 
-        // ترحيل قيد التسوية المحاسبي تلقائياً إذا أُغلقت الدورة
         if (in_array($broiler_cycle->status, ['closed', 'completed'], true)) {
             $financialService->recordBroilerCycleJournalEntry($broiler_cycle, auth()->id() ?? 1);
         }

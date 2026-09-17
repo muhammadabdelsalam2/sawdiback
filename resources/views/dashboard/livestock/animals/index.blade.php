@@ -42,7 +42,6 @@
             scrollbar-width: thin;
         }
 
-        /* شارات الحالة والصحة */
         .tag-pill {
             background-color: #f1f5f9;
             color: #0f172a;
@@ -93,7 +92,6 @@
             font-weight: 600;
         }
 
-        /* أزرار الإجراءات */
         .btn-action-view {
             color: #0284c7;
             background-color: #f0f9ff;
@@ -137,7 +135,7 @@
 @endphp
 
 <div class="container-fluid my-4 animals-page">
-    {{-- رأس الصفحة --}}
+    {{-- Header --}}
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
         <div>
             <h2 class="h3 font-weight-bold text-dark mb-1">{{ __('livestock.titles.animals') }}</h2>
@@ -172,7 +170,7 @@
         </div>
     @endif
 
-    {{-- قسم الفلاتر والبحث --}}
+    {{-- Filters --}}
     <div class="filter-card shadow-sm">
         <form method="GET" action="{{ route('customer.livestock.animals.index', ['locale' => $currentLocale]) }}" class="row g-2 align-items-center">
             <div class="col-md-3 col-sm-6">
@@ -183,8 +181,8 @@
             
             @if(isset($farms))
                 <div class="col-md-3 col-sm-6">
-                    <select name="farm_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <option value="">-- {{ __('farms.fields.farm') }}: {{ $isArabic ? 'الكل' : 'All' }} --</option>
+                    <select name="farm_id" id="filterFarmSelect" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">-- {{ __('farms.fields.farm') }}: {{ $isArabic ? 'الكل (المزارع الأربعة)' : 'All Farms' }} --</option>
                         @foreach($farms as $farm)
                             <option value="{{ $farm->id }}" @selected(request('farm_id') == $farm->id)>{{ $farm->name }}</option>
                         @endforeach
@@ -194,10 +192,10 @@
 
             @if(isset($pens))
                 <div class="col-md-3 col-sm-6">
-                    <select name="pen_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <select name="pen_id" id="filterPenSelect" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">-- {{ __('farms.fields.pen') }}: {{ $isArabic ? 'الكل' : 'All' }} --</option>
                         @foreach($pens as $pen)
-                            <option value="{{ $pen->id }}" @selected(request('pen_id') == $pen->id)>
+                            <option value="{{ $pen->id }}" data-farm="{{ $pen->farm_id }}" @selected(request('pen_id') == $pen->id)>
                                 {{ $pen->pen_number }} ({{ $pen->farm->name ?? '' }})
                             </option>
                         @endforeach
@@ -218,7 +216,7 @@
         </form>
     </div>
 
-    {{-- جدول عرض الحيوانات --}}
+    {{-- Animals Table --}}
     <div class="card-main">
         <div class="table-responsive">
             <table class="table table-hover mb-0 text-center">
@@ -243,7 +241,11 @@
                             <td><span class="tag-pill">{{ $animal->tag_number }}</span></td>
                             <td class="font-weight-bold">{{ $animal->species->name ?? '-' }}</td>
                             <td>{{ $animal->breed->name ?? '-' }}</td>
-                            <td>{{ $animal->pen?->farm?->name ?? '-' }}</td>
+                            <td>
+                                <span class="badge bg-light text-primary border font-weight-bold">
+                                    {{ $animal->pen?->farm?->name ?? ($animal->farm?->name ?? '-') }}
+                                </span>
+                            </td>
                             <td>
                                 @if($animal->pen)
                                     <span class="badge bg-light text-dark border">
@@ -308,24 +310,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentLang = '{{ strtolower($currentLocale) }}';
-            const isArabic = currentLang.startsWith('ar');
-
-            // دالة تنبيهات SweetAlert مشتركة للعمليات
-            window.showLivestockAlert = function(title, text, icon = 'info') {
-                Swal.fire({
-                    title: title,
-                    text: text,
-                    icon: icon,
-                    confirmButtonColor: '#15803d',
-                    confirmButtonText: isArabic ? 'حسناً' : 'OK'
-                });
-            };
-        });
-    </script>
-@endpush

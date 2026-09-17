@@ -16,22 +16,32 @@ class PoultryTransportVehicle extends Model
     use ScopedByTenant;
     use SoftDeletes;
 
-    protected $fillable = [
-        'tenant_id',
-        'farm_id',
-        'plate_number',
-        'driver_name',
-        'driver_phone',
-        'capacity_birds',
-        'capacity_crates',
-        'status',
-        'notes',
-    ];
+   protected $fillable = [
+    'tenant_id',
+    'farm_id',
+    'ownership_type',
+    'lessor_name',
+    'lessor_phone',
+    'lease_cost',
+    'lease_period',
+    'lease_start_date',
+    'lease_end_date',
+    'plate_number',
+    'driver_name',
+    'driver_phone',
+    'capacity_birds',
+    'capacity_crates',
+    'status',
+    'notes',
+];
 
-    protected $casts = [
-        'capacity_birds'  => 'integer',
-        'capacity_crates' => 'integer',
-    ];
+protected $casts = [
+    'capacity_birds'   => 'integer',
+    'capacity_crates'  => 'integer',
+    'lease_cost'       => 'decimal:2',
+    'lease_start_date' => 'date',
+    'lease_end_date'   => 'date',
+];
 
     public function farm(): BelongsTo
     {
