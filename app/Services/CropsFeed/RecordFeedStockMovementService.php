@@ -3,6 +3,7 @@
 namespace App\Services\CropsFeed;
 
 use App\Models\FeedStockMovement;
+use App\Models\FeedType;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -15,33 +16,46 @@ class RecordFeedStockMovementService
     public function execute(array $data): FeedStockMovement
     {
         return DB::transaction(function () use ($data) {
-            $quantity = (float) $data['quantity']; // تأكد من أن الكمية موجبة
-            if ($quantity < 0) {
-                throw new RuntimeException('Feed quantity must be a positive number.');
+            $tenantId = $data['tenant_id'] ?? (string) auth()->user()->tenant_id;
+            $quantity = (float) $data['quantity'];
+
+            if ($quantity <= 0) {
+                throw new RuntimeException(__('crops_feed.messages.validation.quantity_positive') ?? 'يجب أن تكون الكمية عدداً موجباً.');
             }
+
+            $feedType = FeedType::query()->where('tenant_id', $tenantId)->findOrFail($data['feed_type_id']);
+
+            // ضبط وحدة القياس: إذا تم الإدخال بالطن وكان العلف مسجلاً بالكيلو يتم التحويل للتوحيد
+            $unit = $data['unit'] ?? 'kg';
+            $normalizedQuantity = ($unit === 'ton') ? ($quantity * 1000) : $quantity;
+
             $unitCost = array_key_exists('unit_cost', $data) && $data['unit_cost'] !== null
                 ? (float) $data['unit_cost']
                 : null;
+
             $totalCost = $unitCost !== null ? round($unitCost * $quantity, 2) : null;
 
             if ($data['movement_type'] === 'out') {
-                $stock = $this->stockService->stockOnHand((int) $data['feed_type_id']);
-                if ($stock < $quantity) {
-                    throw new RuntimeException('Insufficient feed stock for this operation.');
+                $stock = $this->stockService->stockOnHand((int) $feedType->id);
+                if ($stock < $normalizedQuantity) {
+                    throw new RuntimeException(__('crops_feed.messages.validation.insufficient_stock') ?? 'رصيد العلف الحالي لا يكفي لهذه العملية.');
                 }
             }
 
+            // تحديد مصدر العلف (مشترى / مزروع داخلياً بالمزرعة / يدوي)
+            $sourceType = $data['source_type'] ?? 'purchased';
+
             return FeedStockMovement::query()->create([
-                'tenant_id' => $data['tenant_id'] ?? null,
-                'feed_type_id' => $data['feed_type_id'],
+                'tenant_id'     => $tenantId,
+                'feed_type_id'  => $feedType->id,
                 'movement_type' => $data['movement_type'],
-                'quantity' => $quantity,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
+                'quantity'      => $normalizedQuantity,
+                'unit_cost'     => $unitCost,
+                'total_cost'    => $totalCost,
                 'movement_date' => $data['movement_date'],
-                'source_type' => 'manual',
-                'source_id' => null,
-                'notes' => $data['notes'] ?? null,
+                'source_type'   => $sourceType,
+                'source_id'     => $data['source_id'] ?? null,
+                'notes'         => $data['notes'] ?? null,
             ]);
         });
     }

@@ -71,8 +71,8 @@ class Crop extends Model
         $unit = $this->yield_unit ?? self::UNIT_TON;
         $isArabic = str_starts_with(app()->getLocale(), 'ar');
 
-        return $unit === self::UNIT_KG 
-            ? ($isArabic ? 'كيلو' : 'kg') 
+        return $unit === self::UNIT_KG
+            ? ($isArabic ? 'كيلو' : 'kg')
             : ($isArabic ? 'طن' : 'ton');
     }
 
