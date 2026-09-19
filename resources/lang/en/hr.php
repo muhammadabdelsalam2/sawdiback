@@ -17,6 +17,7 @@ return [
         'attendance' => 'Attendance',
         'create_leave_request' => 'Create Leave Request',
         'attachments' => 'Attachments',
+        'annual_leave_alerts' => 'Annual Leave Alerts',
     ],
     'actions' => [
         'add_employee' => 'Add Employee',

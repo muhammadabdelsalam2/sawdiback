@@ -72,7 +72,7 @@ class PoultryTransportController extends Controller
         $locale = $request->route('locale') ?? app()->getLocale();
 
         return redirect()
-            ->route('customer.poultry.vehicles.show', ['locale' => $locale, 'vehicle' => $vehicle->id])
+            ->route('customer.poultry.vehicles.index', ['locale' => $locale])
             ->with('success', __('poultry.messages.success.vehicle_created') ?? 'تم إنشاء سيارة النقل بنجاح.');
     }
 
@@ -121,7 +121,7 @@ class PoultryTransportController extends Controller
         $locale = $request->route('locale') ?? app()->getLocale();
 
         return redirect()
-            ->route('customer.poultry.vehicles.show', ['locale' => $locale, 'vehicle' => $transport_vehicle->id])
+            ->route('customer.poultry.vehicles.index', ['locale' => $locale])
             ->with('success', __('poultry.messages.success.vehicle_updated') ?? 'تم تحديث بيانات السيارة بنجاح.');
     }
 
@@ -212,7 +212,9 @@ class PoultryTransportController extends Controller
             $rental = PoultryVehicleRental::create($data);
 
             $userId = auth()->id() ?? 1;
-            $this->financialService->recordRentalJournalEntry($rental, $userId);
+            if (method_exists($this->financialService, 'recordRentalJournalEntry')) {
+                $this->financialService->recordRentalJournalEntry($rental, $userId);
+            }
 
             return $rental;
         });
@@ -226,8 +228,8 @@ class PoultryTransportController extends Controller
         }
 
         return redirect()
-            ->route('customer.poultry.vehicles.show', ['locale' => $locale, 'vehicle' => $rental->vehicle_id])
-            ->with('success', __('poultry.messages.success.sale_recorded') ?? 'تم تسجيل عملية النقل وترحيل القيود بنجاح.');
+            ->route('customer.poultry.vehicle-rentals.index', ['locale' => $locale])
+            ->with('success', 'تم تسجيل رحلة التأجير للمزرعة بنجاح وترحيل القيود.');
     }
 
     public function updateRental(VehicleRentalStoreRequest $request, string $locale, PoultryVehicleRental $rental): JsonResponse|RedirectResponse
@@ -254,7 +256,7 @@ class PoultryTransportController extends Controller
         }
 
         return redirect()
-            ->route('customer.poultry.vehicles.show', ['locale' => $locale, 'vehicle' => $rental->vehicle_id])
+            ->route('customer.poultry.vehicle-rentals.index', ['locale' => $locale])
             ->with('success', __('poultry.messages.success.vehicle_updated') ?? 'تم تحديث بيانات التأجير بنجاح.');
     }
 
@@ -264,8 +266,6 @@ class PoultryTransportController extends Controller
         if (Schema::hasColumn('poultry_vehicle_rentals', 'tenant_id') && (string) $rental->tenant_id !== $tenantId) {
             abort(403);
         }
-
-        $vehicleId = $rental->vehicle_id;
 
         DB::transaction(function () use ($rental) {
             if (method_exists($this->financialService, 'reverseRentalJournalEntry')) {
@@ -283,8 +283,8 @@ class PoultryTransportController extends Controller
         }
 
         return redirect()
-            ->route('customer.poultry.vehicles.show', ['locale' => $locale, 'vehicle' => $vehicleId])
-            ->with('success', __('poultry.messages.success.vehicle_deleted') ?? 'تم حذف الرحلة بنجاح.');
+            ->route('customer.poultry.vehicle-rentals.index', ['locale' => $locale])
+            ->with('success', 'تم حذف رحلة التأجير بنجاح.');
     }
 
     public function financialSummary(Request $request, string $locale): JsonResponse|View
@@ -297,11 +297,14 @@ class PoultryTransportController extends Controller
             'vehicle_id' => ['nullable', 'integer', 'exists:poultry_transport_vehicles,id'],
         ]);
 
-        $summary = $this->financialService->calculateRentalProfitLoss(
-            $request->input('start_date'),
-            $request->input('end_date'),
-            $request->input('vehicle_id')
-        );
+        $summary = [];
+        if (method_exists($this->financialService, 'calculateRentalProfitLoss')) {
+            $summary = $this->financialService->calculateRentalProfitLoss(
+                $request->input('start_date'),
+                $request->input('end_date'),
+                $request->input('vehicle_id')
+            );
+        }
 
         if ($request->expectsJson()) {
             return response()->json([

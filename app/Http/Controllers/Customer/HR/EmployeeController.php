@@ -40,31 +40,118 @@ class EmployeeController extends Controller
         return view('dashboard.customer.hr.employees.index', compact('employees'));
     }
 
-    public function documentAlerts(string $locale, HrDocumentAlertService $alerts): View
+    public function documentAlerts(Request $request, string $locale): View
     {
-        $days = (int) config('hr.document_expiry_alert_days', 30);
-        $rows = $alerts->expiringDocuments($days);
+        $tenantId = (string) auth()->user()->tenant_id;
+        $currentLocale = $locale;
+        $today = \Carbon\Carbon::today();
+        $thresholdDate = $today->copy()->addDays(60);
 
-        return view('dashboard.customer.hr.employees.document-alerts', compact('rows', 'days'));
-    }
-
-    public function annualLeaveAlerts(string $locale): View
-    {
-        $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
-        $thresholdDays = 30;
-
-        $approachingLeaves = Employee::query()
+        // فحص الموظفين النشطين الذين تقترب وثائقهم من الانتهاء
+        // (مثل: national_id_expiry, passport_expiry, contract_end_date, residency_expiry)
+        $employees = Employee::query()
             ->where('tenant_id', $tenantId)
-            ->where('is_active', true)
-            ->whereNotNull('next_annual_leave_date')
-            ->whereBetween('next_annual_leave_date', [now()->toDateString(), now()->addDays($thresholdDays)->toDateString()])
-            ->with(['department', 'jobTitle', 'replacementEmployee'])
-            ->orderBy('next_annual_leave_date')
-            ->get();
+            ->where('status', 'active')
+            ->with(['department:id,name', 'jobTitle:id,name'])
+            ->get()
+            ->map(function ($employee) use ($today, $thresholdDate) {
+                $expiringDocs = [];
 
-        return view('dashboard.customer.hr.employees.annual-leave-alerts', compact('approachingLeaves', 'thresholdDays'));
+                // 1. انتهاء الهوية / الإقامة
+                if ($employee->id_expiry_date) {
+                    $expiry = \Carbon\Carbon::parse($employee->id_expiry_date);
+                    if ($expiry->lessThanOrEqualTo($thresholdDate)) {
+                        $expiringDocs[] = [
+                            'doc_name' => 'بطاقة الهوية / الإقامة',
+                            'doc_name_en' => 'National ID / Residency',
+                            'doc_number' => $employee->national_id ?? $employee->id_number ?? '-',
+                            'expiry_date' => $expiry,
+                            'days_remaining' => (int) $today->diffInDays($expiry, false),
+                            'is_expired' => $expiry->isPast(),
+                        ];
+                    }
+                }
+
+                // 2. انتهاء عقد العمل
+                if ($employee->contract_end_date) {
+                    $contractExpiry = \Carbon\Carbon::parse($employee->contract_end_date);
+                    if ($contractExpiry->lessThanOrEqualTo($thresholdDate)) {
+                        $expiringDocs[] = [
+                            'doc_name' => 'عقد العمل',
+                            'doc_name_en' => 'Employment Contract',
+                            'doc_number' => $employee->contract_number ?? '-',
+                            'expiry_date' => $contractExpiry,
+                            'days_remaining' => (int) $today->diffInDays($contractExpiry, false),
+                            'is_expired' => $contractExpiry->isPast(),
+                        ];
+                    }
+                }
+
+                // 3. جواز السفر (إن وجد الحقل)
+                if (isset($employee->passport_expiry_date) && $employee->passport_expiry_date) {
+                    $passExpiry = \Carbon\Carbon::parse($employee->passport_expiry_date);
+                    if ($passExpiry->lessThanOrEqualTo($thresholdDate)) {
+                        $expiringDocs[] = [
+                            'doc_name' => 'جواز السفر',
+                            'doc_name_en' => 'Passport',
+                            'doc_number' => $employee->passport_number ?? '-',
+                            'expiry_date' => $passExpiry,
+                            'days_remaining' => (int) $today->diffInDays($passExpiry, false),
+                            'is_expired' => $passExpiry->isPast(),
+                        ];
+                    }
+                }
+
+                $employee->expiring_documents = $expiringDocs;
+                return $employee;
+            })
+            ->filter(function ($emp) {
+                return !empty($emp->expiring_documents);
+            })
+            ->values();
+
+        return view('dashboard.customer.hr.employees.document-alerts', compact('employees', 'currentLocale'));
     }
+    public function annualLeaveAlerts(Request $request, string $locale): View
+    {
+        $tenantId = (string) auth()->user()->tenant_id;
+        $currentLocale = $locale;
 
+        // جلب الموظفين النشطين مع بيانات القسم والمسمى الوظيفي
+        $employees = Employee::query()
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->with(['department:id,name', 'jobTitle:id,name'])
+            ->get()
+            ->map(function ($employee) {
+                if (!$employee->hire_date) {
+                    return null;
+                }
+
+                // حساب موعد الإجازة السنوية القادم بناءً على تاريخ التعيين
+                $hireDate = \Carbon\Carbon::parse($employee->hire_date);
+                $today = \Carbon\Carbon::today();
+
+                $nextDueDate = $hireDate->copy()->year($today->year);
+                if ($nextDueDate->isPast()) {
+                    $nextDueDate->addYear();
+                }
+
+                $daysRemaining = (int) $today->diffInDays($nextDueDate, false);
+
+                $employee->next_annual_leave_date = $nextDueDate;
+                $employee->days_until_leave = $daysRemaining;
+
+                return $employee;
+            })
+            ->filter(function ($emp) {
+                // عرض الموظفين الذين موعد إجازتهم خلال الـ 60 يوماً القادمة
+                return $emp && $emp->days_until_leave <= 60;
+            })
+            ->sortBy('days_until_leave')
+            ->values();
+
+        return view('dashboard.customer.hr.employees.annual-leave-alerts', compact('employees', 'currentLocale'));    }
     public function create(string $locale): View
     {
         $tenantId = $this->ctx->tenantIdOrFail(auth()->user());
@@ -175,21 +262,75 @@ class EmployeeController extends Controller
 
     public function salaryCertificate(string $locale, Employee $employee): View
     {
-        $this->authorizeTenant($employee);
+        $tenantId = (string) auth()->user()->tenant_id;
+        if ((string) $employee->tenant_id !== $tenantId) {
+            abort(403);
+        }
 
         $employee->load([
-            'department',
-            'jobTitle',
-            'farm',
-            'financialActions' => fn($q) => $q->where('status', 'active'),
+            'department:id,name',
+            'jobTitle:id,name',
         ]);
 
-        $certificateData = $employee->generateSalaryCertificate();
+        // الراتب الأساسي
+        $baseSalary = (float) ($employee->basic_salary ?? $employee->salary ?? 0);
+        $salaryIncreases = 0.0;
+        $monthlyLoanDeduction = 0.0;
 
-        return view('dashboard.customer.hr.employees.salary-certificate', compact('employee', 'certificateData'));
-    }
+        // فحص آمن لجدول الحركات المالية إن وجد
+        if (method_exists($employee, 'financialActions')) {
+            $relation = $employee->financialActions();
+            $relatedTable = $relation->getRelated()->getTable();
 
-    public function storeFinancialAction(EmployeeFinancialActionStoreRequest $request, string $locale, Employee $employee): RedirectResponse
+            // تحديد اسم عمود نوع الحركة (type أو action_type)
+            $typeCol = \Illuminate\Support\Facades\Schema::hasColumn($relatedTable, 'type')
+                ? 'type'
+                : (\Illuminate\Support\Facades\Schema::hasColumn($relatedTable, 'action_type') ? 'action_type' : null);
+
+            $hasStatusCol = \Illuminate\Support\Facades\Schema::hasColumn($relatedTable, 'status');
+            $hasInstallmentCol = \Illuminate\Support\Facades\Schema::hasColumn($relatedTable, 'monthly_installment');
+
+            if ($typeCol) {
+                // حساب الزيادات والبدلات المستمرة
+                $increasesQuery = $employee->financialActions()->whereIn($typeCol, ['increase', 'allowance', 'bonus']);
+                if ($hasStatusCol) {
+                    $increasesQuery->whereIn('status', ['approved', 'active']);
+                }
+                $salaryIncreases = (float) $increasesQuery->sum('amount');
+
+                // حساب استقطاع السلف الشهري
+                if ($hasInstallmentCol) {
+                    $loansQuery = $employee->financialActions()->whereIn($typeCol, ['loan', 'advance']);
+                    if ($hasStatusCol) {
+                        $loansQuery->whereIn('status', ['active', 'approved']);
+                    }
+                    $monthlyLoanDeduction = (float) $loansQuery->sum('monthly_installment');
+                }
+            }
+        }
+
+        $totalSalary = $baseSalary + $salaryIncreases;
+        $netSalary = max(0, $totalSalary - $monthlyLoanDeduction);
+
+        $certificateData = [
+            'full_name'              => $employee->name ?? trim(($employee->first_name ?? '') . ' ' . ($employee->last_name ?? '')),
+            'worker_number'          => $employee->employee_code ?? $employee->worker_number ?? ('#' . $employee->id),
+            'national_id'            => $employee->national_id ?? $employee->id_number ?? '-',
+            'profession'             => $employee->jobTitle?->name ?? $employee->profession ?? '-',
+            'department'             => $employee->department?->name ?? '-',
+            'hire_date'              => $employee->hire_date ? \Carbon\Carbon::parse($employee->hire_date)->format('Y-m-d') : '-',
+            'issue_date'             => \Carbon\Carbon::today()->format('Y-m-d'),
+            'base_salary'            => $baseSalary,
+            'salary_increases'       => $salaryIncreases,
+            'total_salary'           => $totalSalary,
+            'monthly_loan_deduction' => $monthlyLoanDeduction,
+            'net_salary'             => $netSalary,
+        ];
+
+        $currentLocale = $locale;
+
+        return view('dashboard.customer.hr.employees.salary-certificate', compact('employee', 'certificateData', 'currentLocale'));
+    }    public function storeFinancialAction(EmployeeFinancialActionStoreRequest $request, string $locale, Employee $employee): RedirectResponse
     {
         $this->authorizeTenant($employee);
 

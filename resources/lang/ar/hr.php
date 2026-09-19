@@ -18,6 +18,7 @@ return [
         'attendance' => 'الحضور',
         'create_leave_request' => 'إنشاء طلب إجازة',
         'attachments' => 'المرفقات',
+        'annual_leave_alerts' => 'تنبيهات الإجازات السنوية',
     ],
     'actions' => [
         'add_employee' => 'إضافة موظف',

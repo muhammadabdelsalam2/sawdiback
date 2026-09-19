@@ -63,7 +63,17 @@ class LivestockAnimalController extends Controller
 
     public function store(LivestockAnimalStoreRequest $request, string $locale): RedirectResponse
     {
-        $animal = $this->registerAnimalService->execute($request->validated());
+        $data = $request->validated();
+
+        // إسناد المزرعة من الحظيرة المختارة إن وجدت أو الاعتماد على المزرعة المحددة
+        if ($request->filled('pen_id') && empty($data['farm_id'])) {
+            $pen = FarmPen::find($request->pen_id);
+            if ($pen) {
+                $data['farm_id'] = $pen->farm_id;
+            }
+        }
+
+        $animal = $this->registerAnimalService->execute($data);
 
         return redirect()
             ->route('customer.livestock.animals.show', ['locale' => $locale, 'animal' => $animal->id])
@@ -141,7 +151,16 @@ class LivestockAnimalController extends Controller
             abort(403);
         }
 
-        $this->animals->update($animal, $request->validated());
+        $data = $request->validated();
+
+        if ($request->filled('pen_id') && empty($data['farm_id'])) {
+            $pen = FarmPen::find($request->pen_id);
+            if ($pen) {
+                $data['farm_id'] = $pen->farm_id;
+            }
+        }
+
+        $this->animals->update($animal, $data);
 
         return redirect()
             ->route('customer.livestock.animals.show', ['locale' => $locale, 'animal' => $animal->id])

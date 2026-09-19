@@ -21,12 +21,15 @@ use App\Http\Controllers\Customer\Farms\FarmPenController;
 use App\Http\Controllers\Customer\HR\DepartmentController;
 use App\Http\Controllers\Customer\HR\JobTitleController;
 use App\Http\Controllers\Customer\HR\EmployeeController;
+use App\Http\Controllers\Customer\HR\EmployeeRecordController;
 use App\Http\Controllers\Customer\HR\AttendanceController;
 use App\Http\Controllers\Customer\HR\LeaveRequestController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesContractController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesCustomerController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesDistributionDashboardController;
-use App\Http\Controllers\Customer\SalesDistribution\SalesInvoiceController;
+use App\Http\Controllers\Customer\SalesInvoiceController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesDistributionDashboardController as SDDashboardController;
+use App\Http\Controllers\Customer\SalesDistribution\SalesInvoiceController as SDSalesInvoiceController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesOrderController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesPaymentController;
 use App\Http\Controllers\Customer\SalesDistribution\SalesShipmentController;
@@ -53,6 +56,7 @@ use App\Http\Controllers\Customer\Poultry\LayerFlockController;
 use App\Http\Controllers\Customer\Poultry\PoultryAlertController;
 use App\Http\Controllers\Customer\Poultry\PoultryTransportController;
 use App\Http\Controllers\Customer\Poultry\PoultryVehicleController;
+use App\Http\Controllers\Customer\Fisheries\FishBatchController;
 use App\Http\Controllers\Customer\Account\AccountController;
 use App\Http\Controllers\setting\SearchController;
 
@@ -284,6 +288,17 @@ Route::prefix('{locale}')
             });
 
         // =========================
+        // Fisheries (إدارة أحواض ودورات الأسماك)
+        // =========================
+        Route::prefix('fisheries')->name('fisheries.')->group(function () {
+            Route::post('{fish_batch}/feeding', [FishBatchController::class, 'recordFeeding'])->name('feeding');
+            Route::post('{fish_batch}/mortality', [FishBatchController::class, 'recordMortality'])->name('mortality');
+            Route::post('{fish_batch}/harvest', [FishBatchController::class, 'recordHarvest'])->name('harvest');
+        });
+        Route::resource('fisheries', FishBatchController::class)
+            ->parameters(['fisheries' => 'fish_batch']);
+
+        // =========================
         // Sales & Distribution
         // =========================
         Route::prefix('sales-distribution')->name('sales-distribution.')->middleware(['permission:sales.view'])->group(function () {
@@ -381,6 +396,13 @@ Route::prefix('{locale}')
 
                 Route::delete('employees/{employee}/financial_actions/{financialAction}', [EmployeeController::class, 'deleteFinancialAction'])
                     ->name('employees.financial_actions.destroy');
+
+                // سجلات الموظف (إنجازات، خبرات، شهادات، مخالفات)
+                Route::post('employees/{employee}/records', [EmployeeRecordController::class, 'store'])
+                    ->name('employees.records.store');
+
+                Route::delete('employees/{employee}/records/{record}', [EmployeeRecordController::class, 'destroy'])
+                    ->name('employees.records.destroy');
 
                 Route::resource('employees', EmployeeController::class);
 

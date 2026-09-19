@@ -127,17 +127,20 @@ class Employee extends Model
     /**
      * استخراج بيانات شهادة الراتب المعتمدة
      */
-    public function generateSalaryCertificate(): array
+ public function generateSalaryCertificate(): array
     {
         $baseSalary = (float) ($this->salary ?? 0);
         $increases = $this->active_increases_total;
         $totalSalary = $baseSalary + $increases;
 
-        // الاستقطاع الشهري للسلفيات إن وجد
+        // الاستقطاع الشهري للسلفيات والأقساط النشطة
         $monthlyAdvanceDeduction = (float) $this->financialActions()
-            ->where('type', 'advance_payment')
-            ->where('status', 'active')
-            ->sum('monthly_deduction');
+            ->whereIn('type', [
+                EmployeeFinancialAction::TYPE_ADVANCE_PAYMENT,
+                EmployeeFinancialAction::TYPE_MONTHLY_DEDUCTION
+            ])
+            ->where('status', EmployeeFinancialAction::STATUS_ACTIVE)
+            ->sum('installment_amount');
 
         return [
             'worker_number'            => $this->worker_number,

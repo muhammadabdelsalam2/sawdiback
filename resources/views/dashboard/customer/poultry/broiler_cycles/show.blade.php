@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        {{-- نموذج تسجيل التكاليف والأعلاف --}}
+        {{-- نموذج تسجيل التكاليف والأعلاف والتشغيل --}}
         <div class="card-block mb-3">
             <h5 class="section-title mb-3 font-weight-bold">
                 <i class="fas fa-coins text-warning mr-1"></i> {{ __('poultry.actions.record_cost') }}
@@ -65,10 +65,14 @@
                 @csrf
                 <div class="col-md-3">
                     <select name="cost_type" id="cost_type_select" class="form-select" required>
-                        <option value="feed">{{ __('poultry.options.feed') }}</option>
-                        <option value="chicks_purchase">{{ __('poultry.options.chicks_purchase') }}</option>
-                        <option value="slaughter_packaging">{{ __('poultry.options.slaughter_packaging') }}</option>
-                        <option value="other">{{ __('poultry.options.other') }}</option>
+                        <option value="feed">{{ __('poultry.options.feed') ?? 'أعلاف وتغذية' }}</option>
+                        <option value="electricity">كهرباء وطاقة</option>
+                        <option value="water">مياه وري</option>
+                        <option value="fuel">وقود وتدفئة (ديزل / غاز)</option>
+                        <option value="transport">نقل وتوصيل</option>
+                        <option value="chicks_purchase">{{ __('poultry.options.chicks_purchase') ?? 'شراء كتاكيت' }}</option>
+                        <option value="slaughter_packaging">{{ __('poultry.options.slaughter_packaging') ?? 'تجهيز وتغليف' }}</option>
+                        <option value="other">{{ __('poultry.options.other') ?? 'مصاريف أخرى' }}</option>
                     </select>
                 </div>
                 <div class="col-md-2" id="feed_quantity_wrapper">
@@ -147,32 +151,52 @@
             <div class="table-container mb-4">
                 <table class="table registry-table mb-0">
                     <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>نوع التكلفة</th>
-                            <th>الكمية (كجم)</th>
-                            <th>المبلغ</th>
-                            <th>ملاحظات</th>
-                        </tr>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>نوع التكلفة</th>
+                        <th>الكمية (كجم)</th>
+                        <th>المبلغ</th>
+                        <th>ملاحظات</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @forelse($cycle->costs as $cost)
-                            <tr>
-                                <td>{{ $cost->cost_date ? \Carbon\Carbon::parse($cost->cost_date)->format('Y-m-d') : '-' }}</td>
-                                <td>
-                                    <span class="badge {{ $cost->cost_type === 'feed' ? 'bg-warning text-dark' : 'bg-light text-dark border' }}">
-                                        {{ __('poultry.options.' . $cost->cost_type) }}
+                    @forelse($cycle->costs as $cost)
+                        <tr>
+                            <td>{{ $cost->cost_date ? \Carbon\Carbon::parse($cost->cost_date)->format('Y-m-d') : '-' }}</td>
+                            <td>
+                                @php
+                                    $costLabel = match($cost->cost_type) {
+                                        'feed' => 'أعلاف وتغذية',
+                                        'electricity' => 'كهرباء وطاقة',
+                                        'water' => 'مياه وري',
+                                        'fuel' => 'وقود وتدفئة',
+                                        'transport' => 'نقل وتوصيل',
+                                        'chicks_purchase' => 'شراء كتاكيت',
+                                        'slaughter_packaging' => 'تجهيز وتغليف',
+                                        default => $cost->cost_type
+                                    };
+                                    $badgeBg = match($cost->cost_type) {
+                                        'feed' => 'bg-warning text-dark',
+                                        'electricity' => 'bg-primary text-white',
+                                        'water' => 'bg-info text-dark',
+                                        'fuel' => 'bg-secondary text-white',
+                                        'transport' => 'bg-dark text-white',
+                                        default => 'bg-light text-dark border'
+                                    };
+                                @endphp
+                                <span class="badge {{ $badgeBg }}">
+                                        {{ $costLabel }}
                                     </span>
-                                </td>
-                                <td>{{ $cost->quantity_kg ? number_format($cost->quantity_kg, 2) : '-' }}</td>
-                                <td class="text-danger font-weight-bold">{{ number_format((float)$cost->amount, 2) }}</td>
-                                <td>{{ $cost->notes ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5">{{ __('poultry.empty.no_costs') ?? 'لا توجد تكاليف مسجلة حتى الآن.' }}</td>
-                            </tr>
-                        @endforelse
+                            </td>
+                            <td>{{ $cost->quantity_kg ? number_format($cost->quantity_kg, 2) : '-' }}</td>
+                            <td class="text-danger font-weight-bold">{{ number_format((float)$cost->amount, 2) }}</td>
+                            <td>{{ $cost->notes ?? '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">{{ __('poultry.empty.no_costs') ?? 'لا توجد تكاليف مسجلة حتى الآن.' }}</td>
+                        </tr>
+                    @endforelse
                     </tbody>
                 </table>
             </div>
