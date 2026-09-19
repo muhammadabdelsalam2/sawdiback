@@ -17,12 +17,18 @@ class RecordFeedConsumptionService
     public function execute(array $data): FeedConsumption
     {
         return DB::transaction(function () use ($data) {
-            $feedType = FeedType::query()->findOrFail($data['feed_type_id']);
+            $tenantId = $data['tenant_id'] ?? (string) auth()->user()->tenant_id;
+            $feedType = FeedType::query()->where('tenant_id', $tenantId)->findOrFail($data['feed_type_id']);
             $quantity = (float) $data['quantity'];
+
+            if ($quantity <= 0) {
+                throw new RuntimeException(__('crops_feed.messages.validation.quantity_positive') ?? 'يجب أن تكون كمية الاستهلاك أكبر من الصفر.');
+            }
+
             $stock = $this->stockService->stockOnHand($feedType->id);
 
             if ($stock < $quantity) {
-                throw new RuntimeException('Insufficient feed stock for this operation.');
+                throw new RuntimeException(__('crops_feed.messages.validation.insufficient_stock') ?? 'رصيد العلف الحالي غير كافٍ لتسجيل هذا الاستهلاك.');
             }
 
             $unitCost = array_key_exists('unit_cost', $data) && $data['unit_cost'] !== null
@@ -32,28 +38,30 @@ class RecordFeedConsumptionService
             $totalCost = round($quantity * $unitCost, 2);
 
             $consumption = FeedConsumption::query()->create([
-                'tenant_id' => $data['tenant_id'] ?? null,
-                'feed_type_id' => $feedType->id,
-                'animal_id' => $data['animal_id'] ?? null,
-                'group_name' => $data['group_name'] ?? null,
+                'tenant_id'        => $tenantId,
+                'feed_type_id'     => $feedType->id,
+                'target_section'   => $data['target_section'] ?? null,
+                'pen_id'           => $data['pen_id'] ?? null,
+                'animal_id'        => $data['animal_id'] ?? null,
+                'group_name'       => $data['group_name'] ?? null,
                 'consumption_date' => $data['consumption_date'],
-                'quantity' => $quantity,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
-                'notes' => $data['notes'] ?? null,
+                'quantity'         => $quantity,
+                'unit_cost'        => $unitCost,
+                'total_cost'       => $totalCost,
+                'notes'            => $data['notes'] ?? null,
             ]);
 
             FeedStockMovement::query()->create([
-                'tenant_id' => $data['tenant_id'] ?? null,
-                'feed_type_id' => $feedType->id,
+                'tenant_id'     => $tenantId,
+                'feed_type_id'  => $feedType->id,
                 'movement_type' => 'out',
-                'quantity' => $quantity,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
+                'quantity'      => $quantity,
+                'unit_cost'     => $unitCost,
+                'total_cost'    => $totalCost,
                 'movement_date' => $data['consumption_date'],
-                'source_type' => 'feed_consumption',
-                'source_id' => $consumption->id,
-                'notes' => $data['notes'] ?? null,
+                'source_type'   => 'feed_consumption',
+                'source_id'     => $consumption->id,
+                'notes'         => $data['notes'] ?? ('استهلاك - ' . ($data['target_section'] ?? 'عام')),
             ]);
 
             return $consumption;

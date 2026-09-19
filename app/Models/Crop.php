@@ -15,6 +15,9 @@ class Crop extends Model
     use HasTranslations;
     use ScopedByTenant;
 
+    public const UNIT_TON = 'ton';
+    public const UNIT_KG  = 'kg';
+
     protected $fillable = [
         'tenant_id',
         'farm_id',
@@ -27,6 +30,7 @@ class Crop extends Model
         'land_area',
         'planting_date',
         'expected_harvest_date',
+        'yield_unit',
         'yield_tons',
         'wasted_tons',
         'available_for_feed_tons',
@@ -37,16 +41,24 @@ class Crop extends Model
     ];
 
     protected $casts = [
-        'land_area' => 'decimal:2',
-        'planting_date' => 'date',
-        'expected_harvest_date' => 'date',
-        'yield_tons' => 'decimal:2',
-        'wasted_tons' => 'decimal:2',
+        'land_area'               => 'decimal:2',
+        'planting_date'           => 'date',
+        'expected_harvest_date'   => 'date',
+        'yield_tons'              => 'decimal:2',
+        'wasted_tons'             => 'decimal:2',
         'available_for_feed_tons' => 'decimal:2',
-        'sale_price_per_ton' => 'decimal:2',
-        'water_cost' => 'decimal:2',
-        'labor_cost' => 'decimal:2',
-        'name_translations' => 'array',
+        'sale_price_per_ton'      => 'decimal:2',
+        'water_cost'              => 'decimal:2',
+        'labor_cost'              => 'decimal:2',
+        'name_translations'       => 'array',
+    ];
+
+    protected $appends = [
+        'total_cost',
+        'cost_per_ton',
+        'profit_or_loss',
+        'loss_rate',
+        'yield_unit_label',
     ];
 
     public function getLocalizedNameAttribute(): ?string
@@ -54,12 +66,15 @@ class Crop extends Model
         return $this->getLocalized('name_translations', 'name');
     }
 
-    protected $appends = [
-        'total_cost',
-        'cost_per_ton',
-        'profit_or_loss',
-        'loss_rate',
-    ];
+    public function getYieldUnitLabelAttribute(): string
+    {
+        $unit = $this->yield_unit ?? self::UNIT_TON;
+        $isArabic = str_starts_with(app()->getLocale(), 'ar');
+
+        return $unit === self::UNIT_KG
+            ? ($isArabic ? 'كيلو' : 'kg')
+            : ($isArabic ? 'طن' : 'ton');
+    }
 
     public function tenant(): BelongsTo
     {
@@ -104,14 +119,23 @@ class Crop extends Model
         return number_format((float) $value, 2, '.', '');
     }
 
+    /**
+     * حساب الإنتاجية بالطن موحدة لأغراض التكاليف والربحية
+     */
+    public function getYieldInTonsAttribute(): float
+    {
+        $val = (float) ($this->yield_tons ?? 0);
+        return ($this->yield_unit === self::UNIT_KG) ? ($val / 1000) : $val;
+    }
+
     public function getCostPerTonAttribute(): ?string
     {
-        $yield = (float) ($this->yield_tons ?? 0);
-        if ($yield <= 0) {
+        $yieldTons = $this->yield_in_tons;
+        if ($yieldTons <= 0) {
             return null;
         }
 
-        return number_format(((float) $this->total_cost) / $yield, 2, '.', '');
+        return number_format(((float) $this->total_cost) / $yieldTons, 2, '.', '');
     }
 
     public function getProfitOrLossAttribute(): ?string
@@ -122,6 +146,7 @@ class Crop extends Model
             return null;
         }
 
+        // إذا كانت الوحدة كيلو، فسعر البيع المدخل يعتبر سعر الكيلو
         $revenue = $yield * $price;
         $profit = $revenue - (float) $this->total_cost;
 

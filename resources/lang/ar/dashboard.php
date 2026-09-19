@@ -5,6 +5,7 @@ return [
         'title' => 'نظام السوادي ERP',
     ],
     'navbar' => [
+        'poultry_vehicles' => 'سيارات نقل الدواجن',
         'search' => 'بحث',
         'search_placeholder' => 'ابحث عن أي شيء...',
         'profile' => 'الملف الشخصي',

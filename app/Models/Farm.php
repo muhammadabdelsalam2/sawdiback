@@ -10,21 +10,31 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Farm extends Model
 {
-    use HasFactory;
-    use ScopedByTenant;
-    use SoftDeletes;
+    use HasFactory, ScopedByTenant, SoftDeletes;
 
-    protected $fillable = ['tenant_id', 'name', 'type', 'location', 'is_active', 'notes'];
+    protected $fillable = [
+        'tenant_id',
+        'name',
+        'code',
+        'ownership_type', // owned (ملك) / rented (إيجار)
+        'location',
+        'area_sqm',
+        'notes',
+        'is_active',
+    ];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'area_sqm' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
 
     public function pens(): HasMany
     {
         return $this->hasMany(FarmPen::class);
     }
 
-    public function crops(): HasMany
+    public function employees(): HasMany
     {
-        return $this->hasMany(Crop::class);
+        return $this->hasMany(Employee::class);
     }
 }

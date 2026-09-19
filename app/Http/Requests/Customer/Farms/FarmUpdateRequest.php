@@ -14,15 +14,32 @@ class FarmUpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        $tenantId = session('tenant_id') ?? auth()->user()?->tenant_id;
-        $farm = $this->route('farm');
+        $farmId = $this->route('farm') instanceof \App\Models\Farm 
+            ? $this->route('farm')->id 
+            : $this->route('farm');
 
         return [
-            'name' => ['required', 'string', 'max:190', Rule::unique('farms', 'name')->ignore($farm?->id)->where(fn ($q) => $q->where('tenant_id', $tenantId))],
-            'type' => ['required', Rule::in(['owned', 'rented'])],
-            'location' => ['nullable', 'string', 'max:255'],
-            'is_active' => ['nullable', 'boolean'],
-            'notes' => ['nullable', 'string'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('farms', 'name')
+                    ->where(fn ($query) => $query->where('tenant_id', auth()->user()->tenant_id))
+                    ->ignore($farmId),
+            ],
+            'code' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('farms', 'code')
+                    ->where(fn ($query) => $query->where('tenant_id', auth()->user()->tenant_id))
+                    ->ignore($farmId),
+            ],
+            'ownership_type' => ['nullable', 'string', 'in:owned,rented'],
+            'location'       => ['nullable', 'string', 'max:255'],
+            'area_sqm'       => ['nullable', 'numeric', 'min:0'],
+            'is_active'      => ['sometimes', 'boolean'],
+            'notes'          => ['nullable', 'string'],
         ];
     }
 }

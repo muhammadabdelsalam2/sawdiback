@@ -26,6 +26,8 @@ return [
     ],
 
     'actions' => [
+        'transfer_pen' => 'نقل إلى حظيرة',
+        'confirm_transfer' => 'تأكيد النقل',
         'register_animal' => 'تسجيل حيوان',
         'reproduction' => 'التكاثر',
         'alerts' => 'التنبيهات',
@@ -55,10 +57,15 @@ return [
     'sections' => [
         'change_status' => 'تغيير الحالة',
         'record_feeding' => 'تسجيل التغذية',
+        'recent_feeding_logs' => 'آخر سجلات التغذية',
         'record_milk' => 'تسجيل إنتاج الحليب',
+        'recent_milk_logs' => 'آخر سجلات الحليب',
         'record_health' => 'تسجيل حدث صحي',
+        'recent_health_records' => 'آخر السجلات الصحية',
         'record_vaccination' => 'تسجيل تطعيم',
+        'recent_vaccinations' => 'آخر التطعيمات',
         'record_weight' => 'تسجيل الوزن',
+        'recent_weight_logs' => 'آخر قياسات الوزن',
         'vaccine_batches' => 'دفعات اللقاحات',
         'status_history' => 'سجل الحالات',
         'open_new_cycle' => 'فتح دورة جديدة',
@@ -72,6 +79,8 @@ return [
 
     'fields' => [
         'id' => '#',
+        'current_pen' => 'الحظيرة الحالية',
+        'destination_pen' => 'الحظيرة الجديدة',
         'tag' => 'الترقيم',
         'tag_number' => 'رقم الترقيم',
         'species' => 'النوع',
@@ -179,10 +188,12 @@ return [
 
     'messages' => [
         'capture_birth_event' => 'تسجيل حدث ولادة للحيوان المولود',
+        'animal_transferred' => 'تم نقل الحيوان وتحديث طاقة الحظائر بنجاح.',
         'success' => [
             'animal_registered' => 'تم تسجيل الحيوان بنجاح.',
             'animal_updated' => 'تم تحديث بيانات الحيوان بنجاح.',
             'animal_status_updated' => 'تم تحديث حالة الحيوان بنجاح.',
+            'animal_transferred' => 'تم نقل الحيوان وتحديث طاقة الحظائر بنجاح.',
             'species_created' => 'تم إضافة النوع بنجاح.',
             'species_updated' => 'تم تحديث النوع بنجاح.',
             'species_deleted' => 'تم حذف النوع بنجاح.',
@@ -221,6 +232,8 @@ return [
         'no_vaccines' => 'لا توجد لقاحات.',
         'no_vaccine_batches' => 'لا توجد دفعات لقاح مسجلة.',
         'no_expiring_vaccine_batches' => 'لا توجد دفعات لقاح قاربت على الانتهاء.',
+        'no_health_records' => 'لا توجد سجلات صحية مسجلة.',
+        'no_feeding_logs' => 'لا توجد سجلات تغذية مسجلة.',
     ],
 
     'datatable' => [
@@ -236,5 +249,10 @@ return [
         'last' => 'الأخير',
         'next' => '‹',
         'previous' => '›',
+    ],
+
+    'placeholders' => [
+        'select_pen' => 'اختر الحظيرة',
+        'notes' => 'أدخل ملاحظات النقل إن وجدت...',
     ],
 ];

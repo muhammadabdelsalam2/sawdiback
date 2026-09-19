@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Models\Concerns\ScopedByTenant;
-use App\Services\Livestock\LivestockPenProfitService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,29 +11,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FarmPen extends Model
 {
-    use HasFactory;
-    use ScopedByTenant;
-    use SoftDeletes;
+    use HasFactory, ScopedByTenant, SoftDeletes;
 
-    protected $fillable = ['tenant_id', 'farm_id', 'pen_number', 'type', 'capacity', 'notes'];
+    protected $table = 'farm_pens';
 
-    protected $casts = ['capacity' => 'integer'];
+    public const TYPES = [
+        'goat',      // ماعز
+        'cattle',    // بقر
+        'poultry',   // دواجن
+        'fish',      // أسماك
+        'rabbit',    // أرانب
+        'other',     // أخرى
+    ];
 
-    protected $appends = ['animal_count', 'male_count', 'female_count', 'mortality_rate', 'net_profit'];
+   protected $fillable = [
+        'tenant_id',
+        'farm_id',
+        'pen_number',
+        'type',
+        'capacity',
+        'current_count',
+        'notes',
+    ];
 
-    public function scopeForSelect(Builder $query): Builder
-    {
-        return $query->with('farm')->orderBy('pen_number');
-    }
+    protected $casts = [
+        'capacity'      => 'integer',
+        'current_count' => 'integer',
+    ];
 
     public function farm(): BelongsTo
     {
         return $this->belongsTo(Farm::class);
-    }
-
-    public function animals(): HasMany
-    {
-        return $this->hasMany(LivestockAnimal::class, 'pen_id');
     }
 
     public function financialEntries(): HasMany
@@ -43,32 +49,25 @@ class FarmPen extends Model
         return $this->hasMany(LivestockPenFinancialEntry::class, 'pen_id');
     }
 
-    public function getAnimalCountAttribute(): int
+    public function animals(): HasMany
     {
-        return (int) ($this->relationLoaded('animals') ? $this->animals->count() : $this->animals()->count());
+        return $this->hasMany(LivestockAnimal::class, 'pen_id');
     }
 
-    public function getMaleCountAttribute(): int
+    public static function getTypeOptions(): array
     {
-        return (int) ($this->relationLoaded('animals')
-            ? $this->animals->where('gender', 'male')->count()
-            : $this->animals()->where('gender', 'male')->count());
+        return [
+            'goat'    => __('farms.pen_types.goat') ?? 'ماعز',
+            'cattle'  => __('farms.pen_types.cattle') ?? 'البقر',
+            'poultry' => __('farms.pen_types.poultry') ?? 'الدواجن',
+            'fish'    => __('farms.pen_types.fish') ?? 'أسماك',
+            'rabbit'  => __('farms.pen_types.rabbit') ?? 'أرانب',
+            'other'   => __('farms.pen_types.other') ?? 'أخرى',
+        ];
     }
-
-    public function getFemaleCountAttribute(): int
+    public function scopeForSelect($query)
     {
-        return (int) ($this->relationLoaded('animals')
-            ? $this->animals->where('gender', 'female')->count()
-            : $this->animals()->where('gender', 'female')->count());
-    }
-
-    public function getMortalityRateAttribute(): string
-    {
-        return app(LivestockPenProfitService::class)->mortalityRate($this);
-    }
-
-    public function getNetProfitAttribute(): string
-    {
-        return app(LivestockPenProfitService::class)->netProfit($this);
+        return $query->select(['id', 'farm_id', 'pen_number', 'type', 'capacity', 'current_count'])
+                     ->with('farm:id,name');
     }
 }

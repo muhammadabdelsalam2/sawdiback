@@ -33,6 +33,13 @@ class EmployeeStoreRequest extends FormRequest
             'attachment_passport' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'attachment_iqama' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'attachment_identity' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'replacement_employee_id'   => ['nullable', 'exists:employees,id'],
+'next_annual_leave_date'    => ['nullable', 'date'],
+'education'                 => ['nullable', 'string', 'max:500'],
+'work_experience'           => ['nullable', 'string'],
+'self_development'          => ['nullable', 'string'],
+'achievements_creativity'   => ['nullable', 'string'],
+'infractions_absence_notes' => ['nullable', 'string'],
         ];
     }
 

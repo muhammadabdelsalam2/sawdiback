@@ -115,7 +115,9 @@ class LivestockAnimal extends Model
 
     public function feedingLogs(): HasMany
     {
-        return $this->hasMany(AnimalFeedingLog::class, 'animal_id');
+        return $this->hasMany(AnimalFeedingLog::class, 'animal_id')
+            ->with('feedType')
+            ->latest('feeding_date');
     }
 
     public function weightLogs(): HasMany

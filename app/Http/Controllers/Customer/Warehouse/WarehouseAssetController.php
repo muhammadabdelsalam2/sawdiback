@@ -26,7 +26,36 @@ class WarehouseAssetController extends Controller
 
         return view('dashboard.customer.warehouse.index', compact('assets'));
     }
+    public function alerts(Request $request, string $locale): View
+    {
+        $tenantId = (string) auth()->user()->tenant_id;
+        $currentLocale = $locale;
+        $today = \Carbon\Carbon::today();
+        $expiryThreshold = $today->copy()->addDays(30);
 
+        // 1. تنبيهات نقص المخزون
+        $lowStockProducts = InventoryProduct::query()
+            ->where('tenant_id', $tenantId)
+            ->whereColumn('current_stock', '<=', 'min_stock')
+            ->with('category:id,name')
+            ->orderBy('current_stock', 'asc')
+            ->get();
+
+        // 2. تنبيهات التشغيلات قريبة الانتهاء (إن وجد جدول/موديل للباتشات)
+        $expiringBatches = [];
+        if (class_exists(\App\Models\WarehouseBatch::class)) {
+            $expiringBatches = \App\Models\WarehouseBatch::query()
+                ->where('tenant_id', $tenantId)
+                ->whereNotNull('expiry_date')
+                ->where('expiry_date', '<=', $expiryThreshold)
+                ->where('quantity', '>', 0)
+                ->with('product:id,name,sku')
+                ->orderBy('expiry_date', 'asc')
+                ->get();
+        }
+
+        return view('dashboard.customer.warehouse.alerts', compact('lowStockProducts', 'expiringBatches', 'currentLocale'));
+    }
     public function create(string $locale): View
     {
         $farms = Farm::query()->where('tenant_id', auth()->user()?->tenant_id)->get();

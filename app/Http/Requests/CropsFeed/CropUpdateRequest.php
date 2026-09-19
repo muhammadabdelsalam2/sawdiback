@@ -26,6 +26,7 @@ class CropUpdateRequest extends BaseCropsFeedRequest
             'sale_price_per_ton' => ['nullable', 'numeric', 'min:0'],
             'water_cost' => ['nullable', 'numeric', 'min:0'],
             'labor_cost' => ['nullable', 'numeric', 'min:0'],
+            'yield_unit' => ['nullable', 'in:ton,kg'],
             'notes' => ['nullable', 'string'],
         ];
     }

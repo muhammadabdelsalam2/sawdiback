@@ -6,7 +6,8 @@
         $activeLocale = $currentLocale ?? app()->getLocale();
         $features = $planFeatures ?? (auth()->check() ? auth()->user()->planFeatures() : []);
         $hrEnabled = (bool) ($featureFlags['hr_management'] ?? ($features['hr_management']['enabled'] ?? false));
-        $chevronClass = 'fa-solid fa-chevron-right chevron m-1 ' . (($currentLang ?? app()->getLocale()) === 'en' ? 'me-auto' : 'ms-auto');
+        $isArabic = ($currentLang ?? app()->getLocale()) === 'ar';
+        $chevronClass = 'fa-solid fa-chevron-right chevron m-1 ' . ($isArabic ? 'ms-auto' : 'me-auto');
     @endphp
 
     <style>
@@ -70,7 +71,10 @@
                         <a href="{{ route('customer.hr.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.index') ? 'active' : '' }}">{{ __('dashboard.sidebar.hr_dashboard') }}</a>
                         <a href="{{ route('customer.hr.departments.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.departments.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.departments') }}</a>
                         <a href="{{ route('customer.hr.job-titles.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.job-titles.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.job_titles') }}</a>
-                        <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.employees.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.employees') }}</a>
+                        <a href="{{ route('customer.hr.employees.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.employees.index') || request()->routeIs('customer.hr.employees.show') || request()->routeIs('customer.hr.employees.edit') ? 'active' : '' }}">{{ __('dashboard.sidebar.employees') }}</a>
+                        <a href="{{ route('customer.hr.employees.annual-leave-alerts', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.employees.annual-leave-alerts') ? 'active' : '' }}">
+                            {{ $isArabic ? 'تنبيهات الإجازات السنوية' : 'Annual Leave Alerts' }}
+                        </a>
                         <a href="{{ route('customer.hr.attendance.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.attendance.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.attendance') }}</a>
                         <a href="{{ route('customer.hr.leaves.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.hr.leaves.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.leave_requests') }}</a>
                     </div>
@@ -138,12 +142,33 @@
                     <a href="{{ route('customer.poultry.hatchery-machines.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-machines.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_machines') }}</a>
                     <a href="{{ route('customer.poultry.hatchery-batches.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.hatchery-batches.*') ? 'active' : '' }}">{{ __('poultry.titles.hatchery_batches') }}</a>
                     <a href="{{ route('customer.poultry.chicken-breeds.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.chicken-breeds.*') ? 'active' : '' }}">{{ __('poultry.titles.chicken_breeds') }}</a>
+                    <a href="{{ route('customer.poultry.vehicles.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.vehicles.*') ? 'active' : '' }}">{{ __('poultry.titles.vehicles') }}</a>
+                    <a href="{{ route('customer.poultry.vehicle-rentals.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.vehicle-rentals.*') ? 'active' : '' }}">
+                        {{ $isArabic ? 'رحلات تأجير السيارات' : 'Vehicle Rentals' }}
+                    </a>
                     <a href="{{ route('customer.poultry.alerts.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.poultry.alerts.*') ? 'active' : '' }}">{{ __('poultry.titles.alerts') }}</a>
                 </div>
             </div>
         @endcan
 
-        {{-- 6. Health and vaccinations (grouped under livestock's 'animals.view' permission in routes) --}}
+        {{-- 6. Fisheries (الاستزراع السمكي والأحواض) --}}
+        <div class="nav-dropdown {{ request()->routeIs('customer.fisheries.*') ? 'open' : '' }}">
+            <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.fisheries.*') ? 'active' : '' }}">
+                <img src="{{ asset('assets/images/sidebar-icon-3.svg') }}" alt="" class="nav-icon">
+                <span class="nav-label">{{ $isArabic ? 'أحواض الأسماك' : 'Fisheries & Ponds' }}</span>
+                <i class="{{ $chevronClass }}"></i>
+            </a>
+            <div class="dropdown-container">
+                <a href="{{ route('customer.fisheries.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.fisheries.index') ? 'active' : '' }}">
+                    {{ $isArabic ? 'قائمة الأحواض والدورات' : 'Ponds & Batches' }}
+                </a>
+                <a href="{{ route('customer.fisheries.create', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('customer.fisheries.create') ? 'active' : '' }}">
+                    {{ $isArabic ? 'إضافة حوض جديد' : 'Add New Pond' }}
+                </a>
+            </div>
+        </div>
+
+        {{-- 7. Health and vaccinations --}}
         @can('animals.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.livestock.vaccines.*') || request()->routeIs('customer.livestock.alerts.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.livestock.vaccines.*') || request()->routeIs('customer.livestock.alerts.*') ? 'active' : '' }}">
@@ -160,7 +185,7 @@
             </div>
         @endcan
 
-        {{-- 7. Inventory --}}
+        {{-- 8. Inventory --}}
         @can('inventory.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.inventory.*') || request()->routeIs('customer.crops-feed.feed.*') || request()->routeIs('customer.livestock.feed-types.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.inventory.*') || request()->routeIs('customer.crops-feed.feed.*') || request()->routeIs('customer.livestock.feed-types.*') ? 'active' : '' }}">
@@ -180,7 +205,7 @@
             </div>
         @endcan
 
-        {{-- 8. Sales --}}
+        {{-- 9. Sales --}}
         @can('sales.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.sales-distribution.*') ? 'active' : '' }}">
@@ -199,7 +224,7 @@
             </div>
         @endcan
 
-        {{-- 9. Financial reports --}}
+        {{-- 10. Financial reports --}}
         @can('finance.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.finance.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.finance.*') ? 'active' : '' }}">
@@ -218,7 +243,7 @@
             </div>
         @endcan
 
-        {{-- 10. Warehouse --}}
+        {{-- 11. Warehouse --}}
         @can('warehouse.view')
             <a href="{{ route('customer.warehouse-assets.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('customer.warehouse-assets.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-5.svg') }}" alt="" class="nav-icon">
@@ -226,7 +251,7 @@
             </a>
         @endcan
 
-        {{-- 11. Analytics --}}
+        {{-- 12. Analytics --}}
         @can('analytics.view')
             <a href="{{ route('customer.analytics.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('customer.analytics.*') ? 'active' : '' }}">
                 <img src="{{ asset('assets/images/sidebar-icon-8.svg') }}" alt="" class="nav-icon">
@@ -234,7 +259,7 @@
             </a>
         @endcan
 
-        {{-- 12. Ecommerce --}}
+        {{-- 13. Ecommerce --}}
         @can('ecommerce.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.ecommerce.*') ? 'active' : '' }}">
@@ -248,7 +273,7 @@
             </div>
         @endcan
 
-        {{-- 13. Procurement --}}
+        {{-- 14. Procurement --}}
         @can('procurement.view')
             <div class="nav-dropdown {{ request()->routeIs('customer.procurement.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.procurement.*') ? 'active' : '' }}">
@@ -268,7 +293,7 @@
             </div>
         @endcan
 
-        {{-- 14. Production / Subscription (customer.subscription.* has NO permission middleware in routes — always visible to any logged-in Customer/SuperAdmin) --}}
+        {{-- 15. Production / Subscription --}}
         @auth
             <div class="nav-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'open' : '' }}">
                 <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('customer.subscription.*') || request()->routeIs('superadmin.plans.*') || request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}">
@@ -290,44 +315,44 @@
             </div>
         @endauth
 
-        {{-- 15. System management (superadmin.* routes require role:SuperAdmin only — hard-gate here too) --}}
+        {{-- 16. System management --}}
         @if ($isSuperAdmin)
-        @can('roles.manage')
-            <div class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'open' : '' }}">
-                <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">
-                    <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
-                    <span class="nav-label">{{ __('dashboard.sidebar.requirements.system_management') }}</span>
-                    <i class="{{ $chevronClass }}"></i>
-                </a>
-                <div class="dropdown-container">
-                    <a href="{{ route('superadmin.content.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.content.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.content') }}</a>
-                    <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.countries.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.countries') }}</a>
-                    <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.cities.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.cities') }}</a>
-                    <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.theme.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.theme') }}</a>
-                    @can('settings.manage')
-                        <a href="{{ route('superadmin.contact-info.edit', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.contact_info') }}</a>
-                    @endcan
-                    <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">{{ __('dashboard.sidebar.settings.permissionsManagement') }}</a>
-                    @can('farms.manage')
-                        <a href="{{ route('superadmin.farm-assignments.employees', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.employees') ? 'active' : '' }}">{{ __('superadmin.farm_assignments.employees_title') }}</a>
-                        <a href="{{ route('superadmin.farm-assignments.products', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.products') ? 'active' : '' }}">{{ __('superadmin.farm_assignments.products_title') }}</a>
-                    @endcan
+            @can('roles.manage')
+                <div class="nav-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'open' : '' }}">
+                    <a href="javascript:void(0)" class="nav-item has-dropdown {{ request()->routeIs('superadmin.setting.*') || request()->routeIs('superadmin.access-management') || request()->routeIs('superadmin.content.*') || request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">
+                        <img src="{{ asset('assets/images/sidebar-icon-11.svg') }}" alt="" class="nav-icon">
+                        <span class="nav-label">{{ __('dashboard.sidebar.requirements.system_management') }}</span>
+                        <i class="{{ $chevronClass }}"></i>
+                    </a>
+                    <div class="dropdown-container">
+                        <a href="{{ route('superadmin.content.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.content.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.content') }}</a>
+                        <a href="{{ route('superadmin.setting.countries.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.countries.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.countries') }}</a>
+                        <a href="{{ route('superadmin.setting.cities.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.cities.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.cities') }}</a>
+                        <a href="{{ route('superadmin.setting.theme.index', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.setting.theme.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.theme') }}</a>
+                        @can('settings.manage')
+                            <a href="{{ route('superadmin.contact-info.edit', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.contact-info.*') ? 'active' : '' }}">{{ __('dashboard.sidebar.contact_info') }}</a>
+                        @endcan
+                        <a href="{{ route('superadmin.access-management', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.access-management') ? 'active' : '' }}">{{ __('dashboard.sidebar.settings.permissionsManagement') }}</a>
+                        @can('farms.manage')
+                            <a href="{{ route('superadmin.farm-assignments.employees', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.employees') ? 'active' : '' }}">{{ __('superadmin.farm_assignments.employees_title') }}</a>
+                            <a href="{{ route('superadmin.farm-assignments.products', ['locale' => $activeLocale]) }}" class="dropdown-item {{ request()->routeIs('superadmin.farm-assignments.products') ? 'active' : '' }}">{{ __('superadmin.farm_assignments.products_title') }}</a>
+                        @endcan
+                    </div>
                 </div>
-            </div>
-        @endcan
+            @endcan
         @endif
 
-        {{-- 16. User management (superadmin.users.* requires role:SuperAdmin only — hard-gate here too) --}}
+        {{-- 17. User management --}}
         @if ($isSuperAdmin)
-        @can('users.manage')
-            <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
-                <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
-                <span class="nav-label">{{ __('dashboard.sidebar.requirements.user_management') }}</span>
-            </a>
-        @endcan
+            @can('users.manage')
+                <a href="{{ route('superadmin.users.index', ['locale' => $activeLocale]) }}" class="nav-item {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
+                    <img src="{{ asset('assets/images/sidebar-icon-9.svg') }}" alt="" class="nav-icon">
+                    <span class="nav-label">{{ __('dashboard.sidebar.requirements.user_management') }}</span>
+                </a>
+            @endcan
         @endif
 
-        {{-- 17. Logout --}}
+        {{-- 18. Logout --}}
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item d-flex align-items-center">
             <img src="{{ asset('assets/images/sidebar-icon-12.svg') }}" alt="" class="nav-icon me-2">
             <span class="nav-label">{{ __('dashboard.sidebar.requirements.logout') }}</span>
